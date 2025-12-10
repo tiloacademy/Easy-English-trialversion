@@ -33,17 +33,11 @@
             max-width: 100%; height: 100vh; margin: 0; border-radius: 0; padding: 5px;
             background: #2b2b2b;
         }
-        body.game-mode #header-title, 
-        body.game-mode #learning-control,
-        body.game-mode .nav-container,
-        body.game-mode #content-box {
-            /* Ẩn nội dung học nhưng giữ cấu trúc */
-        }
-        /* Khi vào game, ẩn hẳn các phần không cần thiết */
         body.game-mode #learning-control,
         body.game-mode .nav-container,
         body.game-mode #header-title,
-        body.game-mode #word-img {
+        body.game-mode #word-img,
+        body.game-mode #content-box > img {
              display: none !important;
         }
         body.game-mode #game-area {
@@ -146,17 +140,6 @@
         }
         .memory-back img { max-width: 90%; max-height: 90%; object-fit: contain; }
         
-        /* CSS cho nội dung thẻ chữ */
-        .card-text-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.2;
-        }
-        .card-ipa { color: red; font-weight: bold; font-size: 18px; margin-bottom: 2px; }
-        .card-word { color: #333; font-size: 22px; font-weight: bold; }
-
         .exit-game-btn {
             position: absolute; top: 10px; right: 10px;
             background: rgba(255,255,255,0.2); color: white;
@@ -379,19 +362,23 @@
         let cards = [];
         targetWords.forEach(wordKey => {
             let originalObj = items.find(i => i.word === wordKey);
-            let cleanIpa = originalObj.ipa.replace(/\//g, ''); // Xóa dấu / trong game
+            let cleanIpa = originalObj.ipa.replace(/\//g, ''); // Xóa dấu /
 
             // Thẻ Hình
             cards.push({ key: wordKey, type: 'img', content: `<img src="${originalObj.img}">`, speak: originalObj.speakText || wordKey });
             
-            // --- THẺ CHỮ: Cập nhật giao diện mới (IPA đỏ trên, Từ đen dưới) ---
-            let textContent = `
-                <div class="card-text-container">
-                    <span class="card-ipa">${cleanIpa}</span>
-                    <span class="card-word">${wordKey}</span>
+            // --- THẺ CHỮ: Đã sửa đổi để dùng Inline Style đảm bảo hiển thị đúng ---
+            let textHtml = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
+                    <span style="color: red; font-weight: bold; font-size: 20px; font-family: sans-serif; line-height:1.2;">
+                        ${cleanIpa}
+                    </span>
+                    <span style="color: #333; font-weight: bold; font-size: 26px; line-height:1.2; margin-top:2px;">
+                        ${wordKey}
+                    </span>
                 </div>
             `;
-            cards.push({ key: wordKey, type: 'text', content: textContent, speak: originalObj.speakText || wordKey });
+            cards.push({ key: wordKey, type: 'text', content: textHtml, speak: originalObj.speakText || wordKey });
         });
 
         cards.sort(() => 0.5 - Math.random());
