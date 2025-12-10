@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bé Học Tiếng Anh</title>
+    <title>Học Tiếng Anh</title>
     <style>
-        /* --- 1. CẤU HÌNH CỐ ĐỊNH (FIXED LAYOUT) --- */
+        /* --- 1. CẤU HÌNH CỐ ĐỊNH --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -14,58 +14,60 @@
             margin: 0; padding: 0; 
             height: 100vh; width: 100vw; 
             overflow: hidden; /* Chặn cuộn tuyệt đối */
-            display: flex; flex-direction: column;
         }
 
-        /* --- 2. GIAO DIỆN HỌC (LEARNING) --- */
+        /* --- 2. MÀN HÌNH HỌC (LEARNING) --- */
         #learning-screen {
             width: 100%; height: 100%;
             display: flex; flex-direction: column;
-            padding: 10px;
-            background: #fff;
+            padding: 10px; background: #fff;
             position: absolute; top: 0; left: 0; z-index: 10;
         }
 
         .header-title { 
-            height: 5vh; text-align: center; color: #ff6f00; font-size: 20px; font-weight: bold; margin: 0; 
-            display: flex; align-items: center; justify-content: center;
+            height: 40px; text-align: center; color: #ff6f00; font-size: 20px; font-weight: bold; margin: 0; 
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
 
-        /* KHUNG ẢNH: Chiếm 40% chiều cao màn hình - Đảm bảo to rõ */
-        .learn-img-box {
-            height: 40vh; width: 100%;
+        /* KHUNG ẢNH: Sử dụng flex: 1 và min-height: 0 để tránh lỗi mất hình */
+        .learn-img-wrapper {
+            flex: 1; /* Tự giãn hết cỡ trong khoảng trống */
+            min-height: 0; /* Quan trọng: Ngăn flex item bị vỡ layout */
+            width: 100%;
             display: flex; align-items: center; justify-content: center;
             background: #fff8e1; border-radius: 15px; border: 2px dashed #ffcc80;
-            margin: 1vh 0; overflow: hidden;
+            margin: 5px 0; padding: 10px;
         }
         
         #learn-img {
-            height: 90%; width: auto; max-width: 95%;
-            object-fit: contain; display: block;
+            max-width: 100%; max-height: 100%; 
+            object-fit: contain; /* Ảnh luôn nằm trọn trong khung */
+            display: block;
         }
 
-        /* THÔNG TIN CHỮ: Chiếm 20% màn hình */
+        /* THÔNG TIN CHỮ: Cố định chiều cao */
         .word-info { 
-            height: 20vh; display: flex; flex-direction: column; 
+            height: 120px; flex-shrink: 0;
+            display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
         }
-        .word-display { font-size: 32px; font-weight: 900; color: #333; margin: 0; }
+        .word-display { font-size: 36px; font-weight: 900; color: #333; margin: 0; }
         .phonetic { font-size: 20px; color: #666; font-family: serif; margin-top: 5px; }
 
         /* Câu ví dụ */
         .sentence-box { display: none; flex-wrap: wrap; justify-content: center; gap: 5px; }
         .s-chunk { text-align: center; }
-        .s-ipa { font-size: 12px; color: #e67e22; }
-        .s-txt { font-size: 18px; font-weight: bold; }
+        .s-ipa { font-size: 14px; color: #e67e22; }
+        .s-txt { font-size: 20px; font-weight: bold; }
 
-        /* NÚT BẤM: Chiếm phần còn lại */
+        /* KHU VỰC NÚT BẤM */
         .controls-area { 
-            flex: 1; display: flex; flex-direction: column; justify-content: flex-end; 
-            padding-bottom: 10px;
+            height: 130px; flex-shrink: 0;
+            display: flex; flex-direction: column; justify-content: flex-end; 
         }
         
         .btn-large {
-            width: 100%; padding: 15px; border-radius: 50px; border: none;
+            width: 100%; padding: 12px; border-radius: 50px; border: none;
             font-size: 20px; font-weight: bold; color: white; cursor: pointer;
             box-shadow: 0 4px #bbb; margin-bottom: 10px;
         }
@@ -75,20 +77,23 @@
         
         .nav-bar { display: flex; justify-content: space-between; align-items: center; height: 60px; }
         .btn-nav { width: 50px; height: 50px; border-radius: 50%; background: #f39c12; color: white; border: none; font-size: 24px; font-weight: bold; }
-        .btn-replay { background: white; color: #2980b9; border: 2px solid #2980b9; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn-replay { background: white; color: #2980b9; border: 2px solid #2980b9; padding: 10px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        /* --- 3. GIAO DIỆN GAME (GAME MODE) --- */
+        /* --- 3. MÀN HÌNH GAME (FULLSCREEN) --- */
         #game-screen {
             display: none; /* Ẩn mặc định */
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff3e0; z-index: 20;
-            flex-direction: column;
+            /* Dùng Grid để chia layout cứng */
+            display: grid;
+            grid-template-rows: 60px 1fr 80px; /* Header - Body - Footer */
         }
 
-        /* 1. Header Game (10vh) */
+        /* 1. Header Game */
         .game-header {
-            height: 10vh; display: flex; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: center;
             position: relative; background: rgba(255,255,255,0.8);
+            border-bottom: 1px solid #ccc;
         }
         .timer-badge {
             background: white; border: 3px solid #d35400; color: #d35400;
@@ -96,43 +101,42 @@
         }
         .btn-close {
             position: absolute; right: 10px; background: #c0392b; color: white;
-            width: 40px; height: 40px; border-radius: 50%; border: none; font-weight: bold; font-size: 18px;
+            width: 40px; height: 40px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px;
         }
 
-        /* 2. Tháp Thẻ (4 Hàng x 19vh = 76vh) */
+        /* 2. Tháp Thẻ (Body) */
         .tower-container {
-            height: 78vh; /* Chiếm 78% chiều cao màn hình */
-            width: 100%;
+            width: 100%; height: 100%; /* Chiếm toàn bộ phần giữa (1fr) */
             display: flex; flex-direction: column;
-            justify-content: center;
-            padding: 5px;
+            padding: 5px 0;
         }
 
         .tower-row {
-            height: 19vh; /* CỐ ĐỊNH: Mỗi hàng cao đúng 19% màn hình */
+            flex: 1; /* Chia đều chiều cao cho 4 hàng (25% mỗi hàng) */
             width: 100%;
             display: flex; justify-content: center; align-items: center;
-            gap: 10px; margin-bottom: 5px;
+            gap: 15px; /* Khoảng cách ngang giữa các thẻ */
+            border-bottom: 1px dashed rgba(0,0,0,0.05);
         }
 
-        /* THẺ BÀI */
+        /* THẺ BÀI: Tự động to theo chiều cao của hàng */
         .card-flip {
-            height: 95%; /* Gần như cao bằng hàng */
-            aspect-ratio: 0.75; /* Tỷ lệ 3:4 chuẩn */
+            height: 90%; /* Chiếm 90% chiều cao của hàng -> Rất to */
+            aspect-ratio: 0.75; /* Tỷ lệ vàng cho thẻ (3:4) */
             position: relative; perspective: 1000px;
         }
         
         .card-inner {
             position: relative; width: 100%; height: 100%;
             transition: transform 0.4s; transform-style: preserve-3d;
-            border-radius: 10px; box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+            border-radius: 12px; box-shadow: 0 4px 5px rgba(0,0,0,0.3);
         }
         .card-flip.flipped .card-inner { transform: rotateY(180deg); }
         .card-flip.matched .card-inner { opacity: 0; pointer-events: none; }
 
         .face {
             position: absolute; width: 100%; height: 100%;
-            backface-visibility: hidden; border-radius: 10px;
+            backface-visibility: hidden; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             border: 2px solid #5d4037;
         }
@@ -140,22 +144,24 @@
         /* Mặt Úp: Nâu + Số To */
         .front { 
             background: #8d6e63; color: #3e2723; 
-            font-size: 5vh; font-weight: 900; /* Chữ to theo màn hình */
+            font-size: 5vh; /* Chữ to theo màn hình */
+            font-weight: 900;
         }
         
         /* Mặt Ngửa: Ảnh */
         .back { background: white; transform: rotateY(180deg); padding: 5px; }
-        .back img { width: 90%; height: 90%; object-fit: contain; }
+        .back img { width: 95%; height: 95%; object-fit: contain; }
 
-        /* 3. Footer Game (12vh) */
+        /* 3. Footer Game */
         .game-footer {
-            height: 12vh; display: flex; justify-content: space-around; align-items: center;
+            display: flex; justify-content: space-around; align-items: center;
             background: white; border-top: 1px solid #ccc;
         }
         .btn-ctrl {
-            padding: 10px 20px; border-radius: 30px; border: none; color: white;
+            padding: 10px 0; border-radius: 30px; border: none; color: white;
             font-size: 18px; font-weight: bold; cursor: pointer;
             box-shadow: 0 3px #999; width: 40%;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
         }
 
         /* Modal Chiến Thắng */
@@ -169,15 +175,15 @@
 <body>
 
 <div id="learning-screen">
-    <h1 class="header-title">🐻 Bé Học Tiếng Anh 🐰</h1>
+    <div class="header-title">🐻 Bé Học Tiếng Anh 🐰</div>
     
-    <div class="learn-img-box">
-        <img id="learn-img" src="" alt="Learning Image" onerror="this.src='https://img.icons8.com/color/400/image.png'">
+    <div class="learn-img-wrapper">
+        <img id="learn-img" src="" alt="Learning Image">
     </div>
 
     <div class="word-info">
         <div id="mode-word">
-            <h2 class="word-display" id="disp-text">Loading...</h2>
+            <h2 class="word-display" id="disp-text">...</h2>
             <div class="phonetic" id="disp-ipa">...</div>
         </div>
         <div id="mode-sent" class="sentence-box"></div>
@@ -187,7 +193,6 @@
         <div id="action-btn-container">
             <button class="btn-large btn-mic">🎤 Đọc Ngay</button>
         </div>
-
         <div class="nav-bar">
             <button class="btn-nav" onclick="nav(-1)">◀</button>
             <button class="btn-replay" id="btn-audio" onclick="playAudio()">🔊 Nghe lại</button>
@@ -210,10 +215,10 @@
     </div>
 
     <div id="win-modal">
-        <h1 style="color:green; font-size:40px;">XUẤT SẮC!</h1>
-        <p id="win-time" style="font-size:24px;">00:00</p>
+        <h1 style="color:green; font-size:40px;">XUẤT SẮC! 🎉</h1>
+        <p id="win-time" style="font-size:24px; color:#555;">00:00</p>
         <br>
-        <button class="btn-ctrl" style="background:#e67e22" onclick="initGame()">Chơi lại</button>
+        <button class="btn-ctrl" style="background:#e67e22; width: auto; padding: 10px 40px;" onclick="initGame()">Chơi lại</button>
         <br>
         <button class="btn-large" style="background:#2980b9; width:auto; padding:10px 40px;" onclick="exitGame()">Bài Tiếp ➡</button>
     </div>
@@ -221,27 +226,29 @@
 
 <script>
     // --- DỮ LIỆU ---
+    // Tôi sử dụng link ảnh placeholder CÓ CHỮ TÊN HÌNH để đảm bảo bạn nhìn thấy nó hoạt động
+    // Sau khi test xong, bạn thay lại tên file của bạn (ví dụ: 'beer.png')
     const data = [
         // Từ vựng
-        { type: 'word', text: 'Beer', ipa: '/bɪər/', speak: 'beer', img: 'https://img.icons8.com/color/500/beer.png' },
-        { type: 'word', text: 'Deer', ipa: '/dɪər/', speak: 'deer', img: 'https://img.icons8.com/color/500/deer.png' },
-        { type: 'word', text: 'Ear', ipa: '/ɪər/', speak: 'ear', img: 'https://img.icons8.com/color/500/ear.png' },
-        { type: 'word', text: 'Tear', ipa: '/tɪər/', speak: 'tier', img: 'https://img.icons8.com/color/500/crying.png' },
+        { type: 'word', text: 'Beer', ipa: '/bɪər/', speak: 'beer', img: 'https://placehold.co/400x400/png?text=BEER' },
+        { type: 'word', text: 'Deer', ipa: '/dɪər/', speak: 'deer', img: 'https://placehold.co/400x400/png?text=DEER' },
+        { type: 'word', text: 'Ear', ipa: '/ɪər/', speak: 'ear', img: 'https://placehold.co/400x400/png?text=EAR' },
+        { type: 'word', text: 'Tear', ipa: '/tɪər/', speak: 'tier', img: 'https://placehold.co/400x400/png?text=TEAR' },
 
-        // GAME (10 Hình = 5 Cặp)
+        // GAME (5 Cặp hình)
         { 
             type: 'game', title: 'Trò Chơi',
             pairs: [
-                { id: 'beer', img: 'https://img.icons8.com/color/400/beer.png' },
-                { id: 'deer', img: 'https://img.icons8.com/color/400/deer.png' },
-                { id: 'ear',  img: 'https://img.icons8.com/color/400/ear.png' },
-                { id: 'tear', img: 'https://img.icons8.com/color/400/crying.png' },
-                { id: 'bear', img: 'https://img.icons8.com/color/400/bear.png' } 
+                { id: 'beer', img: 'https://placehold.co/300x300/orange/white?text=BEER' },
+                { id: 'deer', img: 'https://placehold.co/300x300/green/white?text=DEER' },
+                { id: 'ear',  img: 'https://placehold.co/300x300/blue/white?text=EAR' },
+                { id: 'tear', img: 'https://placehold.co/300x300/red/white?text=TEAR' },
+                { id: 'bear', img: 'https://placehold.co/300x300/purple/white?text=BEAR' } 
             ]
         },
 
         // Câu
-        { type: 'sent', text: 'The deer is near the chair', img: 'https://img.icons8.com/color/500/deer.png',
+        { type: 'sent', text: 'The deer is near the chair', img: 'https://placehold.co/600x400/png?text=Sentence+Deer',
           parts: [{t:'The',p:'ðə'},{t:'deer',p:'ɪr'},{t:'is',p:'ɪz'},{t:'near',p:'ɪr'},{t:'the',p:'ðə'},{t:'chair',p:'tʃɛr'}] 
         }
     ];
@@ -258,7 +265,7 @@
         idx = i;
         const item = data[i];
 
-        // Ẩn Game, Hiện Học
+        // Chuyển đổi màn hình (Sử dụng display grid cho game để fix cứng layout)
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('learning-screen').style.display = 'flex';
         document.getElementById('win-modal').style.display = 'none';
@@ -269,10 +276,11 @@
 
         if(item.type === 'game') {
             // Màn hình chờ Game
-            imgEl.src = 'https://img.icons8.com/color/500/controller.png';
+            imgEl.src = 'https://placehold.co/400x400/png?text=GAME+TIME';
             document.getElementById('disp-text').innerText = "Giờ Chơi!";
             document.getElementById('disp-ipa').innerText = "";
             document.getElementById('mode-sent').style.display = 'none';
+            document.getElementById('mode-word').style.display = 'block';
             replayBtn.style.visibility = 'hidden';
 
             btnArea.innerHTML = `<button class="btn-large btn-game-entry" onclick="startGame()">🚀 Bắt Đầu Chơi</button>`;
@@ -313,10 +321,11 @@
         window.speechSynthesis.speak(u);
     }
 
-    // --- LOGIC GAME ---
+    // --- LOGIC GAME 3-2-3-2 ---
     function startGame() {
         document.getElementById('learning-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'flex';
+        // Sử dụng Grid cho Game Screen
+        document.getElementById('game-screen').style.display = 'grid'; 
         initGame();
     }
 
