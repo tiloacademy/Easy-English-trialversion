@@ -7,102 +7,502 @@
     <style>
         /* --- CÀI ĐẶT CHUNG --- */
         :root {
-            --primary-color: #00A4EF; 
+            --primary-color: #00A4EF;
             --card-bg: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
             --bg-color: #e0f7fa;
         }
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background-color: var(--bg-color); 
-            text-align: center; padding: 10px; margin: 0; user-select: none; 
-            height: 100vh; overflow: hidden;
-        }
-        
-        /* CONTAINER CHÍNH */
-        .card { 
-            background: white; border-radius: 20px; padding: 10px; 
-            max-width: 600px; margin: 0 auto; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-            height: 95vh; display: flex; flex-direction: column;
-            box-sizing: border-box; transition: 0.3s;
-            position: relative;
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            text-align: center; padding: 10px; margin: 0; user-select: none;
+            height: 100vh; overflow: hidden; /* Chặn cuộn trang để giống app */
         }
 
+        /* CONTAINER CHÍNH */
+        .card {
+            background: white; border-radius: 20px; padding: 10px;
+            max-width: 600px; margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: 95vh; display: flex; flex-direction: column;
+            box-sizing: border-box; transition: 0.3s;
+        }
         /* --- CHẾ ĐỘ FULLSCREEN CHO GAME --- */
         body.game-mode .card {
             max-width: 100%; height: 100vh; margin: 0; border-radius: 0; padding: 5px;
-            background: #2b2b2b;
+            background: #2b2b2b; /* Nền tối giống Wordwall để nổi bật thẻ */
         }
-        body.game-mode #header-title, 
-        body.game-mode #learning-control,
-        body.game-mode .nav-container,
-        body.game-mode #word-img {
-            display: none !important;
+        body.game-mode #header-title,
+        body.game-mode #learning-section,
+        body.game-mode .nav-container {
+            display: none !important; /* Ẩn hết giao diện học */
         }
         body.game-mode #game-area {
             display: flex !important;
+            height: 100%;
         }
-
         /* --- KHU VỰC HÌNH ẢNH HỌC TẬP --- */
-        .content-box { 
-            flex: 1; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
+        .content-box {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             width: 100%; overflow: hidden; position: relative;
         }
-        
-        #word-img { 
-            max-width: 100%; max-height: 40vh; 
-            object-fit: contain; border-radius: 15px; 
+
+        #word-img {
+            max-width: 100%; max-height: 40vh;
+            object-fit: contain; border-radius: 15px;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
-
-        /* --- GAME MEMORY --- */
-        .game-area { 
-            width: 100%; height: 100%; 
-            display: none; flex-direction: column; 
-            align-items: center; justify-content: flex-start; /* Để đồng hồ lên trên */
-            padding-top: 20px;
+        /* --- GAME MEMORY (Lưới thẻ) --- */
+        .game-area {
+            width: 100%; height: 100%;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
         }
-
-        /* Đồng hồ đếm giờ (Mới thêm) */
-        .timer-badge {
-            background: #fff; border: 3px solid #ff9800; color: #e65100;
-            padding: 8px 25px; border-radius: 25px;
-            font-size: 24px; font-weight: bold;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 0 #ef6c00;
-        }
-
-        .memory-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px; 
-            width: 100%; 
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 cột mặc định */
+            gap: 8px;
+            width: 100%; height: 100%;
             max-width: 800px;
             padding: 10px; box-sizing: border-box;
-            /* align-content: center; bỏ cái này để grid ko bị co giữa */
+            align-content: center; /* Căn giữa theo chiều dọc */
         }
-
+        /* Responsive cho lưới thẻ */
         @media (orientation: portrait) {
-            .memory-grid { grid-template-columns: repeat(3, 1fr); }
+            .memory-grid { grid-template-columns: repeat(3, 1fr); } /* Dọc thì 3 cột cho to */
         }
-
         .memory-card {
             position: relative;
-            width: 100%; aspect-ratio: 3/4;
+            width: 100%; aspect-ratio: 3/4; /* Thẻ hình chữ nhật đứng nhẹ */
             cursor: pointer;
             perspective: 1000px;
-            opacity: 0;
+            opacity: 0; /* Ẩn để chờ hiệu ứng chia bài */
             transform: scale(0);
         }
-
+        /* Hiệu ứng chia bài (Shuffle Animation) */
         @keyframes dealCard {
             0% { opacity: 0; transform: translateY(500px) scale(0.1) rotate(180deg); }
             60% { opacity: 1; transform: scale(1.1); }
             100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
         .memory-card.dealing { animation: dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-
         .memory-inner {
             position: relative; width: 100%; height: 100%;
-            text-align: center; transition
+            text-align: center; transition: transform 0.4s;
+            transform-style: preserve-3d;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .memory-card.flipped .memory-inner { transform: rotateY(180deg); }
+
+        /* Đã ghép đúng */
+        .memory-card.matched .memory-inner {
+            opacity: 0; transition: opacity 0.5s; pointer-events: none;
+        }
+        .memory-front, .memory-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid white; box-sizing: border-box;
+        }
+        /* Mặt sau (Úp - Xanh) */
+        .memory-front {
+            background: var(--card-bg);
+            color: white; font-size: 40px; font-weight: bold; /* Tăng font size cho số */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
+        }
+        /* Mặt trước (Ngửa - Trắng) */
+        .memory-back {
+            background-color: white; color: #333;
+            transform: rotateY(180deg); padding: 5px;
+        }
+        .memory-back img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .memory-back span { font-weight: 800; font-size: 1.5rem; color: #333; }
+        /* Nút thoát game */
+        .exit-game-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(255,255,255,0.2); color: white;
+            border: 1px solid white; border-radius: 20px;
+            padding: 5px 15px; font-size: 14px; cursor: pointer; z-index: 100;
+        }
+        /* --- UI HỌC TẬP --- */
+        h1 { font-size: 20px; margin: 5px 0; color: #ff6f00; }
+        
+        /* CHỈNH SỬA PHẦN HIỂN THỊ CHỮ VÀ PHIÊN ÂM */
+        #single-word-area {
+            display: flex;
+            flex-direction: column; /* Xếp dọc */
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        /* Phiên âm: Màu đỏ, in đậm */
+        .phonetic { 
+            font-size: 28px; 
+            color: red; 
+            font-weight: bold; 
+            font-family: sans-serif; 
+            margin-bottom: 5px; 
+        }
+        
+        /* Từ vựng: Màu đen, chữ thường */
+        #word-text { 
+            font-size: 40px; 
+            color: #333; 
+            margin: 0; 
+            font-weight: normal;
+        }
+
+        .sentence-container { display: none; justify-content: center; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+        .word-block { display: flex; flex-direction: column; align-items: center; }
+        .ipa-top { color: #F25022; font-size: 14px; font-weight: bold; }
+        .text-bottom { color: #000; font-size: 22px; }
+        .btn-mic {
+            background-color: #4CAF50; color: white; border: none;
+            padding: 15px 0; width: 100%; border-radius: 50px;
+            font-size: 20px; font-weight: bold; margin-top: 10px;
+            box-shadow: 0 4px #2e7d32; cursor: pointer;
+        }
+        .btn-mic:active { transform: translateY(2px); box-shadow: 0 1px #2e7d32; }
+
+        .nav-container { display: flex; justify-content: space-between; margin-top: auto; padding-bottom: 10px; }
+        .btn-nav { background: #FF9800; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; color: white; cursor: pointer; }
+        .stars { font-size: 35px; color: #FFD700; margin: 5px 0; }
+        .feedback { font-size: 16px; color: #555; height: 25px; font-style: italic; }
+        #game-win-msg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none; z-index: 100; width: 80%;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="main-card">
+    <h1 id="header-title"> 🐻  Học phát âm  🐰 </h1>
+
+    <div class="content-box" id="content-box">
+        <img id="word-img" src="" alt="Learning Image" onerror="this.style.display='none'">
+
+        <div id="game-area" class="game-area">
+            <button class="exit-game-btn" onclick="exitGame()"> ❌  Thoát</button>
+            <div id="memory-grid" class="memory-grid"></div>
+        </div>
+    </div>
+
+    <div id="game-win-msg">
+        <h2 style="color: green; font-size: 30px;"> 🎉  THẮNG RỒI!  🎉 </h2>
+        <button class="btn-mic" style="background:#2196F3; margin-top:20px;" onclick="nextItem()">Bài tiếp theo  ➡ </button>
+        <br><br>
+        <button class="btn-nav" style="background:#9C27B0; font-size:16px; width:auto; padding:0 20px;" onclick="setupMemoryGame()">Chơi lại</button>
+    </div>
+    
+    <div id="learning-control">
+        <div id="single-word-area">
+            <div class="phonetic" id="phonetic">...</div>
+            <h2 id="word-text">...</h2>
+        </div>
+        
+        <div id="sentence-area" class="sentence-container"></div>
+        <div class="stars" id="stars">☆☆☆☆☆</div>
+        <div class="feedback" id="feedback">...</div>
+
+        <button id="mic-btn" class="btn-mic" onclick="startListeningSafe()"> 🎤  Đọc Ngay</button>
+
+        <div class="nav-container">
+            <button class="btn-nav" onclick="prevItem()"> ◀ </button>
+            <button style="background:none; border:none; color:#2196F3; font-weight:bold; cursor:pointer;" onclick="playSampleSafe()"> 🔊  Nghe lại</button>
+            <button class="btn-nav" onclick="nextItem()"> ▶ </button>
+        </div>
+    </div>
+</div>
+<script>
+    // --- DỮ LIỆU ---
+    // QUAN TRỌNG: Đã thêm speakText: "tier" cho từ "tear" ở mọi nơi
+    const items = [
+        // NHÓM 1: ÂM /ɪr/
+        { word: "beer", ipa: "/ɪr/", img: "beer.png", type: "word", speakText: "beer", similar: ["bear", "beard", "pier", "beers"] },
+        { word: "deer", ipa: "/ɪr/", img: "deer.png", type: "word", speakText: "deer", similar: ["dear", "dare", "tear", "there"] },
+        { word: "cheer", ipa: "/ɪr/", img: "cheer.png", type: "word", speakText: "cheer", similar: ["chair", "cheers", "sheer", "chia"] },
+        { word: "tear", ipa: "/ɪr/", img: "tear.png", type: "word", speakText: "tier", similar: ["tier", "tea", "here", "tears"] },
+        { word: "ear", ipa: "/ɪr/", img: "ear.png", type: "word", speakText: "ear", similar: ["year", "here", "ears", "air", "yeah", "hear", "near"] },
+
+        // NHÓM 2: ÂM /ɛr/
+        { word: "bear", ipa: "/ɛr/", img: "bear.png", type: "word", speakText: "bear", similar: ["bare", "beer", "pair", "bears", "bar"] },
+        { word: "pear", ipa: "/ɛr/", img: "pear.png", type: "word", speakText: "pear", similar: ["pair", "pare", "bear", "pears"] },
+        { word: "share", ipa: "/ɛr/", img: "share.png", type: "word", speakText: "share", similar: ["chair", "sure", "cher", "shared"] },
+        { word: "stair", ipa: "/ɛr/", img: "stair.png", type: "word", speakText: "stair", similar: ["stare", "star", "stairs", "stay"] },
+        { word: "chair", ipa: "/ɛr/", img: "chair.png", type: "word", speakText: "chair", similar: ["cheer", "share", "chairs", "care"] },
+
+        // CÂU
+        {
+            type: "sentence", word: "The deer is near the chair", img: "sentence_deer.png",
+            htmlParts: [ {text: "The", ipa: "ðə"}, {text: "deer", ipa: "ɪr"}, {text: "is", ipa: "ɪz"}, {text: "near", ipa: "ɪr"}, {text: "the", ipa: "ðə"}, {text: "chair.", ipa: "tʃ ɛr"} ],
+            similar: ["the deer is near the chair", "deer near chair"]
+        },
+        {
+            type: "sentence", word: "The bear shares the pear", img: "sentence_bear.png",
+            htmlParts: [ {text: "The", ipa: "ðə"}, {text: "bear", ipa: "ɛr"}, {text: "shares", ipa: "ʃ ɛr"}, {text: "the", ipa: "ðə"}, {text: "pear.", ipa: "ɛr"} ],
+            similar: ["the bear shares the pear", "bear shares pear"]
+        },
+        // GAME FULLSCREEN
+        { type: "game", title: "Game /ɪr/", gameData: ["beer", "deer", "cheer", "tear", "ear"] },
+        { type: "game", title: "Game /ɛr/", gameData: ["bear", "pear", "share", "stair", "chair"] }
+    ];
+    let currentIndex = 0;
+    let recognition;
+    let recognitionTimeout;
+    let audioWin, audioCorrect, audioWrong;
+
+    // Biến Game
+    let hasFlippedCard = false;
+    let lockBoard = false;
+    let firstCard, secondCard;
+    let matchedPairs = 0;
+    window.onload = function() {
+        try {
+            document.getElementById('feedback').innerText = "Sẵn sàng!";
+            loadItem(0, false);
+            audioWin = new Audio("win.mp3");
+            audioCorrect = new Audio("correct.mp3");
+            audioWrong = new Audio("wrong.mp3");
+        } catch (e) { console.error(e); }
+    };
+    function loadItem(index, autoPlay = true) {
+        const item = items[index];
+        const mainCard = document.getElementById('main-card');
+        const learningControl = document.getElementById('learning-control');
+        const imgEl = document.getElementById('word-img');
+        const gameArea = document.getElementById('game-area');
+        // Reset
+        window.speechSynthesis.cancel();
+        resetState();
+        document.getElementById('game-win-msg').style.display = 'none';
+        if (item.type === 'game') {
+            // --- CHẾ ĐỘ GAME: BẬT FULLSCREEN ---
+            document.body.classList.add('game-mode'); // Thêm class để CSS xử lý full màn hình
+            imgEl.style.display = 'none';
+            learningControl.style.display = 'none';
+            gameArea.style.display = 'flex';
+
+            setupMemoryGame();
+        } else {
+            // --- CHẾ ĐỘ HỌC: TẮT FULLSCREEN ---
+            document.body.classList.remove('game-mode');
+            imgEl.style.display = 'block';
+            learningControl.style.display = 'block';
+            gameArea.style.display = 'none';
+
+            if(item.img) imgEl.src = item.img;
+            if (item.type === 'sentence') {
+                document.getElementById('single-word-area').style.display = 'none';
+                document.getElementById('sentence-area').style.display = 'flex';
+                const container = document.getElementById('sentence-area');
+                container.innerHTML = '';
+                item.htmlParts.forEach(part => {
+                    const block = document.createElement('div');
+                    block.className = 'word-block';
+                    block.innerHTML = `<div class="ipa-top">${part.ipa}</div><div class="text-bottom">${part.text}</div>`;
+                    container.appendChild(block);
+                });
+            } else {
+                document.getElementById('single-word-area').style.display = 'flex';
+                document.getElementById('sentence-area').style.display = 'none';
+                
+                // --- CHỈNH SỬA Ở ĐÂY: Chữ thường (không viết hoa) ---
+                document.getElementById('word-text').innerText = item.word ? item.word : "ERR";
+                // Loại bỏ dấu gạch chéo / trong IPA để giống hình
+                document.getElementById('phonetic').innerText = item.ipa.replace(/\//g, '');
+            }
+            if(autoPlay) setTimeout(() => { playSampleSafe(); }, 500);
+        }
+    }
+    // --- LOGIC GAME CẢI TIẾN: HIỂN THỊ SỐ 1-10 ---
+    function setupMemoryGame() {
+        const currentItem = items[currentIndex];
+        const targetWords = currentItem.gameData;
+        const grid = document.getElementById('memory-grid');
+        const winMsg = document.getElementById('game-win-msg');
+
+        grid.innerHTML = "";
+        winMsg.style.display = "none";
+
+        hasFlippedCard = false;
+        lockBoard = false;
+        firstCard = null;
+        secondCard = null;
+        matchedPairs = 0;
+        let cards = [];
+        targetWords.forEach(wordKey => {
+            let originalObj = items.find(i => i.word === wordKey);
+            // Thẻ Hình
+            cards.push({ key: wordKey, type: 'img', content: `<img src="${originalObj.img}">`, speak: originalObj.speakText || wordKey });
+            // Thẻ Chữ (Chữ thường)
+            cards.push({ key: wordKey, type: 'text', content: `<span>${wordKey}</span>`, speak: originalObj.speakText || wordKey });
+        });
+        cards.sort(() => 0.5 - Math.random());
+        cards.forEach((cardData, idx) => {
+            const cardEl = document.createElement('div');
+            cardEl.classList.add('memory-card');
+            cardEl.dataset.key = cardData.key;
+            cardEl.dataset.speak = cardData.speak; // Lưu từ để đọc
+
+            // THAY ĐỔI: Dùng biến idx (vị trí trong mảng) + 1 để tạo số thứ tự
+            const cardNumber = idx + 1;
+            cardEl.innerHTML = `
+                <div class="memory-inner">
+                    <div class="memory-front">${cardNumber}</div>
+                    <div class="memory-back">${cardData.content}</div>
+                </div>
+            `;
+
+            // Hiệu ứng "Deal Card": Mỗi thẻ xuất hiện chậm hơn thẻ trước một chút
+            cardEl.style.animationDelay = `${idx * 0.1}s`;
+            cardEl.classList.add('dealing');
+            cardEl.addEventListener('click', flipCard);
+            grid.appendChild(cardEl);
+        });
+    }
+    function flipCard() {
+        if (lockBoard) return;
+        if (this === firstCard) return;
+        this.classList.add('flipped');
+        // --- PHÁT ÂM THANH NGAY KHI LẬT ---
+        // Lấy từ cần đọc (đã xử lý tear -> tier ở bước setup)
+        let wordToSpeak = this.dataset.speak;
+        let u = new SpeechSynthesisUtterance(wordToSpeak);
+        u.lang = 'en-US';
+        window.speechSynthesis.speak(u);
+        if (!hasFlippedCard) {
+            hasFlippedCard = true;
+            firstCard = this;
+            return;
+        }
+        secondCard = this;
+        checkForMatch();
+    }
+    function checkForMatch() {
+        let isMatch = firstCard.dataset.key === secondCard.dataset.key;
+        if (isMatch) {
+            disableCards();
+            playSoundSafeLocal('correct');
+        } else {
+            playSoundSafeLocal('wrong');
+            unflipCards();
+        }
+    }
+    function disableCards() {
+        lockBoard = true;
+        setTimeout(() => {
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            resetBoard();
+        }, 600);
+        matchedPairs++;
+        if (matchedPairs === 5) {
+            setTimeout(() => {
+                document.getElementById('game-win-msg').style.display = 'block';
+                playSoundSafeLocal('win');
+            }, 1000);
+        }
+    }
+    function unflipCards() {
+        lockBoard = true;
+        setTimeout(() => {
+            firstCard.classList.remove('flipped');
+            secondCard.classList.remove('flipped');
+            resetBoard();
+        }, 1200);
+    }
+    function resetBoard() {
+        [hasFlippedCard, lockBoard] = [false, false];
+        [firstCard, secondCard] = [null, null];
+    }
+
+    function exitGame() {
+        // Quay lại bài trước đó (hoặc bài đầu tiên nếu thích)
+        prevItem();
+    }
+    // --- CÁC HÀM HỌC TẬP ---
+    function nextItem() { if (currentIndex < items.length - 1) { currentIndex++; loadItem(currentIndex, true); } }
+    function prevItem() { if (currentIndex > 0) { currentIndex--; loadItem(currentIndex, true); } }
+
+    function resetState() {
+        document.getElementById('stars').innerText = "☆☆☆☆☆";
+        document.getElementById('mic-btn').disabled = false;
+        document.getElementById('mic-btn').innerText = " 🎤  Đọc Ngay";
+        document.getElementById('feedback').innerText = "...";
+        clearTimeout(recognitionTimeout);
+    }
+
+    function playSampleSafe() {
+        if(items[currentIndex].type === 'game') return;
+        try {
+            window.speechSynthesis.cancel();
+            const item = items[currentIndex];
+            const textToSpeak = item.speakText || item.word;
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'en-US'; utterance.rate = item.type === 'sentence' ? 0.7 : 0.8;
+            window.speechSynthesis.speak(utterance);
+        } catch (e) {}
+    }
+    function startListeningSafe() {
+        if(items[currentIndex].type === 'game') return;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) { alert("Dùng Chrome/Safari nhé."); return; }
+        try {
+            window.speechSynthesis.cancel();
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 10; recognition.continuous = false;
+            document.getElementById('mic-btn').innerText = " 👂  Đang nghe..."; document.getElementById('mic-btn').disabled = true;
+            document.getElementById('feedback').innerText = "Đang nghe...";
+            recognition.start();
+            const waitTime = items[currentIndex].type === 'sentence' ? 10000 : 8000;
+            clearTimeout(recognitionTimeout);
+            recognitionTimeout = setTimeout(() => { try { recognition.stop(); } catch(e){} document.getElementById('feedback').innerText = "Hết giờ!"; resetBtn(); }, waitTime);
+            recognition.onresult = function(event) {
+                clearTimeout(recognitionTimeout);
+                let heardWords = [];
+                for(let i = 0; i < event.results[0].length; i++) { heardWords.push(event.results[0][i].transcript.toLowerCase()); }
+                checkResultSmart(heardWords);
+            };
+            recognition.onerror = function() { clearTimeout(recognitionTimeout); document.getElementById('feedback').innerText = "Thử lại nào!"; resetBtn(); };
+            recognition.onend = function() { if(document.getElementById('mic-btn').disabled) resetBtn(); };
+        } catch (e) { resetBtn(); }
+    }
+    function checkResultSmart(heardWords) {
+        const currentData = items[currentIndex];
+        const targetText = currentData.word.toLowerCase();
+        const cleanTarget = targetText.replace(/[.,]/g, "");
+        const validList = currentData.similar || [];
+        let isPerfect = heardWords.some(w => w.replace(/[.,]/g, "").includes(cleanTarget) || validList.includes(w.replace(/[.,]/g, "")));
+        if (isPerfect) { showResult(5, "Tuyệt vời!"); return; }
+        let bestGuess = heardWords[0];
+        if (currentData.type === 'sentence') {
+            const targetWordsArr = cleanTarget.split(" "); let matchCount = 0;
+            targetWordsArr.forEach(tw => { if (bestGuess.includes(tw)) matchCount++; });
+            if (matchCount >= targetWordsArr.length / 2) showResult(3, "Khá lắm!"); else showResult(2, "Cố lên!");
+        } else {
+            if (bestGuess.charAt(0) === targetText.charAt(0)) showResult(4, "Gần đúng!"); else showResult(2, "Cố lên!");
+        }
+    }
+    function showResult(starCount, message) {
+        let stars = ""; for (let i = 0; i < 5; i++) { stars += (i < starCount) ?
+        " ⭐ " : "☆"; }
+        document.getElementById('stars').innerText = stars;
+        document.getElementById('feedback').innerText = message;
+        playSoundSafeLocal(starCount === 5 ? 'win' : (starCount >= 3 ? 'correct' : 'wrong'));
+        resetBtn();
+    }
+    function resetBtn() { document.getElementById('mic-btn').disabled = false; document.getElementById('mic-btn').innerText = " 🎤  Đọc Ngay"; }
+    function playSoundSafeLocal(type) {
+        try {
+            let s; if(type==='win') s = audioWin; else if(type==='correct') s = audioCorrect; else s = audioWrong;
+            if(s) s.play().catch(e=>{});
+        } catch(e){}
+    }
+</script>
+</body>
+</html>
