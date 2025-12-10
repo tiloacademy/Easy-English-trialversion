@@ -15,7 +15,7 @@
             font-family: 'Segoe UI', Roboto, sans-serif; 
             background-color: var(--bg-color); 
             text-align: center; padding: 10px; margin: 0; user-select: none; 
-            height: 100vh; overflow: hidden; /* Chặn cuộn trang để giống app */
+            height: 100vh; overflow: hidden;
         }
         
         /* CONTAINER CHÍNH */
@@ -30,12 +30,12 @@
         /* --- CHẾ ĐỘ FULLSCREEN CHO GAME --- */
         body.game-mode .card {
             max-width: 100%; height: 100vh; margin: 0; border-radius: 0; padding: 5px;
-            background: #2b2b2b; /* Nền tối giống Wordwall để nổi bật thẻ */
+            background: #2b2b2b;
         }
         body.game-mode #header-title, 
         body.game-mode #learning-section,
         body.game-mode .nav-container {
-            display: none !important; /* Ẩn hết giao diện học */
+            display: none !important;
         }
         body.game-mode #game-area {
             display: flex !important;
@@ -55,38 +55,49 @@
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
 
-        /* --- GAME MEMORY (Lưới thẻ) --- */
+        /* --- GAME MEMORY (BỐ CỤC THÁP 3-2-3-2) --- */
         .game-area { 
             width: 100%; height: 100%; 
             display: none; flex-direction: column; 
             align-items: center; justify-content: center; 
         }
 
-        .memory-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); /* 4 cột mặc định */
-            gap: 8px; 
-            width: 100%; height: 100%;
-            max-width: 800px;
-            padding: 10px; box-sizing: border-box;
-            align-content: center; /* Căn giữa theo chiều dọc */
+        /* Container chứa các hàng thẻ */
+        .game-tower-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Khoảng cách giữa các hàng */
+            width: 100%;
         }
 
-        /* Responsive cho lưới thẻ */
-        @media (orientation: portrait) {
-            .memory-grid { grid-template-columns: repeat(3, 1fr); } /* Dọc thì 3 cột cho to */
+        /* Một hàng thẻ */
+        .game-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Khoảng cách giữa các thẻ trong hàng */
+            width: 100%;
         }
 
+        /* Thẻ bài */
         .memory-card {
             position: relative;
-            width: 100%; aspect-ratio: 3/4; /* Thẻ hình chữ nhật đứng nhẹ */
+            /* Kích thước cố định để đảm bảo hàng 3 thẻ không bị vỡ trên điện thoại nhỏ */
+            width: 75px; height: 100px; 
             cursor: pointer;
             perspective: 1000px;
-            opacity: 0; /* Ẩn để chờ hiệu ứng chia bài */
+            opacity: 0;
             transform: scale(0);
         }
 
-        /* Hiệu ứng chia bài (Shuffle Animation) */
+        /* Responsive cho điện thoại siêu nhỏ */
+        @media (max-width: 350px) {
+            .memory-card { width: 65px; height: 90px; }
+            .game-row { gap: 10px; }
+        }
+
+        /* Hiệu ứng chia bài */
         @keyframes dealCard {
             0% { opacity: 0; transform: translateY(500px) scale(0.1) rotate(180deg); }
             60% { opacity: 1; transform: scale(1.1); }
@@ -104,7 +115,6 @@
 
         .memory-card.flipped .memory-inner { transform: rotateY(180deg); }
         
-        /* Đã ghép đúng */
         .memory-card.matched .memory-inner { 
             opacity: 0; transition: opacity 0.5s; pointer-events: none; 
         } 
@@ -117,15 +127,15 @@
             border: 3px solid white; box-sizing: border-box;
         }
 
-        /* Mặt sau (Úp - Xanh) - ĐÃ CHỈNH SỬA FONT LỚN HƠN ĐỂ HIỂN THỊ SỐ */
+        /* Mặt sau (Úp - Hiện số 1-10) */
         .memory-front { 
             background: var(--card-bg); 
-            color: white; font-size: 40px; font-weight: bold; /* Tăng font size cho số */
+            color: white; font-size: 36px; font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
             background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
         }
 
-        /* Mặt trước (Ngửa - Trắng) */
+        /* Mặt trước (Ngửa - Hiện hình) */
         .memory-back { 
             background-color: white; color: #333; 
             transform: rotateY(180deg); padding: 5px; 
@@ -133,7 +143,6 @@
         .memory-back img { max-width: 90%; max-height: 90%; object-fit: contain; }
         .memory-back span { font-weight: 800; font-size: 1.5rem; color: #333; }
 
-        /* Nút thoát game */
         .exit-game-btn {
             position: absolute; top: 10px; right: 10px;
             background: rgba(255,255,255,0.2); color: white;
@@ -183,7 +192,7 @@
         
         <div id="game-area" class="game-area">
             <button class="exit-game-btn" onclick="exitGame()">❌ Thoát</button>
-            <div id="memory-grid" class="memory-grid"></div>
+            <div id="game-tower-view" class="game-tower-view"></div>
         </div>
     </div>
     
@@ -216,7 +225,6 @@
 
 <script>
     // --- DỮ LIỆU ---
-    // QUAN TRỌNG: Đã thêm speakText: "tier" cho từ "tear" ở mọi nơi
     const items = [
         // NHÓM 1: ÂM /ɪr/
         { word: "beer", ipa: "/ɪr/", img: "beer.png", type: "word", speakText: "beer", similar: ["bear", "beard", "pier", "beers"] }, 
@@ -283,15 +291,15 @@
         document.getElementById('game-win-msg').style.display = 'none';
 
         if (item.type === 'game') {
-            // --- CHẾ ĐỘ GAME: BẬT FULLSCREEN ---
-            document.body.classList.add('game-mode'); // Thêm class để CSS xử lý full màn hình
+            // --- CHẾ ĐỘ GAME ---
+            document.body.classList.add('game-mode');
             imgEl.style.display = 'none';
             learningControl.style.display = 'none';
             gameArea.style.display = 'flex';
             
             setupMemoryGame();
         } else {
-            // --- CHẾ ĐỘ HỌC: TẮT FULLSCREEN ---
+            // --- CHẾ ĐỘ HỌC ---
             document.body.classList.remove('game-mode');
             imgEl.style.display = 'block';
             learningControl.style.display = 'block';
@@ -321,14 +329,16 @@
         }
     }
 
-    // --- LOGIC GAME CẢI TIẾN: HIỂN THỊ SỐ 1-10 ---
+    // --- LOGIC GAME CẢI TIẾN: BỐ CỤC THÁP 3-2-3-2 ---
     function setupMemoryGame() {
         const currentItem = items[currentIndex];
         const targetWords = currentItem.gameData;
-        const grid = document.getElementById('memory-grid');
+        
+        // Lấy container mới
+        const container = document.getElementById('game-tower-view');
         const winMsg = document.getElementById('game-win-msg');
         
-        grid.innerHTML = "";
+        container.innerHTML = "";
         winMsg.style.display = "none";
         
         hasFlippedCard = false;
@@ -348,28 +358,44 @@
 
         cards.sort(() => 0.5 - Math.random());
 
-        cards.forEach((cardData, idx) => {
-            const cardEl = document.createElement('div');
-            cardEl.classList.add('memory-card');
-            cardEl.dataset.key = cardData.key;
-            cardEl.dataset.speak = cardData.speak; // Lưu từ để đọc
-            
-            // THAY ĐỔI: Dùng biến idx (vị trí trong mảng) + 1 để tạo số thứ tự
-            const cardNumber = idx + 1;
+        // --- TẠO HÀNG (ROW) VÀ CHIA THẺ VÀO ---
+        const layoutStructure = [3, 2, 3, 2]; // Bố cục tháp
+        let cardGlobalIndex = 0;
 
-            cardEl.innerHTML = `
-                <div class="memory-inner">
-                    <div class="memory-front">${cardNumber}</div>
-                    <div class="memory-back">${cardData.content}</div>
-                </div>
-            `;
-            
-            // Hiệu ứng "Deal Card": Mỗi thẻ xuất hiện chậm hơn thẻ trước một chút
-            cardEl.style.animationDelay = `${idx * 0.1}s`;
-            cardEl.classList.add('dealing');
+        layoutStructure.forEach(count => {
+            // Tạo một hàng div
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('game-row');
 
-            cardEl.addEventListener('click', flipCard);
-            grid.appendChild(cardEl);
+            for (let i = 0; i < count; i++) {
+                if (cardGlobalIndex >= cards.length) break;
+
+                const cardData = cards[cardGlobalIndex];
+                const cardNumber = cardGlobalIndex + 1; // Số thứ tự liên tục 1-10
+
+                const cardEl = document.createElement('div');
+                cardEl.classList.add('memory-card');
+                cardEl.dataset.key = cardData.key;
+                cardEl.dataset.speak = cardData.speak; 
+                
+                cardEl.innerHTML = `
+                    <div class="memory-inner">
+                        <div class="memory-front">${cardNumber}</div>
+                        <div class="memory-back">${cardData.content}</div>
+                    </div>
+                `;
+                
+                // Animation
+                cardEl.style.animationDelay = `${cardGlobalIndex * 0.1}s`;
+                cardEl.classList.add('dealing');
+
+                cardEl.addEventListener('click', flipCard);
+                rowDiv.appendChild(cardEl);
+
+                cardGlobalIndex++;
+            }
+            // Thêm hàng vào container chính
+            container.appendChild(rowDiv);
         });
     }
 
@@ -379,8 +405,6 @@
 
         this.classList.add('flipped');
 
-        // --- PHÁT ÂM THANH NGAY KHI LẬT ---
-        // Lấy từ cần đọc (đã xử lý tear -> tier ở bước setup)
         let wordToSpeak = this.dataset.speak; 
         let u = new SpeechSynthesisUtterance(wordToSpeak);
         u.lang = 'en-US';
@@ -439,7 +463,6 @@
     }
     
     function exitGame() {
-        // Quay lại bài trước đó (hoặc bài đầu tiên nếu thích)
         prevItem();
     }
 
