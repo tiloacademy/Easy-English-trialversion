@@ -34,9 +34,7 @@ body {
 .btn-menu:active { transform: scale(0.95); background: #f0f8ff; }
 
 /* --- 3. KHUNG CHÍNH --- */
-#main-container {
-    width: 100%; height: 100%; position: relative;
-}
+#main-container { width: 100%; height: 100%; position: relative; }
 
 /* --- 4. MÀN HÌNH HỌC TẬP --- */
 #learning-screen {
@@ -66,13 +64,13 @@ body {
     height: 120px; flex-shrink: 0;
     display: flex; flex-direction: row;
     align-items: center; justify-content: center;
-    gap: 0px; /* Dính liền các khối */
+    gap: 0px; 
     flex-wrap: wrap;
 }
 .char-block {
     display: flex; flex-direction: column;
     align-items: center; justify-content: flex-end;
-    margin: 0; /* Dính liền các chữ */
+    margin: 0; 
 }
 .cb-ipa {
     font-size: 24px; color: red; font-weight: bold; font-family: sans-serif;
@@ -189,9 +187,17 @@ body {
     background: rgba(255,255,255,0.95); z-index: 100;
     flex-direction: column; align-items: center; justify-content: center;
 }
+#debug-msg {
+    position: fixed; bottom: 0; left: 0; width: 100%; 
+    background: rgba(0,0,0,0.7); color: yellow; 
+    font-size: 10px; text-align: center; padding: 2px;
+    z-index: 10000; display: none; /* Ẩn mặc định, chỉ hiện khi có lỗi */
+}
 </style>
 </head>
 <body>
+    <div id="debug-msg"></div>
+
     <div id="menu-screen" style="display: flex;">
         <div class="menu-title"> 📚  CHỌN BÀI HỌC</div>
         <button class="btn-menu" onclick="startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
@@ -250,6 +256,22 @@ const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
 
+// Hàm báo lỗi nếu không tìm thấy file
+function logError(msg) {
+    const el = document.getElementById('debug-msg');
+    el.style.display = 'block';
+    el.innerText = "LỖI: " + msg;
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+// Kiểm tra xem file có tồn tại không
+[audioWin, audioCorrect, audioWrong].forEach(a => {
+    a.addEventListener('error', function(e) {
+        let filename = e.target.src.split('/').pop();
+        logError("Không tìm thấy file " + filename + ". Hãy kiểm tra viết hoa/thường!");
+    });
+});
+
 // CẤU HÌNH DỮ LIỆU
 const lesson15 = [
     { img: "gear.jpg", speak: "gear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
@@ -289,12 +311,10 @@ let currentData = [];
 let idx = 0;
 let timerInt, sec=0, flipped=false, lock=false, c1, c2, match=0, lastWord="";
 let recognition;
-// Biến toàn cục để giữ giọng đọc không bị trình duyệt xóa
 let currentUtterance = null;
 
-// --- [QUAN TRỌNG] HÀM MỞ KHÓA ÂM THANH CHO MOBILE ---
+// --- HÀM MỞ KHÓA ÂM THANH CHO MOBILE ---
 function unlockAudio() {
-    // Phát tất cả âm thanh ở chế độ im lặng một lần để "xin phép" trình duyệt
     [audioWin, audioCorrect, audioWrong].forEach(snd => {
         snd.muted = true;
         let playPromise = snd.play();
@@ -302,23 +322,21 @@ function unlockAudio() {
             playPromise.then(_ => {
                 snd.pause();
                 snd.currentTime = 0;
-                snd.muted = false; // Bật tiếng lại để dùng sau này
-            }).catch(error => {
-                console.log("Audio autoplay prevented by browser");
-            });
+                snd.muted = false; 
+            }).catch(error => { console.log("Unlock audio failed"); });
         }
     });
-    
-    // Mồi giọng đọc TTS (Text-to-Speech)
+    // Mồi giọng đọc TTS
     if(window.speechSynthesis) {
-        const dummy = new SpeechSynthesisUtterance(" ");
+        // Đọc một từ ngắn để kích hoạt
+        const dummy = new SpeechSynthesisUtterance("start");
+        dummy.volume = 0; // Đọc thầm
         window.speechSynthesis.speak(dummy);
     }
 }
 
 // --- HÀM TẢI TRƯỚC ẢNH ---
 function preloadImages() {
-    console.log("Preloading...");
     currentData.forEach(item => {
         if (item.img) { new Image().src = item.img; }
         if (item.type === 'game' && item.pairs) {
@@ -339,7 +357,7 @@ function startLesson(num) {
     currentData = (num === 15) ? lesson15 : lesson16;
     idx = 0;
     
-    // KÍCH HOẠT MỞ KHÓA ÂM THANH NGAY KHI BẤM NÚT
+    // KÍCH HOẠT MỞ KHÓA ÂM THANH
     unlockAudio();
     preloadImages(); 
     
@@ -397,11 +415,14 @@ function render(i) {
             }
         });
         infoDisplay.innerHTML = html;
-        setTimeout(playAudio, 500);
+        
+        // --- SỬA QUAN TRỌNG: BỎ setTimeout ---
+        // Gọi thẳng hàm đọc để không bị trình duyệt chặn
+        playAudio();
     }
 }
 
-// --- AUDIO HELPERS (ĐÃ CẢI TIẾN CHO MOBILE) ---
+// --- AUDIO HELPERS ---
 function nav(d) { render(idx + d); }
 function nextItem() { nav(1); }
 
@@ -415,17 +436,15 @@ function playAudio() {
 
 function speak(txt) {
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Dừng câu cũ
+        window.speechSynthesis.cancel();
         currentUtterance = new SpeechSynthesisUtterance(txt);
         currentUtterance.lang = 'en-US';
-        currentUtterance.rate = 0.9; // Đọc chậm hơn một chút cho bé dễ nghe
+        currentUtterance.rate = 0.9; 
+        currentUtterance.volume = 1.0; // Đảm bảo âm lượng max
         
-        // Sửa lỗi nuốt chữ trên một số thiết bị Android
+        // Fix lỗi nuốt chữ Android
         currentUtterance.onend = function() { currentUtterance = null; }
-        
         window.speechSynthesis.speak(currentUtterance);
-    } else {
-        alert("Máy của bạn không hỗ trợ đọc tiếng Anh :(");
     }
 }
 
@@ -497,14 +516,14 @@ function check() {
         setTimeout(() => {
             c1.classList.add('matched'); c2.classList.add('matched');
             match++; 
-            audioCorrect.play().catch(e => console.log(e)); // Thêm catch lỗi
+            audioCorrect.play().catch(e => console.log("Lỗi âm thanh: ", e));
             reset();
             if(match===5) win();
         }, 600);
     } else {
         setTimeout(() => {
             c1.classList.remove('flipped'); c2.classList.remove('flipped');
-            audioWrong.play().catch(e => console.log(e));
+            audioWrong.play().catch(e => console.log("Lỗi âm thanh: ", e));
             reset();
         }, 1000);
     }
@@ -523,7 +542,7 @@ function win() {
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Bạn đã hoàn thành trò chơi trong " + timeStr;
     document.getElementById('win-modal').style.display = 'flex';
-    audioWin.play().catch(e => console.log(e));
+    audioWin.play().catch(e => console.log("Lỗi âm thanh: ", e));
     speak("Excellent job!");
 }
 function exitGame() {
