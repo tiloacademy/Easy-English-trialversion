@@ -5,23 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Bé Học Tiếng Anh</title>
 <style>
-/* --- 1. CẤU HÌNH --- */
+/* --- 1. CẤU HÌNH CỐ ĐỊNH --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fdf2e9; /* Màu nền kem */
-    margin: 0; padding: 0;
-    height: 100vh; width: 100vw;
-    overflow: hidden;
+    background-color: #fdf2e9; margin: 0; padding: 0;
+    height: 100vh; width: 100vw; overflow: hidden;
     display: flex; flex-direction: column;
+}
+
+/* --- MÀN HÌNH CHÀO (MỚI) --- */
+#start-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 99999;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+.btn-start-big {
+    background: #27ae60; color: white; border: 4px solid white;
+    padding: 20px 60px; border-radius: 50px;
+    font-size: 30px; font-weight: bold; cursor: pointer;
+    animation: pulse 1.5s infinite;
 }
 
 /* --- 2. MENU --- */
 #menu-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #fff; z-index: 9999;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 25px;
+    display: none; /* Ẩn đi để chờ màn hình Start */
+    flex-direction: column; align-items: center; justify-content: center; gap: 25px;
 }
 .menu-title { font-size: 32px; color: #ff6f00; font-weight: bold; margin-bottom: 20px; }
 .btn-menu {
@@ -32,7 +44,7 @@ body {
 }
 .btn-menu:active { transform: scale(0.95); background: #f0f8ff; }
 
-/* --- 3. GIAO DIỆN CHÍNH --- */
+/* --- 3. KHUNG CHÍNH --- */
 #main-container { width: 100%; height: 100%; position: relative; }
 
 /* Màn hình học */
@@ -48,43 +60,27 @@ body {
 }
 .btn-home { background: #eee; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; }
 .header-title { color: #ff6f00; font-size: 20px; font-weight: bold; }
-
 .learn-img-wrapper {
     flex: 1; width: 100%; min-height: 0;
-    display: flex; align-items: center; justify-content: center;
-    margin: 10px 0;
+    display: flex; align-items: center; justify-content: center; margin: 10px 0;
 }
-#learn-img {
-    max-width: 100%; max-height: 100%;
-    object-fit: contain; border-radius: 15px;
-}
-
-/* KHU VỰC CHỮ (Đã sửa lỗi khoảng cách) */
+#learn-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 15px; }
 .info-area {
-    height: 120px; flex-shrink: 0;
-    display: flex; flex-direction: row;
-    align-items: center; justify-content: center;
-    gap: 0px; flex-wrap: wrap;
+    height: 120px; flex-shrink: 0; display: flex; flex-direction: row;
+    align-items: center; justify-content: center; gap: 0px; flex-wrap: wrap;
 }
-.char-block {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: flex-end;
-    margin: 0; 
-}
+.char-block { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin: 0; }
 .cb-ipa { font-size: 24px; color: red; font-weight: bold; font-family: sans-serif; height: 30px; line-height: 30px; }
 .cb-text { font-size: 40px; color: #333; font-weight: bold; height: 50px; line-height: 50px; }
 .sent-ipa { font-size: 16px; color: red; font-weight: bold; height: 20px; }
 .sent-text { font-size: 24px; color: #333; font-weight: bold; height: 30px; }
 .spacer { width: 15px; }
-
 .stars { height: 35px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0; }
 .stars.active { color: #FFD700; text-shadow: 0 0 5px orange; }
 .feedback-text { height: 25px; text-align: center; font-size: 16px; color: #555; font-style: italic; margin-bottom: 5px; }
-
 .action-row {
-    height: 60px; flex-shrink: 0;
-    display: flex; justify-content: center; gap: 15px; align-items: center;
-    margin-bottom: 20px;
+    height: 60px; flex-shrink: 0; display: flex; justify-content: center; gap: 15px;
+    align-items: center; margin-bottom: 20px;
 }
 .btn-action {
     flex: 1; height: 55px; border-radius: 30px; border: none;
@@ -96,30 +92,24 @@ body {
 .btn-listen { background: #2980b9; }
 .btn-game-entry { background: #9b59b6; width: 80%; max-width: none; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
-
 .nav-row {
-    height: 60px; flex-shrink: 0;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 15px; margin-bottom: 10px;
+    height: 60px; flex-shrink: 0; display: flex; justify-content: space-between;
+    align-items: center; padding: 0 15px; margin-bottom: 10px;
 }
 .btn-nav {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: #f39c12; color: white; border: none;
-    font-size: 30px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 4px #d35400;
+    width: 60px; height: 60px; border-radius: 50%; background: #f39c12; color: white; border: none;
+    font-size: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #d35400;
 }
 .btn-nav:active { transform: translateY(2px); box-shadow: none; }
 
 /* --- 4. GAME SCREEN --- */
 #game-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: #fff3e0; z-index: 20;
-    flex-direction: column;
+    background: #fff3e0; z-index: 20; flex-direction: column;
 }
 .game-header {
     height: 70px; display: flex; justify-content: center; align-items: center;
-    position: relative; background: rgba(255,255,255,0.9);
-    border-bottom: 1px solid #ddd;
+    position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd;
 }
 .timer-badge {
     background: white; border: 3px solid #d35400; color: #d35400;
@@ -130,27 +120,21 @@ body {
     width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px;
 }
 .tower-container {
-    flex: 1; width: 100%;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 10px 0;
+    flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0;
 }
 .tower-row {
-    flex: 1; width: 100%;
-    display: flex; justify-content: center; align-items: center;
-    gap: 10px; margin-bottom: 5px;
+    flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px;
 }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
 .card-inner {
-    position: relative; width: 100%; height: 100%;
-    transition: transform 0.4s; transform-style: preserve-3d;
-    border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    position: relative; width: 100%; height: 100%; transition: transform 0.4s;
+    transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 .card-flip.flipped .card-inner { transform: rotateY(180deg); }
 .card-flip.matched .card-inner { opacity: 0; pointer-events: none; }
 .face {
-    position: absolute; width: 100%; height: 100%;
-    backface-visibility: hidden; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
     border: 2px solid #5d4037;
 }
 .front { background: #8d6e63; color: #3e2723; font-size: 6vh; font-weight: 900; }
@@ -172,18 +156,22 @@ body {
     background: rgba(255,255,255,0.95); z-index: 100;
     flex-direction: column; align-items: center; justify-content: center;
 }
-/* Hiển thị lỗi nếu có */
+/* Hiển thị lỗi */
 #error-log {
-    position: fixed; bottom: 0; left: 0; width: 100%;
-    background: rgba(255,0,0,0.8); color: white; font-size: 12px;
-    padding: 5px; text-align: center; display: none; z-index: 10000;
+    position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8);
+    color: white; font-size: 12px; padding: 5px; text-align: center; display: none; z-index: 10000;
 }
 </style>
 </head>
 <body>
     <div id="error-log"></div>
 
-    <div id="menu-screen" style="display: flex;">
+    <div id="start-overlay">
+        <button class="btn-start-big" onclick="appStart()">▶ BẮT ĐẦU</button>
+        <p style="color:white; margin-top:20px; font-size:14px;">Chạm để bật âm thanh</p>
+    </div>
+
+    <div id="menu-screen">
         <div class="menu-title"> 📚  CHỌN BÀI HỌC</div>
         <button class="btn-menu" onclick="startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
         <button class="btn-menu" onclick="startLesson(16)">Bài 16: /aʊ/ & /oʊ/</button>
@@ -230,15 +218,47 @@ body {
     </div>
 
 <script>
-// KHỞI TẠO ÂM THANH
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
-
-// BIẾN TOÀN CỤC (QUAN TRỌNG ĐỂ FIX LỖI TRÊN ANDROID)
 let currentUtterance = null; 
 
-// DATA BÀI HỌC
+// --- HÀM KHỞI ĐỘNG ỨNG DỤNG (MỚI) ---
+function appStart() {
+    // 1. Ẩn màn hình Start
+    document.getElementById('start-overlay').style.display = 'none';
+    document.getElementById('menu-screen').style.display = 'flex';
+    
+    // 2. MỞ KHÓA ÂM THANH (Chắc chắn hoạt động vì người dùng vừa click)
+    [audioWin, audioCorrect, audioWrong].forEach(snd => {
+        snd.muted = true; 
+        snd.play().then(() => {
+            snd.pause(); snd.currentTime = 0; snd.muted = false;
+        }).catch(e => console.log(e));
+    });
+    
+    // 3. MỞ KHÓA GIỌNG ĐỌC (TTS)
+    if(window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        let s = new SpeechSynthesisUtterance("Welcome");
+        s.volume = 0.1; // Đọc nhỏ để mồi
+        window.speechSynthesis.speak(s);
+    }
+}
+
+// Báo lỗi file
+function logError(msg) {
+    const el = document.getElementById('error-log');
+    el.style.display = 'block'; el.innerText = "LỖI: " + msg;
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+[audioWin, audioCorrect, audioWrong].forEach(a => {
+    a.addEventListener('error', (e) => {
+        logError("File âm thanh lỗi/không tìm thấy: " + e.target.src.split('/').pop());
+    });
+});
+
+// DATA
 const lesson15 = [
     { img: "gear.jpg", speak: "gear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
     { img: "deer.jpg", speak: "deer", similar: ["dear"], parts: [{i:"ɪr", t:"deer"}] },
@@ -278,23 +298,6 @@ let idx = 0;
 let timerInt, sec=0, flipped=false, lock=false, c1, c2, match=0, lastWord="";
 let recognition;
 
-// --- [FIX] MỞ KHÓA ÂM THANH NGAY KHI NGƯỜI DÙNG CHẠM VÀO MÀN HÌNH ---
-function unlockAudio() {
-    [audioWin, audioCorrect, audioWrong].forEach(snd => {
-        snd.muted = true; 
-        snd.play().then(() => {
-            snd.pause(); snd.currentTime = 0; snd.muted = false;
-        }).catch(e => console.log("Unlock failed", e));
-    });
-    // Mồi TTS
-    if(window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        let s = new SpeechSynthesisUtterance(" ");
-        window.speechSynthesis.speak(s);
-    }
-}
-
-// --- TẢI ẢNH ---
 function preloadImages() {
     try {
         currentData.forEach(item => {
@@ -306,12 +309,10 @@ function preloadImages() {
                 });
             }
         });
-    } catch(e) { console.log(e); }
+    } catch(e) {}
 }
 
-// --- LOGIC CHÍNH ---
 function startLesson(num) {
-    unlockAudio(); // MỞ KHÓA NGAY LẬP TỨC
     currentData = (num === 15) ? lesson15 : lesson16;
     idx = 0;
     preloadImages();
@@ -360,13 +361,10 @@ function render(i) {
             if(item.type === 'sent' && index < item.parts.length - 1) html += `<div class="spacer"></div>`;
         });
         infoDisplay.innerHTML = html;
-        
-        // [QUAN TRỌNG] BỎ SETTIMEOUT ĐỂ ĐỌC ĐƯỢC TRÊN MOBILE
-        playAudio();
+        playAudio(); // Đọc ngay, không chờ đợi
     }
 }
 
-// --- HÀM AUDIO ---
 function nav(d) { render(idx + d); }
 function nextItem() { nav(1); }
 
@@ -381,20 +379,14 @@ function playAudio() {
 function speak(txt) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        // Gán vào biến toàn cục để không bị Garbage Collection xóa mất
         currentUtterance = new SpeechSynthesisUtterance(txt);
         currentUtterance.lang = 'en-US';
         currentUtterance.rate = 0.9;
-        
-        // Xử lý sự kiện kết thúc để giải phóng biến (tùy chọn)
         currentUtterance.onend = function() { currentUtterance = null; }
-        currentUtterance.onerror = function(e) { console.log("TTS Error:", e); }
-        
         window.speechSynthesis.speak(currentUtterance);
     }
 }
 
-// --- GAME LOGIC ---
 function enterGame() {
     document.getElementById('learning-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
@@ -409,6 +401,7 @@ function initGame() {
     sec=0; document.getElementById('timer').innerText = "00:00";
     startTimer();
     flipped=false; lock=false; c1=null; c2=null; match=0; lastWord="Choose";
+    
     let cards = [];
     item.pairs.forEach(key => {
         let original = currentData.find(d => {
@@ -427,6 +420,7 @@ function initGame() {
             cards.push({ id: key, type: 'text', content: htmlText, speak: original.speak });
         }
     });
+    
     cards.sort(() => 0.5 - Math.random());
     const rows = [3, 2, 3, 2];
     let cCount = 0; let num = 1;
@@ -495,7 +489,6 @@ function exitGame() {
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
 }
-// --- MIC & SPEECH ---
 function startListening() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return alert("Trình duyệt không hỗ trợ");
@@ -518,7 +511,6 @@ function resetMic() {
     btn.disabled = false; btn.innerText = " 🎤  Đọc Ngay";
     btn.style.backgroundColor = "#27ae60";
 }
-// --- LOGIC CHẤM ĐIỂM ---
 function levenshteinDistance(a, b) {
     const matrix = [];
     for (let i = 0; i <= b.length; i++) matrix[i] = [i];
