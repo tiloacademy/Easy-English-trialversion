@@ -66,13 +66,13 @@ body {
     height: 120px; flex-shrink: 0;
     display: flex; flex-direction: row;
     align-items: center; justify-content: center;
-    gap: 0px; /* SỬA: Bỏ khoảng cách giữa các khối */
+    gap: 0px; /* Dính liền các khối */
     flex-wrap: wrap;
 }
 .char-block {
     display: flex; flex-direction: column;
     align-items: center; justify-content: flex-end;
-    margin: 0; /* SỬA: Bỏ margin để các chữ dính liền nhau */
+    margin: 0; /* Dính liền các chữ */
 }
 .cb-ipa {
     font-size: 24px; color: red; font-weight: bold; font-family: sans-serif;
@@ -84,7 +84,7 @@ body {
 }
 .sent-ipa { font-size: 16px; color: red; font-weight: bold; height: 20px; }
 .sent-text { font-size: 24px; color: #333; font-weight: bold; height: 30px; }
-.spacer { width: 15px; } /* Khoảng cách giữa các từ trong câu */
+.spacer { width: 15px; } 
 
 .stars {
     height: 35px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0;
@@ -245,12 +245,12 @@ body {
     </div>
 
 <script>
-// --- KHỞI TẠO ---
+// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
 
-// BÀI 15
+// CẤU HÌNH DỮ LIỆU
 const lesson15 = [
     { img: "gear.jpg", speak: "gear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
     { img: "deer.jpg", speak: "deer", similar: ["dear"], parts: [{i:"ɪr", t:"deer"}] },
@@ -268,7 +268,6 @@ const lesson15 = [
     { type: "game", title: "Game /ɛr/", pairs: ["bear", "pear", "share", "stair", "chair"] }
 ];
 
-// BÀI 16 (Đã gộp từ "shows" để không bị tách)
 const lesson16 = [
     { img: "shower.jpg", speak: "shower", similar: ["show"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
     { img: "shout.jpg", speak: "shout", similar: ["out"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {i:"", t:"t"}] },
@@ -281,7 +280,6 @@ const lesson16 = [
     { img: "phone.jpg", speak: "phone", similar: ["fun"], parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
     { img: "goat.jpg", speak: "goat", similar: ["got"], parts: [{i:"", t:"g"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
     { type: "sent", img: "sentence_cow.jpg", speak: "The brown cow shouts at the mouse", parts: [{i:"ðə", t:"The"}, {i:"aʊ", t:"brown"}, {i:"aʊ", t:"cow"}, {i:"aʊ", t:"shouts"}, {i:"æ", t:"at"}, {i:"ðə", t:"the"}, {i:"aʊ _", t:"mouse."}] },
-    // ĐÃ SỬA DÒNG DƯỚI: Gộp "show" và "s" thành "shows"
     { type: "sent", img: "sentence_joe.jpg", speak: "Joe shows the slow goat the soap", parts: [{i:"dʒ oʊ", t:"Joe"}, {i:"ʃ oʊ z", t:"shows"}, {i:"ðə", t:"the"}, {i:"oʊ", t:"slow"}, {i:"oʊ", t:"goat"}, {i:"ðə", t:"the"}, {i:"oʊ", t:"soap."}] },
     { type: "game", title: "Game /aʊ/", pairs: ["cow", "brown", "shout", "tower", "shower"] },
     { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"] }
@@ -291,15 +289,38 @@ let currentData = [];
 let idx = 0;
 let timerInt, sec=0, flipped=false, lock=false, c1, c2, match=0, lastWord="";
 let recognition;
+// Biến toàn cục để giữ giọng đọc không bị trình duyệt xóa
+let currentUtterance = null;
 
-// --- HÀM TẢI TRƯỚC ẢNH (PRELOAD) ---
-function preloadImages() {
-    console.log("Đang tải trước ảnh...");
-    currentData.forEach(item => {
-        if (item.img) {
-            const img = new Image();
-            img.src = item.img;
+// --- [QUAN TRỌNG] HÀM MỞ KHÓA ÂM THANH CHO MOBILE ---
+function unlockAudio() {
+    // Phát tất cả âm thanh ở chế độ im lặng một lần để "xin phép" trình duyệt
+    [audioWin, audioCorrect, audioWrong].forEach(snd => {
+        snd.muted = true;
+        let playPromise = snd.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                snd.pause();
+                snd.currentTime = 0;
+                snd.muted = false; // Bật tiếng lại để dùng sau này
+            }).catch(error => {
+                console.log("Audio autoplay prevented by browser");
+            });
         }
+    });
+    
+    // Mồi giọng đọc TTS (Text-to-Speech)
+    if(window.speechSynthesis) {
+        const dummy = new SpeechSynthesisUtterance(" ");
+        window.speechSynthesis.speak(dummy);
+    }
+}
+
+// --- HÀM TẢI TRƯỚC ẢNH ---
+function preloadImages() {
+    console.log("Preloading...");
+    currentData.forEach(item => {
+        if (item.img) { new Image().src = item.img; }
         if (item.type === 'game' && item.pairs) {
              item.pairs.forEach(key => {
                 let original = currentData.find(d => {
@@ -307,10 +328,7 @@ function preloadImages() {
                      let fullWord = d.parts.map(p => p.t).join("");
                      return (fullWord === key || d.speak === key);
                 });
-                if (original && original.img) {
-                    const i = new Image();
-                    i.src = original.img;
-                }
+                if (original && original.img) { new Image().src = original.img; }
              });
         }
     });
@@ -320,12 +338,16 @@ function preloadImages() {
 function startLesson(num) {
     currentData = (num === 15) ? lesson15 : lesson16;
     idx = 0;
-    // GỌI HÀM PRELOAD
+    
+    // KÍCH HOẠT MỞ KHÓA ÂM THANH NGAY KHI BẤM NÚT
+    unlockAudio();
     preloadImages(); 
+    
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('main-container').style.display = 'block';
     render(0);
 }
+
 function goHome() {
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
@@ -354,15 +376,13 @@ function render(i) {
         infoDisplay.innerHTML = `<h2 class="word-display" style="font-size:30px;">${item.title}</h2>`;
         btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="enterGame()"> 🚀  Bắt Đầu Chơi</button>`;
     } else {
-        imgEl.src = ""; // Xóa ảnh cũ
-        imgEl.src = item.img;
+        imgEl.src = ""; imgEl.src = item.img;
         
         btnContainer.innerHTML = `
             <button class="btn-action btn-mic" id="mic-btn" onclick="startListening()"> 🎤  Đọc Ngay</button>
             <button class="btn-action btn-listen" id="btn-replay" onclick="playAudio()"> 🔊  Nghe Lại</button>
         `;
         let html = '';
-        // LOGIC HIỂN THỊ MỚI: TỰ ĐỘNG THÊM KHOẢNG CÁCH GIỮA CÁC TỪ TRONG CÂU
         item.parts.forEach((p, index) => {
             const ipaHtml = p.i ? p.i : "&nbsp;";
             const textClass = (item.type === 'sent') ? 'sent-text' : 'cb-text';
@@ -372,7 +392,6 @@ function render(i) {
                 <div class="${ipaClass}">${ipaHtml}</div>
                 <div class="${textClass}">${p.t}</div>
             </div>`;
-            // Chỉ thêm khoảng trắng nếu là câu VÀ không phải từ cuối cùng
             if(item.type === 'sent' && index < item.parts.length - 1) {
                 html += `<div class="spacer"></div>`;
             }
@@ -382,9 +401,10 @@ function render(i) {
     }
 }
 
-// --- AUDIO HELPERS ---
+// --- AUDIO HELPERS (ĐÃ CẢI TIẾN CHO MOBILE) ---
 function nav(d) { render(idx + d); }
 function nextItem() { nav(1); }
+
 function playAudio() {
     const item = currentData[idx];
     if(item.type !== 'game') {
@@ -392,11 +412,21 @@ function playAudio() {
         speak(fullText);
     }
 }
+
 function speak(txt) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt);
-    u.lang = 'en-US';
-    window.speechSynthesis.speak(u);
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Dừng câu cũ
+        currentUtterance = new SpeechSynthesisUtterance(txt);
+        currentUtterance.lang = 'en-US';
+        currentUtterance.rate = 0.9; // Đọc chậm hơn một chút cho bé dễ nghe
+        
+        // Sửa lỗi nuốt chữ trên một số thiết bị Android
+        currentUtterance.onend = function() { currentUtterance = null; }
+        
+        window.speechSynthesis.speak(currentUtterance);
+    } else {
+        alert("Máy của bạn không hỗ trợ đọc tiếng Anh :(");
+    }
 }
 
 // --- GAME LOGIC ---
@@ -466,14 +496,15 @@ function check() {
     if(c1.dataset.id === c2.dataset.id) {
         setTimeout(() => {
             c1.classList.add('matched'); c2.classList.add('matched');
-            match++; audioCorrect.play();
+            match++; 
+            audioCorrect.play().catch(e => console.log(e)); // Thêm catch lỗi
             reset();
             if(match===5) win();
         }, 600);
     } else {
         setTimeout(() => {
             c1.classList.remove('flipped'); c2.classList.remove('flipped');
-            audioWrong.play();
+            audioWrong.play().catch(e => console.log(e));
             reset();
         }, 1000);
     }
@@ -492,7 +523,7 @@ function win() {
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Bạn đã hoàn thành trò chơi trong " + timeStr;
     document.getElementById('win-modal').style.display = 'flex';
-    audioWin.play();
+    audioWin.play().catch(e => console.log(e));
     speak("Excellent job!");
 }
 function exitGame() {
@@ -601,10 +632,10 @@ function checkResult(heardArray) {
     document.getElementById('feedback').innerText = msg;
 
     if (finalStars >= 4) {
-        audioWin.play(); 
+        audioWin.play().catch(e => console.log(e)); 
         if(finalStars === 5) speak(msg);
     } else {
-        audioWrong.play();
+        audioWrong.play().catch(e => console.log(e));
     }
     resetMic();
 }
