@@ -15,7 +15,7 @@ body {
     display: flex; flex-direction: column;
 }
 
-/* --- 2. MENU CHÍNH (Hiện ngay) --- */
+/* --- 2. MENU CHÍNH --- */
 #menu-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #fff; z-index: 9999;
@@ -93,71 +93,94 @@ body {
     flex-direction: column; align-items: center; justify-content: center;
 }
 
-/* --- GAME 1: FLIP --- */
+/* --- GAME 1: FLIP (LẬT BÀI) --- */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
-.card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.4s; transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+.card-inner {
+    position: relative; width: 100%; height: 100%; transition: transform 0.4s;
+    transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
 .card-flip.flipped .card-inner { transform: rotateY(180deg); }
 .card-flip.matched .card-inner { opacity: 0; pointer-events: none; }
-.face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid #5d4037; }
+.face {
+    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    border: 2px solid #5d4037;
+}
 .front { background: #8d6e63; color: #3e2723; font-size: 6vh; font-weight: 900; }
 .back { background: white; transform: rotateY(180deg); padding: 2px; }
 .back img { width: 95%; height: 95%; object-fit: contain; }
-.game-card-text { display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%; width: 100%; flex-wrap: wrap; }
+.game-card-text {
+    display: flex; flex-direction: row; align-items: center; justify-content: center;
+    height: 100%; width: 100%; flex-wrap: wrap;
+}
 .gc-block { display: flex; flex-direction: column; align-items: center; margin: 0 1px; }
 .gc-ipa { color: red; font-weight: bold; font-size: 1.8vh; height: 2vh; }
 .gc-word { color: #333; font-weight: bold; font-size: 2.5vh; }
 
-/* --- GAME 2: WHACK-A-MOLE 3D FARM THEME --- */
+/* --- GAME 2: WHACK-A-MOLE 3D FARM --- */
 #whack-wrapper {
     flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
     overflow: hidden;
-    /* Nền Nông Trại Hoạt Hình */
-    background: url('https://img.freepik.com/free-vector/cartoon-farm-landscape-with-green-field_107791-1913.jpg') no-repeat center bottom;
-    background-size: cover;
+    /* Tự vẽ nền Nông Trại bằng CSS Gradient để không bị lỗi ảnh */
+    background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #8bc34a 40%, #8bc34a 100%);
+    position: relative;
+}
+/* Trang trí đám mây */
+#whack-wrapper::before {
+    content: '☁️ ☁️'; font-size: 60px; position: absolute; top: 20px; left: 20px; opacity: 0.8;
+}
+#whack-wrapper::after {
+    content: '☁️'; font-size: 50px; position: absolute; top: 50px; right: 30px; opacity: 0.8;
 }
 
 .wood-sign {
-    /* Bảng gỗ rustic hơn */
-    background: url('https://img.freepik.com/free-vector/wooden-plank-textured-background_53876-114720.jpg');
-    background-size: cover;
-    border: none; color: #5d2e0c;
+    /* Tạo hiệu ứng bảng gỗ bằng CSS */
+    background: #8d6e63;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+    border: 4px solid #5d4037; color: white;
     padding: 10px 20px; border-radius: 10px; font-weight: bold;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.4); text-align: center;
-    min-width: 150px; text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+    box-shadow: 0 5px 0 rgba(0,0,0,0.3); text-align: center;
+    min-width: 150px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
+    z-index: 10;
 }
 
 .hud-row { display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px; z-index: 5; }
-.target-word { font-size: 24px; color: #d35400; text-transform: uppercase; font-weight: 900; }
-.score-text { font-size: 24px; color: #27ae60; font-weight: 900; }
+.target-word { font-size: 24px; color: #ffeb3b; text-transform: uppercase; font-weight: 900; }
+.score-text { font-size: 24px; color: #fff; font-weight: 900; }
 
 .game-field-3d {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
     width: 90%; max-width: 420px;
-    /* 3D Effect & Texture Đất */
-    transform: perspective(800px) rotateX(30deg);
+    /* Hiệu ứng 3D nghiêng */
+    transform: perspective(800px) rotateX(25deg);
     padding: 25px;
-    background-image: url('https://img.freepik.com/free-photo/soil-texture-background_1101-628.jpg'); /* Texture đất */
-    background-size: cover;
+    /* Màu đất nền */
+    background-color: #6d4c41; 
+    background-image: radial-gradient(circle, #795548 10%, transparent 10%), radial-gradient(circle, #795548 10%, transparent 10%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    
     border-radius: 20px;
-    border: 8px solid #4a8c2a; /* Viền cỏ */
-    box-shadow: 0 20px 0 #2e5a1c, 0 25px 25px rgba(0,0,0,0.6);
+    border: 8px solid #388e3c; /* Viền cỏ xanh đậm */
+    box-shadow: 0 20px 0 #2e7d32, 0 25px 25px rgba(0,0,0,0.6);
 }
 
 .hole {
     position: relative; aspect-ratio: 1;
-    background: #2b1b13; /* Lỗ tối màu */
+    background: #3e2723; /* Lỗ tối */
     border-radius: 50%;
-    box-shadow: inset 0 10px 20px black, 0 3px 0 rgba(255,255,255,0.1);
-    overflow: hidden; border: 3px solid #3e2723;
+    box-shadow: inset 0 10px 20px black;
+    overflow: hidden; 
+    border: 2px solid #5d4037;
 }
 
 .mole {
     position: absolute; top: 100%; left: 10%; width: 80%; height: 95%;
-    background: #D2691E;
+    background: #D2691E; /* Da chuột */
     border-radius: 45% 45% 10% 10%;
-    transition: top 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bật lên nảy hơn */
+    transition: top 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     padding-top: 5px; cursor: pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.4);
@@ -175,10 +198,10 @@ body {
 }
 .mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP CUTE HƠN */
+/* BÚA ĐẬP CUTE */
 .hammer {
     position: absolute; width: 100px; height: 100px; pointer-events: none; z-index: 999;
-    /* Hình búa gỗ hoạt hình */
+    /* Dùng link búa gỗ hoạt hình đáng yêu */
     background-image: url('https://img.icons8.com/external-flaticons-flat-flat-icons/96/external-hammer-farm-flaticons-flat-flat-icons.png');
     background-size: contain; background-repeat: no-repeat;
     transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
@@ -342,7 +365,7 @@ const lesson16 = [
     { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"] }
 ];
 
-// BÀI 17 - ĐÃ TÁCH 2 GAME
+// BÀI 17
 const lesson17 = [
     { img: "face.jpg", speak: "face", pre: "A", similar: [], parts: [{i:"", t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
     { img: "cake.jpg", speak: "cake", pre: "A", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
@@ -472,13 +495,13 @@ function speak(txt) {
 function enterGame() {
     document.getElementById('learning-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
-    const currentLessonGame = currentData[idx];
+    const currentLessonGame = currentData.find(i => i.type === 'game');
     if (currentLessonGame.gameType === 'mole') initMoleGame();
     else initFlipGame();
 }
 
 function initGame() {
-    const currentLessonGame = currentData[idx];
+    const currentLessonGame = currentData.find(i => i.type === 'game');
     if (currentLessonGame.gameType === 'mole') initMoleGame();
     else initFlipGame();
 }
@@ -514,7 +537,6 @@ function initFlipGame() {
             cards.push({ id: key, type: 'text', content: htmlText, speak: original.speak });
         }
     });
-    
     cards.sort(() => 0.5 - Math.random());
     const rows = [3, 2, 3, 2];
     let cCount = 0; let num = 1;
@@ -561,7 +583,7 @@ function checkFlip() {
 }
 function resetFlip() { flipped=false; lock=false; c1=null; c2=null; }
 
-// --- GAME 2: WHACK-A-MOLE PRO 3D (TÁCH ÂM) ---
+// --- GAME 2: WHACK-A-MOLE PRO 3D ---
 function initMoleGame() {
     document.getElementById('tower').style.display = 'none';
     document.getElementById('whack-wrapper').style.display = 'flex';
@@ -572,12 +594,10 @@ function initMoleGame() {
     currentScore = 0;
     updateScore(0);
 
-    // LỌC TỪ THEO ÂM CỦA GAME HIỆN TẠI
     const currentGameItem = currentData[idx];
-    const targetPhoneme = currentGameItem.phoneme; // 'eɪ' hoặc 'aɪ'
+    const targetPhoneme = currentGameItem.phoneme;
 
     moleRemainingWords = lesson17.filter(wordItem => {
-        // Chỉ lấy từ vựng có chứa âm mục tiêu
         if (!wordItem.img || wordItem.type === 'sent') return false;
         return wordItem.parts.some(p => p.i.includes(targetPhoneme));
     }).sort(() => 0.5 - Math.random());
@@ -592,7 +612,6 @@ function initMoleGame() {
 function nextMoleRound() {
     if (moleRemainingWords.length === 0) {
         win();
-        stopMoleGame();
         return;
     }
     moleTarget = moleRemainingWords.pop();
@@ -601,7 +620,6 @@ function nextMoleRound() {
     clearInterval(moleAudioLoop);
     moleAudioLoop = setInterval(() => { speak(moleTarget.speak); }, 2500);
     
-    // Kho nhiễu: Lấy tất cả các từ (không phải câu)
     const allVocab = [...lesson15, ...lesson16, ...lesson17].filter(i => i.img && i.type !== 'sent');
     peep(allVocab);
 }
@@ -700,6 +718,7 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
+    stopMoleGame(); // --- SỬA LỖI QUAN TRỌNG: DỪNG ÂM THANH GAME ---
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
