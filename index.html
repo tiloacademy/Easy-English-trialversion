@@ -85,10 +85,8 @@ body {
     width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px;
 }
 .game-footer {
-    height: 120px;
-    display: flex; justify-content: center; align-items: center;
-    background: white; border-top: 1px solid #ccc;
-    padding-bottom: 50px;
+    height: 120px; display: flex; justify-content: center; align-items: center;
+    background: white; border-top: 1px solid #ccc; padding-bottom: 50px;
 }
 #win-modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -96,7 +94,7 @@ body {
     flex-direction: column; align-items: center; justify-content: center;
 }
 
-/* --- GAME 1: FLIP --- */
+/* --- GAME 1: FLIP (LẬT BÀI) --- */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
@@ -179,37 +177,39 @@ body {
     border: 2px solid #5d4037;
 }
 
-/* --- CHỈNH SỬA CHUỘT VÀ THẺ --- */
+/* --- CHỈNH SỬA CHUỘT & THẺ BÀI --- */
 .mole {
-    position: absolute; top: 100%; left: 10%; width: 80%; height: 95%;
+    position: absolute; top: 100%; left: 5%; 
+    width: 90%; /* To bè ra một chút */
+    height: 100%; /* Cao hết cỡ bằng cái hố */
     background: #D2691E;
-    border-radius: 45% 45% 10% 10%;
+    border-radius: 40% 40% 0 0;
     transition: top 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     padding-top: 5px; cursor: pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
-/* Mắt và mũi chuột */
-.mole::before { content: '👀'; font-size: 20px; position: absolute; top: 5px; }
-.mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 25px; }
+.mole::before { content: '👀'; font-size: 18px; position: absolute; top: 2px; }
+.mole::after { content: '🐽'; font-size: 14px; position: absolute; top: 18px; }
 
-/* Chuột ngoi cao hơn để không bị che bởi đất khi gắn thẻ thấp */
-.mole.up { top: 2%; } 
+/* Chuột ngoi lên tận cùng */
+.mole.up { top: 0%; } 
 
-/* Thẻ to hơn và hạ thấp xuống ngực */
+/* Thẻ hình nằm ở phần thân, không che mặt */
 .mole-card {
-    width: 130%; /* Rộng hẳn ra */
-    height: 65%;
-    background: white; border: 3px solid #eee; border-radius: 10px;
+    width: 100%; 
+    height: 70%; /* Chiếm phần lớn thân dưới */
+    background: white; border: 2px solid #ddd; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    z-index: 2; 
-    margin-top: 45px; /* Hạ thấp xuống để lộ mặt chuột */
-    transform: rotate(-3deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    
+    position: absolute; 
+    bottom: 0; /* Gắn chặt vào đáy chuột */
+    left: 0;
 }
-.mole-card img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP (Fix hiển thị) */
+/* BÚA ĐẬP CUTE */
 .hammer {
     position: fixed; 
     width: 100px; height: 100px; pointer-events: none; 
@@ -320,6 +320,7 @@ body {
     </div>
 
 <script>
+// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
