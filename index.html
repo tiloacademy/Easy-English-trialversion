@@ -9,10 +9,11 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #87CEEB;
+    background-color: #87CEEB; /* Nền trời xanh */
     margin: 0; padding: 0;
     height: 100vh; width: 100vw; overflow: hidden;
     display: flex; flex-direction: column;
+    user-select: none; /* Chống bôi đen khi bấm nhanh */
 }
 
 /* --- 2. MENU CHÍNH --- */
@@ -123,53 +124,60 @@ body {
 #whack-wrapper {
     flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
     overflow: hidden;
-    /* Tự vẽ nền Nông Trại bằng CSS Gradient để không bị lỗi ảnh */
+    /* Nền Nông Trại Vẽ Bằng Code */
     background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #8bc34a 40%, #8bc34a 100%);
     position: relative;
 }
-/* Trang trí đám mây */
 #whack-wrapper::before {
-    content: '☁️ ☁️'; font-size: 60px; position: absolute; top: 20px; left: 20px; opacity: 0.8;
+    content: '☁️'; font-size: 60px; position: absolute; top: 30px; left: 20px; opacity: 0.8;
 }
 #whack-wrapper::after {
-    content: '☁️'; font-size: 50px; position: absolute; top: 50px; right: 30px; opacity: 0.8;
+    content: '☁️'; font-size: 50px; position: absolute; top: 60px; right: 40px; opacity: 0.8;
 }
 
 .wood-sign {
-    /* Tạo hiệu ứng bảng gỗ bằng CSS */
     background: #8d6e63;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
     border: 4px solid #5d4037; color: white;
-    padding: 10px 20px; border-radius: 10px; font-weight: bold;
-    box-shadow: 0 5px 0 rgba(0,0,0,0.3); text-align: center;
-    min-width: 150px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
+    padding: 5px 15px; border-radius: 10px; font-weight: bold;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4); text-align: center;
+    min-width: 130px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
     z-index: 10;
 }
 
-.hud-row { display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px; z-index: 5; }
-.target-word { font-size: 24px; color: #ffeb3b; text-transform: uppercase; font-weight: 900; }
+.hud-row { display: flex; gap: 10px; margin-bottom: 10px; margin-top: 5px; z-index: 5; justify-content: center; width: 100%; }
+
+/* --- STYLE CHO MỤC TIÊU (GIỐNG THẺ HỌC) --- */
+#target-word-container {
+    display: flex; flex-direction: row; justify-content: center; align-items: flex-end;
+    background: white; padding: 5px 15px; border-radius: 8px;
+    border: 2px solid #5d4037;
+    margin-top: 5px;
+}
+.target-char { display: flex; flex-direction: column; align-items: center; margin: 0 1px; }
+.target-ipa { color: red; font-weight: bold; font-size: 14px; height: 16px; }
+.target-txt { color: #333; font-weight: bold; font-size: 24px; }
+
 .score-text { font-size: 24px; color: #fff; font-weight: 900; }
 
 .game-field-3d {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
-    width: 90%; max-width: 420px;
-    /* Hiệu ứng 3D nghiêng */
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    width: 90%; max-width: 400px;
+    /* 3D Effect */
     transform: perspective(800px) rotateX(25deg);
-    padding: 25px;
-    /* Màu đất nền */
+    padding: 20px;
+    /* Màu đất */
     background-color: #6d4c41; 
-    background-image: radial-gradient(circle, #795548 10%, transparent 10%), radial-gradient(circle, #795548 10%, transparent 10%);
+    background-image: radial-gradient(circle, #795548 10%, transparent 10%);
     background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-    
     border-radius: 20px;
-    border: 8px solid #388e3c; /* Viền cỏ xanh đậm */
+    border: 8px solid #388e3c; /* Viền cỏ */
     box-shadow: 0 20px 0 #2e7d32, 0 25px 25px rgba(0,0,0,0.6);
 }
 
 .hole {
     position: relative; aspect-ratio: 1;
-    background: #3e2723; /* Lỗ tối */
+    background: #2b1b13; /* Lỗ */
     border-radius: 50%;
     box-shadow: inset 0 10px 20px black;
     overflow: hidden; 
@@ -198,10 +206,10 @@ body {
 }
 .mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP CUTE */
+/* BÚA ĐẬP CUTE (Đã fix hiển thị) */
 .hammer {
-    position: absolute; width: 100px; height: 100px; pointer-events: none; z-index: 999;
-    /* Dùng link búa gỗ hoạt hình đáng yêu */
+    position: absolute; width: 100px; height: 100px; pointer-events: none; z-index: 10000;
+    /* Link búa gỗ hoạt hình */
     background-image: url('https://img.icons8.com/external-flaticons-flat-flat-icons/96/external-hammer-farm-flaticons-flat-flat-icons.png');
     background-size: contain; background-repeat: no-repeat;
     transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
@@ -273,7 +281,7 @@ body {
                 <div class="hud-row">
                     <div class="wood-sign">
                         <small>MỤC TIÊU:</small><br>
-                        <span id="target-word-display" class="target-word">...</span>
+                        <div id="target-word-container"></div> 
                     </div>
                     <div class="wood-sign">
                         <small>ĐIỂM SỐ:</small><br>
@@ -298,7 +306,7 @@ body {
                 <button class="btn-action btn-nav" style="width: 60%; border-radius: 30px; font-size: 20px; box-shadow: 0 4px #e67e22; background-color: #e67e22;" onclick="initGame()"> ↻  Chơi lại</button>
             </div>
             <div id="win-modal">
-                <h1 style="color:green; font-size:36px; margin-bottom: 10px;">HOÀN THÀNH!  🌾 </h1>
+                <h1 style="color:green; font-size:36px; margin-bottom: 10px;">HOÀN THÀNH!  🎉 </h1>
                 <h2 style="color:#d35400; font-size:40px; margin: 5px 0;">Tổng điểm: <span id="final-score">0</span></h2>
                 <p id="win-msg" style="font-size:20px; color:#555; margin-bottom: 30px;">Thời gian: 00:00</p>
                 <button class="btn-action btn-nav" style="width:auto; padding: 0 40px;" onclick="initGame()">Chơi lại</button>
@@ -309,26 +317,13 @@ body {
     </div>
 
 <script>
+// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
 let currentUtterance = null; 
 
-function unlockAudio() {
-    [audioWin, audioCorrect, audioWrong].forEach(snd => {
-        snd.muted = true; 
-        snd.play().then(() => {
-            snd.pause(); snd.currentTime = 0; snd.muted = false;
-        }).catch(e => {});
-    });
-    if(window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        let s = new SpeechSynthesisUtterance(" ");
-        s.volume = 0.1;
-        window.speechSynthesis.speak(s);
-    }
-}
-
+// --- DỮ LIỆU ---
 // BÀI 15
 const lesson15 = [
     { img: "gear.jpg", speak: "gear", pre: "ear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
@@ -412,20 +407,20 @@ function startLesson(num) {
     if(num === 15) currentData = lesson15;
     else if(num === 16) currentData = lesson16;
     else if(num === 17) currentData = lesson17;
-    
     idx = 0;
-    unlockAudio();
     preloadImages();
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('main-container').style.display = 'block';
     render(0);
 }
 
+// --- SỬA LỖI 1: TẮT HẾT ÂM THANH KHI RA MENU ---
 function goHome() {
+    stopMoleGame(); // Tắt vòng lặp game
+    window.speechSynthesis.cancel(); // Tắt giọng đọc ngay
+    
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
-    window.speechSynthesis.cancel();
-    stopMoleGame();
 }
 
 function render(i) {
@@ -609,13 +604,26 @@ function initMoleGame() {
     nextMoleRound();
 }
 
+// --- SỬA LỖI 3: HIỂN THỊ MỤC TIÊU GIỐNG THẺ HỌC ---
+function renderTargetWord(item) {
+    let html = '';
+    item.parts.forEach(p => {
+        const ipaHtml = p.i ? p.i : "&nbsp;";
+        html += `<div class="target-char"><div class="target-ipa">${ipaHtml}</div><div class="target-txt">${p.t}</div></div>`;
+    });
+    document.getElementById('target-word-container').innerHTML = html;
+}
+
 function nextMoleRound() {
     if (moleRemainingWords.length === 0) {
         win();
         return;
     }
     moleTarget = moleRemainingWords.pop();
-    document.getElementById('target-word-display').innerText = moleTarget.speak.toUpperCase();
+    
+    // GỌI HÀM HIỂN THỊ MỚI
+    renderTargetWord(moleTarget);
+    
     speak(moleTarget.speak);
     clearInterval(moleAudioLoop);
     moleAudioLoop = setInterval(() => { speak(moleTarget.speak); }, 2500);
@@ -689,10 +697,12 @@ function updateScore(points) {
     document.getElementById('score-display').innerText = currentScore;
 }
 
+// --- SỬA LỖI 1: HÀM DỪNG GAME TRIỆT ĐỂ ---
 function stopMoleGame() {
-    clearInterval(moleAudioLoop);
-    clearTimeout(moleLoop);
+    clearInterval(moleAudioLoop); // Tắt đọc từ lặp lại
+    clearTimeout(moleLoop);       // Tắt chuột chui lên
     moles.forEach(m => m.classList.remove('up', 'bonked'));
+    window.speechSynthesis.cancel(); // Tắt tiếng đang đọc dở
 }
 
 function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
@@ -718,7 +728,7 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
-    stopMoleGame(); // --- SỬA LỖI QUAN TRỌNG: DỪNG ÂM THANH GAME ---
+    stopMoleGame(); // Quan trọng: Dừng game khi thắng
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
@@ -728,7 +738,7 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    stopMoleGame();
+    stopMoleGame(); // Quan trọng: Dừng game khi thoát
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
