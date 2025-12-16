@@ -403,13 +403,13 @@ let hammerTimeout;
 // --- HÀM TẮT HẾT ÂM THANH (QUAN TRỌNG) ---
 // Chạy ngay khi tải trang để chắc chắn không có âm thanh ma
 window.onload = function() {
-    fullReset();
+    stopAllAudio();
 }
 
 // Hàm này dùng để CẤM TIỆT âm thanh (khi ra Menu hoặc thoát Game về Menu)
-function fullReset() {
-    isMoleGameActive = false; 
-    isAudioAllowed = false; // CẤM âm thanh
+function stopAllAudio() {
+    isMoleGameActive = false; // Tắt cờ game
+    isAudioAllowed = false; // CẤM mọi âm thanh phát ra
     
     window.speechSynthesis.cancel();
     clearInterval(moleAudioLoop);
@@ -418,11 +418,13 @@ function fullReset() {
     const allMoles = document.querySelectorAll('.mole');
     allMoles.forEach(m => m.classList.remove('up', 'bonked'));
     
+    // Ẩn búa ngay lập tức
     const hammer = document.getElementById('cursor-hammer');
     if(hammer) {
         hammer.classList.remove('active');
         clearTimeout(hammerTimeout);
     }
+    
     moleAudioLoop = null; 
 }
 
@@ -444,6 +446,13 @@ function gameReset() {
     }
 }
 
+function unlockSpeech() {
+    if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(' '); 
+        window.speechSynthesis.speak(u);
+    }
+}
+
 function preloadImages() {
     try {
         [lesson15, lesson16, lesson17].forEach(l => {
@@ -455,6 +464,7 @@ function preloadImages() {
 function startLesson(num) {
     gameReset(); // Reset nhưng KHÔNG CẤM tiếng
     isAudioAllowed = true; // BẬT CẦU DAO ÂM THANH
+    unlockSpeech(); // Mở khóa âm thanh mobile
     
     if(num === 15) currentData = lesson15;
     else if(num === 16) currentData = lesson16;
@@ -467,13 +477,15 @@ function startLesson(num) {
 }
 
 function goHome() {
-    fullReset(); // TẮT HẾT VÀ CẤM TIẾNG
+    stopAllAudio(); // CẮT ĐỨT ÂM THANH HOÀN TOÀN
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
 }
 
 function render(i) {
-    gameReset(); // Dừng game cũ, chuẩn bị cho cái mới
+    // QUAN TRỌNG: Không gọi stopAllAudio() ở đây vì sẽ làm mất quyền đọc
+    // Chỉ gọi cancel() để dừng từ cũ
+    window.speechSynthesis.cancel(); 
     
     if(i < 0 || i >= currentData.length) return;
     idx = i;
@@ -511,7 +523,7 @@ function render(i) {
             }
         });
         infoDisplay.innerHTML = html;
-        playAudio();
+        // Bỏ dòng playAudio() ở đây để fix lỗi auto-play trên mobile
     }
 }
 
@@ -528,7 +540,7 @@ function playAudio() {
 }
 
 function speak(txt) {
-    if (!isAudioAllowed) return; // CHỐT CHẶN
+    if (!isAudioAllowed) return; 
     
     window.speechSynthesis.cancel();
     if ('speechSynthesis' in window) {
@@ -764,6 +776,12 @@ function updateScore(points) {
     document.getElementById('score-display').innerText = currentScore;
 }
 
+function stopMoleGame() {
+    clearInterval(moleAudioLoop);
+    clearTimeout(moleLoop);
+    moles.forEach(m => m.classList.remove('up', 'bonked'));
+}
+
 function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
 let lastHole;
 function randomHole(moles) {
@@ -787,7 +805,8 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
-    gameReset(); // Dừng game
+    gameReset(); // Dừng game vòng lặp
+    isAudioAllowed = true; // Vẫn cho phép âm thanh win
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
@@ -797,9 +816,10 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    gameReset();
+    gameReset(); // Dừng game
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
+    // Mở lại audio để học tiếp
     isAudioAllowed = true;
     nav(-1);
 }
