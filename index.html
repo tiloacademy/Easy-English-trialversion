@@ -7,38 +7,47 @@
 <style>
 /* --- 1. CẤU HÌNH CỐ ĐỊNH --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fdf2e9;
-    margin: 0; padding: 0;
-    height: 100vh; width: 100vw;
-    overflow: hidden;
+    background-color: #fdf2e9; margin: 0; padding: 0;
+    height: 100vh; width: 100vw; overflow: hidden;
     display: flex; flex-direction: column;
 }
 
-/* --- 2. MENU MỞ ĐẦU --- */
+/* --- MÀN HÌNH CHÀO --- */
+#start-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 99999;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+.btn-start-big {
+    background: #27ae60; color: white; border: 4px solid white;
+    padding: 20px 60px; border-radius: 50px;
+    font-size: 30px; font-weight: bold; cursor: pointer;
+    animation: pulse 1.5s infinite;
+}
+
+/* --- 2. MENU --- */
 #menu-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #fff; z-index: 9999;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 25px;
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 15px;
 }
 .menu-title { font-size: 32px; color: #ff6f00; font-weight: bold; margin-bottom: 20px; }
 .btn-menu {
     background: white; border: 3px solid #00A4EF; color: #00A4EF;
     padding: 15px 40px; border-radius: 50px; font-size: 22px; font-weight: bold;
     box-shadow: 0 5px #ccebfd; cursor: pointer; width: 85%; max-width: 350px;
-    transition: transform 0.1s; margin-bottom: 10px;
+    transition: transform 0.1s; margin-bottom: 5px;
 }
 .btn-menu:active { transform: scale(0.95); background: #f0f8ff; }
 
 /* --- 3. KHUNG CHÍNH --- */
-#main-container {
-    width: 100%; height: 100%; position: relative;
-}
+#main-container { width: 100%; height: 100%; position: relative; }
 
-/* --- 4. MÀN HÌNH HỌC TẬP --- */
+/* Màn hình học */
 #learning-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column;
@@ -51,53 +60,27 @@ body {
 }
 .btn-home { background: #eee; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; }
 .header-title { color: #ff6f00; font-size: 20px; font-weight: bold; }
-
 .learn-img-wrapper {
     flex: 1; width: 100%; min-height: 0;
-    display: flex; align-items: center; justify-content: center;
-    margin: 10px 0;
+    display: flex; align-items: center; justify-content: center; margin: 10px 0;
 }
-#learn-img {
-    max-width: 100%; max-height: 100%;
-    object-fit: contain; border-radius: 15px;
-}
-
+#learn-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 15px; }
 .info-area {
-    height: 120px; flex-shrink: 0;
-    display: flex; flex-direction: row;
-    align-items: center; justify-content: center;
-    gap: 0px; /* SỬA: Bỏ khoảng cách giữa các khối */
-    flex-wrap: wrap;
+    height: 120px; flex-shrink: 0; display: flex; flex-direction: row;
+    align-items: center; justify-content: center; gap: 0px; flex-wrap: wrap;
 }
-.char-block {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: flex-end;
-    margin: 0; /* SỬA: Bỏ margin để các chữ dính liền nhau */
-}
-.cb-ipa {
-    font-size: 24px; color: red; font-weight: bold; font-family: sans-serif;
-    height: 30px; line-height: 30px;
-}
-.cb-text {
-    font-size: 40px; color: #333; font-weight: bold;
-    height: 50px; line-height: 50px;
-}
+.char-block { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin: 0; }
+.cb-ipa { font-size: 24px; color: red; font-weight: bold; font-family: sans-serif; height: 30px; line-height: 30px; }
+.cb-text { font-size: 40px; color: #333; font-weight: bold; height: 50px; line-height: 50px; }
 .sent-ipa { font-size: 16px; color: red; font-weight: bold; height: 20px; }
 .sent-text { font-size: 24px; color: #333; font-weight: bold; height: 30px; }
-.spacer { width: 15px; } /* Khoảng cách giữa các từ trong câu */
-
-.stars {
-    height: 35px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0;
-}
+.spacer { width: 15px; }
+.stars { height: 35px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0; }
 .stars.active { color: #FFD700; text-shadow: 0 0 5px orange; }
-.feedback-text {
-    height: 25px; text-align: center; font-size: 16px; color: #555; font-style: italic; margin-bottom: 5px;
-}
-
+.feedback-text { height: 25px; text-align: center; font-size: 16px; color: #555; font-style: italic; margin-bottom: 5px; }
 .action-row {
-    height: 60px; flex-shrink: 0;
-    display: flex; justify-content: center; gap: 15px; align-items: center;
-    margin-bottom: 20px;
+    height: 60px; flex-shrink: 0; display: flex; justify-content: center; gap: 15px;
+    align-items: center; margin-bottom: 20px;
 }
 .btn-action {
     flex: 1; height: 55px; border-radius: 30px; border: none;
@@ -109,30 +92,24 @@ body {
 .btn-listen { background: #2980b9; }
 .btn-game-entry { background: #9b59b6; width: 80%; max-width: none; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
-
 .nav-row {
-    height: 60px; flex-shrink: 0;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 15px; margin-bottom: 10px;
+    height: 60px; flex-shrink: 0; display: flex; justify-content: space-between;
+    align-items: center; padding: 0 15px; margin-bottom: 10px;
 }
 .btn-nav {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: #f39c12; color: white; border: none;
-    font-size: 30px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 4px #d35400;
+    width: 60px; height: 60px; border-radius: 50%; background: #f39c12; color: white; border: none;
+    font-size: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #d35400;
 }
 .btn-nav:active { transform: translateY(2px); box-shadow: none; }
 
-/* --- 5. GIAO DIỆN GAME --- */
+/* --- 4. GAME SCREEN --- */
 #game-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: #fff3e0; z-index: 20;
-    flex-direction: column;
+    background: #fff3e0; z-index: 20; flex-direction: column;
 }
 .game-header {
     height: 70px; display: flex; justify-content: center; align-items: center;
-    position: relative; background: rgba(255,255,255,0.9);
-    border-bottom: 1px solid #ddd;
+    position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd;
 }
 .timer-badge {
     background: white; border: 3px solid #d35400; color: #d35400;
@@ -143,36 +120,26 @@ body {
     width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px;
 }
 .tower-container {
-    flex: 1; width: 100%;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 10px 0;
+    flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0;
 }
 .tower-row {
-    flex: 1; width: 100%;
-    display: flex; justify-content: center; align-items: center;
-    gap: 10px; margin-bottom: 5px;
+    flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px;
 }
-.card-flip {
-    height: 95%; aspect-ratio: 0.75;
-    position: relative; perspective: 1000px;
-}
+.card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
 .card-inner {
-    position: relative; width: 100%; height: 100%;
-    transition: transform 0.4s; transform-style: preserve-3d;
-    border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    position: relative; width: 100%; height: 100%; transition: transform 0.4s;
+    transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 .card-flip.flipped .card-inner { transform: rotateY(180deg); }
 .card-flip.matched .card-inner { opacity: 0; pointer-events: none; }
 .face {
-    position: absolute; width: 100%; height: 100%;
-    backface-visibility: hidden; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
     border: 2px solid #5d4037;
 }
 .front { background: #8d6e63; color: #3e2723; font-size: 6vh; font-weight: 900; }
 .back { background: white; transform: rotateY(180deg); padding: 2px; }
 .back img { width: 95%; height: 95%; object-fit: contain; }
-
 .game-card-text {
     display: flex; flex-direction: row; align-items: center; justify-content: center;
     height: 100%; width: 100%; flex-wrap: wrap;
@@ -189,36 +156,43 @@ body {
     background: rgba(255,255,255,0.95); z-index: 100;
     flex-direction: column; align-items: center; justify-content: center;
 }
+/* Hiển thị lỗi (Debug) */
+#error-log {
+    position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8);
+    color: white; font-size: 12px; padding: 5px; text-align: center; display: none; z-index: 10000;
+}
 </style>
 </head>
 <body>
-    <div id="menu-screen" style="display: flex;">
+    <div id="error-log"></div>
+
+    <div id="start-overlay">
+        <button class="btn-start-big" onclick="appStart()">▶ BẮT ĐẦU</button>
+        <p style="color:white; margin-top:20px; font-size:14px;">Chạm để bật âm thanh</p>
+    </div>
+
+    <div id="menu-screen">
         <div class="menu-title"> 📚  CHỌN BÀI HỌC</div>
         <button class="btn-menu" onclick="startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
         <button class="btn-menu" onclick="startLesson(16)">Bài 16: /aʊ/ & /oʊ/</button>
+        <button class="btn-menu" onclick="startLesson(17)">Bài 17: /eɪ/ & /aɪ/</button>
     </div>
 
     <div id="main-container" style="display: none;">
-        
         <div id="learning-screen">
             <div class="top-bar">
                 <button class="btn-home" onclick="goHome()"> 🏠 </button>
                 <div class="header-title"> 🐻  Bé Học Tiếng Anh  🐰 </div>
                 <div style="width: 40px;"></div>
             </div>
-
-            <div class="learn-img-wrapper">
-                <img id="learn-img" src="" alt="Hình ảnh">
-            </div>
+            <div class="learn-img-wrapper"><img id="learn-img" src="" alt="Hình ảnh"></div>
             <div class="info-area" id="info-display"></div>
             <div class="stars" id="stars">☆☆☆☆☆</div>
             <div class="feedback-text" id="feedback">...</div>
-            
             <div class="action-row" id="action-container">
                 <button class="btn-action btn-mic" id="mic-btn" onclick="startListening()"> 🎤  Đọc Ngay</button>
                 <button class="btn-action btn-listen" id="btn-replay" onclick="playAudio()"> 🔊  Nghe Lại</button>
             </div>
-            
             <div class="nav-row">
                 <button class="btn-nav" onclick="nav(-1)"> ◀ </button>
                 <button class="btn-nav" onclick="nav(1)"> ▶ </button>
@@ -232,7 +206,7 @@ body {
             </div>
             <div id="tower" class="tower-container"></div>
             <div class="game-footer">
-                <button class="btn-action btn-nav" style="width: 60%; border-radius: 30px; font-size: 20px; box-shadow: 0 4px #e67e22; background-color: #e67e22;" onclick="initGame()"> ↻  Chơi lại</button>
+                <button class="btn-action btn-nav" style="width: 60%; border-radius: 30px; font-size: 20px; background-color: #e67e22;" onclick="initGame()"> ↻  Chơi lại</button>
             </div>
             <div id="win-modal">
                 <h1 style="color:green; font-size:36px; margin-bottom: 10px;">XUẤT SẮC!  🎉 </h1>
@@ -245,12 +219,32 @@ body {
     </div>
 
 <script>
-// --- KHỞI TẠO ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
+let currentUtterance = null; 
 
-// BÀI 15
+// --- HÀM KHỞI ĐỘNG ỨNG DỤNG ---
+function appStart() {
+    document.getElementById('start-overlay').style.display = 'none';
+    document.getElementById('menu-screen').style.display = 'flex';
+    
+    [audioWin, audioCorrect, audioWrong].forEach(snd => {
+        snd.muted = true; 
+        snd.play().then(() => {
+            snd.pause(); snd.currentTime = 0; snd.muted = false;
+        }).catch(e => console.log(e));
+    });
+    
+    if(window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        let s = new SpeechSynthesisUtterance("Welcome");
+        s.volume = 0.1;
+        window.speechSynthesis.speak(s);
+    }
+}
+
+// DATA BÀI 15
 const lesson15 = [
     { img: "gear.jpg", speak: "gear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
     { img: "deer.jpg", speak: "deer", similar: ["dear"], parts: [{i:"ɪr", t:"deer"}] },
@@ -268,7 +262,7 @@ const lesson15 = [
     { type: "game", title: "Game /ɛr/", pairs: ["bear", "pear", "share", "stair", "chair"] }
 ];
 
-// BÀI 16 (Đã gộp từ "shows" để không bị tách)
+// DATA BÀI 16
 const lesson16 = [
     { img: "shower.jpg", speak: "shower", similar: ["show"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
     { img: "shout.jpg", speak: "shout", similar: ["out"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {i:"", t:"t"}] },
@@ -281,10 +275,34 @@ const lesson16 = [
     { img: "phone.jpg", speak: "phone", similar: ["fun"], parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
     { img: "goat.jpg", speak: "goat", similar: ["got"], parts: [{i:"", t:"g"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
     { type: "sent", img: "sentence_cow.jpg", speak: "The brown cow shouts at the mouse", parts: [{i:"ðə", t:"The"}, {i:"aʊ", t:"brown"}, {i:"aʊ", t:"cow"}, {i:"aʊ", t:"shouts"}, {i:"æ", t:"at"}, {i:"ðə", t:"the"}, {i:"aʊ _", t:"mouse."}] },
-    // ĐÃ SỬA DÒNG DƯỚI: Gộp "show" và "s" thành "shows"
     { type: "sent", img: "sentence_joe.jpg", speak: "Joe shows the slow goat the soap", parts: [{i:"dʒ oʊ", t:"Joe"}, {i:"ʃ oʊ z", t:"shows"}, {i:"ðə", t:"the"}, {i:"oʊ", t:"slow"}, {i:"oʊ", t:"goat"}, {i:"ðə", t:"the"}, {i:"oʊ", t:"soap."}] },
     { type: "game", title: "Game /aʊ/", pairs: ["cow", "brown", "shout", "tower", "shower"] },
     { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"] }
+];
+
+// DATA BÀI 17 (MỚI)
+const lesson17 = [
+    // Âm /eɪ/
+    { img: "face.jpg", speak: "face", similar: [], parts: [{i:"", t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
+    { img: "cake.jpg", speak: "cake", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
+    { img: "cave.jpg", speak: "cave", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"v"}, {i:"_", t:"e"}] },
+    { img: "baby.jpg", speak: "baby", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"b"}, {i:"i:", t:"y"}] },
+    { img: "baker.jpg", speak: "baker", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"ər", t:"er"}] },
+    // Câu /eɪ/
+    { type: "sent", img: "sentence_vase.jpg", speak: "Kate paints a vase", parts: [{i:"", t:"K"}, {i:"eɪ", t:"a"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"p"}, {i:"eɪ", t:"ai"}, {i:"", t:"nts"}, {i:"ə", t:"a"}, {i:"", t:"v"}, {i:"eɪ", t:"a"}, {i:"", t:"s"}, {i:"_", t:"e."}] },
+    
+    // Âm /aɪ/
+    { img: "kite.jpg", speak: "kite", similar: [], parts: [{i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}] },
+    { img: "bike.jpg", speak: "bike", similar: [], parts: [{i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
+    { img: "tie.jpg", speak: "tie", similar: [], parts: [{i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"_", t:"e"}] },
+    { img: "pine.jpg", speak: "pine", similar: [], parts: [{i:"", t:"p"}, {i:"aɪ", t:"i"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
+    { img: "cry.jpg", speak: "cry", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
+    // Câu /aɪ/
+    { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {i:"ə", t:"a"}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
+    
+    // Placeholder Game (Chờ nội dung sau)
+    { type: "game", title: "Game /eɪ/", pairs: ["face", "cake", "cave", "baby", "baker"] },
+    { type: "game", title: "Game /aɪ/", pairs: ["kite", "bike", "tie", "pine", "cry"] }
 ];
 
 let currentData = [];
@@ -292,47 +310,38 @@ let idx = 0;
 let timerInt, sec=0, flipped=false, lock=false, c1, c2, match=0, lastWord="";
 let recognition;
 
-// --- HÀM TẢI TRƯỚC ẢNH (PRELOAD) ---
 function preloadImages() {
-    console.log("Đang tải trước ảnh...");
-    currentData.forEach(item => {
-        if (item.img) {
-            const img = new Image();
-            img.src = item.img;
-        }
-        if (item.type === 'game' && item.pairs) {
-             item.pairs.forEach(key => {
-                let original = currentData.find(d => {
-                     if(d.type === 'game' || d.type === 'sent') return false;
-                     let fullWord = d.parts.map(p => p.t).join("");
-                     return (fullWord === key || d.speak === key);
+    try {
+        currentData.forEach(item => {
+            if (item.img) new Image().src = item.img;
+            if (item.type === 'game' && item.pairs) {
+                item.pairs.forEach(key => {
+                    let origin = currentData.find(d => (d.speak === key || (d.parts && d.parts.map(p=>p.t).join("") === key)));
+                    if (origin && origin.img) new Image().src = origin.img;
                 });
-                if (original && original.img) {
-                    const i = new Image();
-                    i.src = original.img;
-                }
-             });
-        }
-    });
+            }
+        });
+    } catch(e) {}
 }
 
-// --- MENU LOGIC ---
 function startLesson(num) {
-    currentData = (num === 15) ? lesson15 : lesson16;
+    if(num === 15) currentData = lesson15;
+    else if(num === 16) currentData = lesson16;
+    else if(num === 17) currentData = lesson17;
+    
     idx = 0;
-    // GỌI HÀM PRELOAD
-    preloadImages(); 
+    preloadImages();
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('main-container').style.display = 'block';
     render(0);
 }
+
 function goHome() {
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
     window.speechSynthesis.cancel();
 }
 
-// --- RENDER GIAO DIỆN ---
 function render(i) {
     if(i < 0 || i >= currentData.length) return;
     idx = i;
@@ -340,7 +349,6 @@ function render(i) {
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
     document.getElementById('win-modal').style.display = 'none';
-
     document.getElementById('stars').innerText = "☆☆☆☆☆";
     document.getElementById('stars').classList.remove('active');
     document.getElementById('feedback').innerText = "...";
@@ -354,37 +362,27 @@ function render(i) {
         infoDisplay.innerHTML = `<h2 class="word-display" style="font-size:30px;">${item.title}</h2>`;
         btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="enterGame()"> 🚀  Bắt Đầu Chơi</button>`;
     } else {
-        imgEl.src = ""; // Xóa ảnh cũ
-        imgEl.src = item.img;
-        
+        imgEl.src = ""; imgEl.src = item.img;
         btnContainer.innerHTML = `
             <button class="btn-action btn-mic" id="mic-btn" onclick="startListening()"> 🎤  Đọc Ngay</button>
             <button class="btn-action btn-listen" id="btn-replay" onclick="playAudio()"> 🔊  Nghe Lại</button>
         `;
         let html = '';
-        // LOGIC HIỂN THỊ MỚI: TỰ ĐỘNG THÊM KHOẢNG CÁCH GIỮA CÁC TỪ TRONG CÂU
         item.parts.forEach((p, index) => {
             const ipaHtml = p.i ? p.i : "&nbsp;";
             const textClass = (item.type === 'sent') ? 'sent-text' : 'cb-text';
             const ipaClass = (item.type === 'sent') ? 'sent-ipa' : 'cb-ipa';
-            html += `
-            <div class="char-block">
-                <div class="${ipaClass}">${ipaHtml}</div>
-                <div class="${textClass}">${p.t}</div>
-            </div>`;
-            // Chỉ thêm khoảng trắng nếu là câu VÀ không phải từ cuối cùng
-            if(item.type === 'sent' && index < item.parts.length - 1) {
-                html += `<div class="spacer"></div>`;
-            }
+            html += `<div class="char-block"><div class="${ipaClass}">${ipaHtml}</div><div class="${textClass}">${p.t}</div></div>`;
+            if(item.type === 'sent' && index < item.parts.length - 1) html += `<div class="spacer"></div>`;
         });
         infoDisplay.innerHTML = html;
-        setTimeout(playAudio, 500);
+        playAudio();
     }
 }
 
-// --- AUDIO HELPERS ---
 function nav(d) { render(idx + d); }
 function nextItem() { nav(1); }
+
 function playAudio() {
     const item = currentData[idx];
     if(item.type !== 'game') {
@@ -392,14 +390,18 @@ function playAudio() {
         speak(fullText);
     }
 }
+
 function speak(txt) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt);
-    u.lang = 'en-US';
-    window.speechSynthesis.speak(u);
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        currentUtterance = new SpeechSynthesisUtterance(txt);
+        currentUtterance.lang = 'en-US';
+        currentUtterance.rate = 0.9;
+        currentUtterance.onend = function() { currentUtterance = null; }
+        window.speechSynthesis.speak(currentUtterance);
+    }
 }
 
-// --- GAME LOGIC ---
 function enterGame() {
     document.getElementById('learning-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
@@ -414,7 +416,6 @@ function initGame() {
     sec=0; document.getElementById('timer').innerText = "00:00";
     startTimer();
     flipped=false; lock=false; c1=null; c2=null; match=0; lastWord="Choose";
-    
     let cards = [];
     item.pairs.forEach(key => {
         let original = currentData.find(d => {
@@ -433,7 +434,6 @@ function initGame() {
             cards.push({ id: key, type: 'text', content: htmlText, speak: original.speak });
         }
     });
-    
     cards.sort(() => 0.5 - Math.random());
     const rows = [3, 2, 3, 2];
     let cCount = 0; let num = 1;
@@ -466,14 +466,15 @@ function check() {
     if(c1.dataset.id === c2.dataset.id) {
         setTimeout(() => {
             c1.classList.add('matched'); c2.classList.add('matched');
-            match++; audioCorrect.play();
+            match++; 
+            audioCorrect.play().catch(e=>console.log(e));
             reset();
             if(match===5) win();
         }, 600);
     } else {
         setTimeout(() => {
             c1.classList.remove('flipped'); c2.classList.remove('flipped');
-            audioWrong.play();
+            audioWrong.play().catch(e=>console.log(e));
             reset();
         }, 1000);
     }
@@ -492,7 +493,7 @@ function win() {
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Bạn đã hoàn thành trò chơi trong " + timeStr;
     document.getElementById('win-modal').style.display = 'flex';
-    audioWin.play();
+    audioWin.play().catch(e=>console.log(e));
     speak("Excellent job!");
 }
 function exitGame() {
@@ -501,11 +502,9 @@ function exitGame() {
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
 }
-
-// --- MIC & SPEECH RECOGNITION ---
 function startListening() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return alert("Trình duyệt không hỗ trợ Web Speech API");
+    if (!SpeechRecognition) return alert("Trình duyệt không hỗ trợ");
     const btn = document.getElementById('mic-btn');
     btn.disabled = true; btn.innerText = " 👂  Đang nghe...";
     btn.style.backgroundColor = "#e74c3c";
@@ -525,46 +524,33 @@ function resetMic() {
     btn.disabled = false; btn.innerText = " 🎤  Đọc Ngay";
     btn.style.backgroundColor = "#27ae60";
 }
-
-// --- LOGIC CHẤM ĐIỂM THÔNG MINH ---
 function levenshteinDistance(a, b) {
     const matrix = [];
     for (let i = 0; i <= b.length; i++) matrix[i] = [i];
     for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
     for (let i = 1; i <= b.length; i++) {
         for (let j = 1; j <= a.length; j++) {
-            if (b.charAt(i - 1) == a.charAt(j - 1)) {
-                matrix[i][j] = matrix[i - 1][j - 1];
-            } else {
-                matrix[i][j] = Math.min(
-                    matrix[i - 1][j - 1] + 1,
-                    Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-                );
-            }
+            if (b.charAt(i - 1) == a.charAt(j - 1)) matrix[i][j] = matrix[i - 1][j - 1];
+            else matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
         }
     }
     return matrix[b.length][a.length];
 }
-
 function checkResult(heardArray) {
     const item = currentData[idx];
     const targetRaw = item.speak.toLowerCase().replace(/[.,!?]/g, "").trim();
     let maxScore = 0; 
-
     for (let text of heardArray) {
         let score = 0;
         let userText = text.trim();
-
         if (targetRaw.split(" ").length === 1) {
             let isExact = (userText === targetRaw);
             let isSimilar = item.similar && item.similar.includes(userText);
-            if (isExact || isSimilar) {
-                score = 100;
-            } else {
+            if (isExact || isSimilar) score = 100;
+            else {
                 let dist = levenshteinDistance(targetRaw, userText);
                 let len = Math.max(targetRaw.length, userText.length);
                 let similarity = (len - dist) / len; 
-                
                 if (similarity >= 0.8) score = 90;       
                 else if (userText.includes(targetRaw)) score = 80; 
                 else if (similarity >= 0.5) score = 60;  
@@ -574,37 +560,25 @@ function checkResult(heardArray) {
             const targetWords = targetRaw.split(/\s+/);
             const userWords = userText.split(/\s+/);
             let matchCount = 0;
-            targetWords.forEach(w => {
-                if (userWords.includes(w)) matchCount++;
-            });
+            targetWords.forEach(w => { if (userWords.includes(w)) matchCount++; });
             score = (matchCount / targetWords.length) * 100;
         }
         if (score > maxScore) maxScore = score;
     }
+    let finalStars = 2; let msg = "Try again!";
+    if (maxScore >= 95) { finalStars = 5; msg = "Excellent! 🎉"; } 
+    else if (maxScore >= 70) { finalStars = 4; msg = "Good job! 👍"; } 
+    else if (maxScore >= 40) { finalStars = 3; msg = "Nice try! 👌"; }
 
-    let finalStars = 2; 
-    let msg = "Try again!";
-
-    if (maxScore >= 95) {
-        finalStars = 5; msg = "Excellent! 🎉";
-    } else if (maxScore >= 70) {
-        finalStars = 4; msg = "Good job! 👍";
-    } else if (maxScore >= 40) {
-        finalStars = 3; msg = "Nice try! 👌";
-    }
-
-    let s = ""; 
-    for(let i=0; i<5; i++) s += (i < finalStars) ? " ⭐ " : "☆";
-    
+    let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? " ⭐ " : "☆";
     document.getElementById('stars').innerText = s;
     document.getElementById('stars').className = (finalStars === 5) ? "stars active" : "stars";
     document.getElementById('feedback').innerText = msg;
-
     if (finalStars >= 4) {
-        audioWin.play(); 
+        audioWin.play().catch(e=>console.log(e)); 
         if(finalStars === 5) speak(msg);
     } else {
-        audioWrong.play();
+        audioWrong.play().catch(e=>console.log(e));
     }
     resetMic();
 }
