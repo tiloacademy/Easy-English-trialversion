@@ -13,7 +13,7 @@ body {
     margin: 0; padding: 0;
     height: 100vh; width: 100vw; overflow: hidden;
     display: flex; flex-direction: column;
-    user-select: none; /* Chống bôi đen khi bấm nhanh */
+    user-select: none; /* Chống bôi đen */
 }
 
 /* --- 2. MENU CHÍNH --- */
@@ -124,16 +124,11 @@ body {
 #whack-wrapper {
     flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
     overflow: hidden;
-    /* Nền Nông Trại Vẽ Bằng Code */
     background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #8bc34a 40%, #8bc34a 100%);
     position: relative;
 }
-#whack-wrapper::before {
-    content: '☁️'; font-size: 60px; position: absolute; top: 30px; left: 20px; opacity: 0.8;
-}
-#whack-wrapper::after {
-    content: '☁️'; font-size: 50px; position: absolute; top: 60px; right: 40px; opacity: 0.8;
-}
+#whack-wrapper::before { content: '☁️'; font-size: 60px; position: absolute; top: 30px; left: 20px; opacity: 0.8; }
+#whack-wrapper::after { content: '☁️'; font-size: 50px; position: absolute; top: 60px; right: 40px; opacity: 0.8; }
 
 .wood-sign {
     background: #8d6e63;
@@ -147,12 +142,12 @@ body {
 
 .hud-row { display: flex; gap: 10px; margin-bottom: 10px; margin-top: 5px; z-index: 5; justify-content: center; width: 100%; }
 
-/* --- STYLE CHO MỤC TIÊU (GIỐNG THẺ HỌC) --- */
+/* TARGET BOX MỚI */
 #target-word-container {
     display: flex; flex-direction: row; justify-content: center; align-items: flex-end;
     background: white; padding: 5px 15px; border-radius: 8px;
     border: 2px solid #5d4037;
-    margin-top: 5px;
+    margin-top: 5px; min-height: 45px;
 }
 .target-char { display: flex; flex-direction: column; align-items: center; margin: 0 1px; }
 .target-ipa { color: red; font-weight: bold; font-size: 14px; height: 16px; }
@@ -163,21 +158,19 @@ body {
 .game-field-3d {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
     width: 90%; max-width: 400px;
-    /* 3D Effect */
     transform: perspective(800px) rotateX(25deg);
     padding: 20px;
-    /* Màu đất */
     background-color: #6d4c41; 
     background-image: radial-gradient(circle, #795548 10%, transparent 10%);
     background-size: 20px 20px;
     border-radius: 20px;
-    border: 8px solid #388e3c; /* Viền cỏ */
+    border: 8px solid #388e3c;
     box-shadow: 0 20px 0 #2e7d32, 0 25px 25px rgba(0,0,0,0.6);
 }
 
 .hole {
     position: relative; aspect-ratio: 1;
-    background: #2b1b13; /* Lỗ */
+    background: #2b1b13;
     border-radius: 50%;
     box-shadow: inset 0 10px 20px black;
     overflow: hidden; 
@@ -186,7 +179,7 @@ body {
 
 .mole {
     position: absolute; top: 100%; left: 10%; width: 80%; height: 95%;
-    background: #D2691E; /* Da chuột */
+    background: #D2691E;
     border-radius: 45% 45% 10% 10%;
     transition: top 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
@@ -197,19 +190,22 @@ body {
 .mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 22px; }
 .mole.up { top: 5%; }
 
+/* --- THẺ ẢNH TO HƠN VÀ RÕ RÀNG HƠN --- */
 .mole-card {
-    width: 95%; height: 55%;
-    background: white; border: 3px solid #fff; border-radius: 10px;
+    width: 110%; /* To hơn chiều ngang chuột */
+    height: 65%; /* To hơn chiều dọc */
+    background: white; border: 4px solid #fff; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    z-index: 2; margin-top: 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    z-index: 2; margin-top: 25px; /* Đẩy lên cao để che thân */
+    transform: rotate(-5deg); /* Nghiêng nhẹ cho tự nhiên */
 }
 .mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP CUTE (Đã fix hiển thị) */
+/* BÚA ĐẬP CUTE - Z-INDEX CAO ĐỂ KHÔNG MẤT */
 .hammer {
-    position: absolute; width: 100px; height: 100px; pointer-events: none; z-index: 10000;
-    /* Link búa gỗ hoạt hình */
+    position: absolute; width: 100px; height: 100px; pointer-events: none; 
+    z-index: 100000; /* Z-index cực cao */
     background-image: url('https://img.icons8.com/external-flaticons-flat-flat-icons/96/external-hammer-farm-flaticons-flat-flat-icons.png');
     background-size: contain; background-repeat: no-repeat;
     transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
@@ -221,7 +217,6 @@ body {
     100% { transform: rotate(0deg); }
 }
 
-/* ĐIỂM BAY */
 .floating-text {
     position: absolute; font-weight: 900; font-size: 28px;
     pointer-events: none; z-index: 1000;
@@ -317,7 +312,6 @@ body {
     </div>
 
 <script>
-// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
@@ -376,9 +370,8 @@ const lesson17 = [
     { img: "cry.jpg", speak: "cry", pre: "I", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
     { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
     
-    // GAME RIÊNG CHO /eɪ/
+    // GAME RIÊNG
     { type: "game", title: "Săn Chuột âm /eɪ/", gameType: "mole", phoneme: "eɪ" },
-    // GAME RIÊNG CHO /aɪ/
     { type: "game", title: "Săn Chuột âm /aɪ/", gameType: "mole", phoneme: "aɪ" } 
 ];
 
@@ -403,7 +396,16 @@ function preloadImages() {
     } catch(e) {}
 }
 
+// --- HÀM TẮT HẾT ÂM THANH (QUAN TRỌNG) ---
+function stopAllAudio() {
+    window.speechSynthesis.cancel(); // Tắt giọng đọc ngay
+    clearInterval(moleAudioLoop);    // Tắt vòng lặp đọc "Pine"
+    clearTimeout(moleLoop);          // Tắt chuột chui
+    if(moles) moles.forEach(m => m.classList.remove('up', 'bonked'));
+}
+
 function startLesson(num) {
+    stopAllAudio(); // Reset trước khi vào bài
     if(num === 15) currentData = lesson15;
     else if(num === 16) currentData = lesson16;
     else if(num === 17) currentData = lesson17;
@@ -414,16 +416,14 @@ function startLesson(num) {
     render(0);
 }
 
-// --- SỬA LỖI 1: TẮT HẾT ÂM THANH KHI RA MENU ---
 function goHome() {
-    stopMoleGame(); // Tắt vòng lặp game
-    window.speechSynthesis.cancel(); // Tắt giọng đọc ngay
-    
+    stopAllAudio(); // CẮT ĐỨT ÂM THANH KHI RA HOME
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
 }
 
 function render(i) {
+    stopAllAudio(); // Chuyển slide cũng phải tắt âm cũ
     if(i < 0 || i >= currentData.length) return;
     idx = i;
     const item = currentData[i];
@@ -477,12 +477,11 @@ function playAudio() {
 }
 
 function speak(txt) {
+    window.speechSynthesis.cancel();
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
         currentUtterance = new SpeechSynthesisUtterance(txt);
         currentUtterance.lang = 'en-US';
         currentUtterance.rate = 0.9;
-        currentUtterance.onend = function() { currentUtterance = null; }
         window.speechSynthesis.speak(currentUtterance);
     }
 }
@@ -503,6 +502,7 @@ function initGame() {
 
 // --- GAME 1: FLIP ---
 function initFlipGame() {
+    stopAllAudio(); // Đảm bảo sạch sẽ
     document.getElementById('tower').style.display = 'flex';
     document.getElementById('whack-wrapper').style.display = 'none';
     const item = currentData[idx];
@@ -580,6 +580,7 @@ function resetFlip() { flipped=false; lock=false; c1=null; c2=null; }
 
 // --- GAME 2: WHACK-A-MOLE PRO 3D ---
 function initMoleGame() {
+    stopAllAudio(); // Dừng mọi âm thanh cũ trước khi vào game
     document.getElementById('tower').style.display = 'none';
     document.getElementById('whack-wrapper').style.display = 'flex';
     document.getElementById('win-modal').style.display = 'none';
@@ -599,12 +600,10 @@ function initMoleGame() {
     
     if (moleRemainingWords.length === 0) return;
     
-    stopMoleGame();
     startTimer();
     nextMoleRound();
 }
 
-// --- SỬA LỖI 3: HIỂN THỊ MỤC TIÊU GIỐNG THẺ HỌC ---
 function renderTargetWord(item) {
     let html = '';
     item.parts.forEach(p => {
@@ -621,7 +620,6 @@ function nextMoleRound() {
     }
     moleTarget = moleRemainingWords.pop();
     
-    // GỌI HÀM HIỂN THỊ MỚI
     renderTargetWord(moleTarget);
     
     speak(moleTarget.speak);
@@ -673,8 +671,9 @@ function bonk(moleEl, event) {
 
 function spawnHammer(x, y) {
     const hammer = document.getElementById('cursor-hammer');
-    hammer.style.left = (x - 50) + 'px';
-    hammer.style.top = (y - 50) + 'px';
+    // Chỉnh vị trí búa để đầu búa đập đúng chỗ
+    hammer.style.left = (x - 60) + 'px'; 
+    hammer.style.top = (y - 70) + 'px';
     hammer.classList.remove('active');
     void hammer.offsetWidth;
     hammer.classList.add('active');
@@ -695,14 +694,6 @@ function updateScore(points) {
     currentScore += points;
     if(currentScore < 0) currentScore = 0;
     document.getElementById('score-display').innerText = currentScore;
-}
-
-// --- SỬA LỖI 1: HÀM DỪNG GAME TRIỆT ĐỂ ---
-function stopMoleGame() {
-    clearInterval(moleAudioLoop); // Tắt đọc từ lặp lại
-    clearTimeout(moleLoop);       // Tắt chuột chui lên
-    moles.forEach(m => m.classList.remove('up', 'bonked'));
-    window.speechSynthesis.cancel(); // Tắt tiếng đang đọc dở
 }
 
 function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
@@ -728,7 +719,7 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
-    stopMoleGame(); // Quan trọng: Dừng game khi thắng
+    stopAllAudio(); // Dừng ngay âm thanh game
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
@@ -738,7 +729,7 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    stopMoleGame(); // Quan trọng: Dừng game khi thoát
+    stopAllAudio(); // Dừng ngay âm thanh game
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
