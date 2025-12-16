@@ -9,11 +9,11 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #87CEEB; /* Nền trời xanh */
+    background-color: #87CEEB;
     margin: 0; padding: 0;
     height: 100vh; width: 100vw; overflow: hidden;
     display: flex; flex-direction: column;
-    user-select: none; /* Chống bôi đen */
+    user-select: none;
 }
 
 /* --- 2. MENU CHÍNH --- */
@@ -85,8 +85,10 @@ body {
     width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px;
 }
 .game-footer {
-    height: 100px; display: flex; justify-content: center; align-items: center;
-    background: white; border-top: 1px solid #ccc; padding-bottom: 20px;
+    height: 120px; /* Tăng chiều cao footer */
+    display: flex; justify-content: center; align-items: center;
+    background: white; border-top: 1px solid #ccc;
+    padding-bottom: 50px; /* ĐẨY NÚT LÊN CAO KHỎI THANH ĐIỀU HƯỚNG */
 }
 #win-modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -126,6 +128,7 @@ body {
     overflow: hidden;
     background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #8bc34a 40%, #8bc34a 100%);
     position: relative;
+    padding-bottom: 20px; /* Khoảng cách an toàn dưới */
 }
 #whack-wrapper::before { content: '☁️'; font-size: 60px; position: absolute; top: 30px; left: 20px; opacity: 0.8; }
 #whack-wrapper::after { content: '☁️'; font-size: 50px; position: absolute; top: 60px; right: 40px; opacity: 0.8; }
@@ -142,7 +145,6 @@ body {
 
 .hud-row { display: flex; gap: 10px; margin-bottom: 10px; margin-top: 5px; z-index: 5; justify-content: center; width: 100%; }
 
-/* TARGET BOX MỚI */
 #target-word-container {
     display: flex; flex-direction: row; justify-content: center; align-items: flex-end;
     background: white; padding: 5px 15px; border-radius: 8px;
@@ -190,22 +192,27 @@ body {
 .mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 22px; }
 .mole.up { top: 5%; }
 
-/* --- THẺ ẢNH TO HƠN VÀ RÕ RÀNG HƠN --- */
+/* --- THẺ ẢNH MAX SIZE --- */
 .mole-card {
-    width: 110%; /* To hơn chiều ngang chuột */
-    height: 65%; /* To hơn chiều dọc */
-    background: white; border: 4px solid #fff; border-radius: 12px;
+    width: 120%; /* Rộng hơn cả con chuột */
+    height: 70%; /* Cao lên */
+    background: white; border: 2px solid #ddd; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    z-index: 2; margin-top: 25px; /* Đẩy lên cao để che thân */
-    transform: rotate(-5deg); /* Nghiêng nhẹ cho tự nhiên */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 2; margin-top: 20px; /* Kéo lên cao hơn */
+    padding: 0; /* Bỏ padding */
 }
-.mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
+.mole-card img { 
+    width: 100%; height: 100%; 
+    object-fit: contain; /* Đảm bảo hình trọn vẹn */
+    pointer-events: none; 
+}
 
-/* BÚA ĐẬP CUTE - Z-INDEX CAO ĐỂ KHÔNG MẤT */
+/* BÚA ĐẬP CUTE - FIXED POSITION ĐỂ KHÔNG BỊ TRÔI */
 .hammer {
-    position: absolute; width: 100px; height: 100px; pointer-events: none; 
-    z-index: 100000; /* Z-index cực cao */
+    position: fixed; /* Quan trọng: Fix theo màn hình */
+    width: 100px; height: 100px; pointer-events: none; 
+    z-index: 999999; /* Luôn nổi trên cùng */
     background-image: url('https://img.icons8.com/external-flaticons-flat-flat-icons/96/external-hammer-farm-flaticons-flat-flat-icons.png');
     background-size: contain; background-repeat: no-repeat;
     transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
@@ -218,7 +225,8 @@ body {
 }
 
 .floating-text {
-    position: absolute; font-weight: 900; font-size: 28px;
+    position: fixed; /* Fix theo màn hình */
+    font-weight: 900; font-size: 28px;
     pointer-events: none; z-index: 1000;
     animation: floatUp 0.8s ease-out forwards;
     text-shadow: 2px 2px 0px black, -2px -2px 0px white;
@@ -312,6 +320,7 @@ body {
     </div>
 
 <script>
+// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
@@ -648,14 +657,17 @@ function peep(allVocab) {
 function bonk(moleEl, event) {
     if(!moleEl.classList.contains('up')) return;
     
-    spawnHammer(event.pageX, event.pageY);
+    // SỬA: Dùng clientX/Y vì búa là position: fixed
+    let touchX = event.clientX || event.pageX;
+    let touchY = event.clientY || event.pageY;
+    spawnHammer(touchX, touchY);
     
     const clickedWord = moleEl.dataset.speak;
     if (clickedWord === moleTarget.speak) {
         audioCorrect.play().catch(e=>{});
         moleEl.classList.add('bonked');
         updateScore(100);
-        showFloatingText(event.pageX, event.pageY, "+100", "yellow");
+        showFloatingText(touchX, touchY, "+100", "yellow");
         setTimeout(() => {
             moleEl.classList.remove('up', 'bonked');
             clearTimeout(moleLoop);
@@ -665,7 +677,7 @@ function bonk(moleEl, event) {
         audioWrong.play().catch(e=>{});
         moleEl.classList.remove('up');
         updateScore(-50);
-        showFloatingText(event.pageX, event.pageY, "-50", "red");
+        showFloatingText(touchX, touchY, "-50", "red");
     }
 }
 
@@ -696,6 +708,12 @@ function updateScore(points) {
     document.getElementById('score-display').innerText = currentScore;
 }
 
+function stopMoleGame() {
+    clearInterval(moleAudioLoop);
+    clearTimeout(moleLoop);
+    moles.forEach(m => m.classList.remove('up', 'bonked'));
+}
+
 function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
 let lastHole;
 function randomHole(moles) {
@@ -719,7 +737,7 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
-    stopAllAudio(); // Dừng ngay âm thanh game
+    stopMoleGame(); // Quan trọng: Dừng game khi thắng
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
@@ -729,7 +747,7 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    stopAllAudio(); // Dừng ngay âm thanh game
+    stopMoleGame(); // Quan trọng: Dừng game khi thoát
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
