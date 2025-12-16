@@ -168,65 +168,49 @@ body {
     box-shadow: 0 20px 0 #2e7d32, 0 25px 25px rgba(0,0,0,0.6);
 }
 
-/* KHUNG HỐ: Cho phép chuột ngoi lên cao nhưng vẫn che phần dưới */
-.hole-container {
-    position: relative; aspect-ratio: 0.8; /* Hố cao hơn để chứa chuột khi chưa ngoi */
-    overflow: hidden; /* Cắt phần chuột ở dưới */
-    border-radius: 0 0 20px 20px; /* Bo tròn đáy */
-}
-
-/* HÌNH ẢNH HỐ (Miệng hố đen) */
-.hole-visual {
-    position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
-    background: #2b1b13; /* Màu hố tối */
+.hole {
+    position: relative; aspect-ratio: 1;
+    background: #2b1b13;
     border-radius: 50%;
     box-shadow: inset 0 10px 20px black;
+    overflow: hidden; 
     border: 2px solid #5d4037;
-    z-index: 1; /* Nằm dưới chuột khi chuột ngoi lên */
 }
 
-/* CHUỘT (Di chuyển từ dưới lên) */
+/* --- CHUỘT & THẺ BÀI --- */
 .mole {
-    position: absolute; 
-    bottom: -60%; /* Ban đầu ẩn dưới đáy */
-    left: 10%; width: 80%; height: 90%;
+    position: absolute; top: 100%; left: 10%; width: 80%; height: 95%;
     background: #D2691E;
-    border-radius: 45% 45% 0 0;
-    transition: bottom 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-radius: 45% 45% 10% 10%;
+    transition: top 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     padding-top: 5px; cursor: pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-    z-index: 0; /* Ban đầu nằm dưới miệng hố */
 }
-/* Khi ngoi lên: Đẩy lên cao và đè lên miệng hố */
-.mole.up { bottom: 10%; z-index: 2; } 
-
 .mole::before { content: '👀'; font-size: 20px; position: absolute; top: 5px; }
 .mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 22px; }
+.mole.up { top: 0%; } 
 
-/* THẺ HÌNH (To và Rõ) */
 .mole-card {
-    width: 140%; /* Rộng hơn cả con chuột */
-    height: 65%;
-    background: white; border: 3px solid #eee; border-radius: 10px;
+    width: 130%; height: 70%;
+    background: white; border: 3px solid #eee; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    position: absolute;
-    bottom: -10px; /* Thẻ nằm ở bụng */
-    left: -20%; /* Căn giữa */
+    z-index: 2; position: absolute; bottom: 0; left: -15%;
     transform: rotate(-3deg);
 }
 .mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP CUTE */
+/* BÚA ĐẬP - DÙNG ẢNH UPLOAD CỦA USER */
 .hammer {
     position: fixed; 
-    font-size: 80px; /* Dùng Emoji cho chắc chắn */
-    pointer-events: none; 
+    width: 100px; height: 100px; pointer-events: none; 
     z-index: 100000;
+    /* ĐÃ ĐỔI SANG FILE LOCAL */
+    background-image: url('hammer.png'); 
+    background-size: contain; background-repeat: no-repeat;
     transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
 }
-.hammer::after { content: '🔨'; } /* Búa Emoji */
 .hammer.active { display: block; animation: hammer-hit 0.15s ease-in; }
 @keyframes hammer-hit {
     0% { transform: rotate(30deg); }
@@ -302,15 +286,15 @@ body {
                 </div>
 
                 <div class="game-field-3d">
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
-                    <div class="hole-container"><div class="hole-visual"></div><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
                 </div>
             </div>
 
@@ -329,6 +313,7 @@ body {
     </div>
 
 <script>
+// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
@@ -405,6 +390,7 @@ let moleAudioLoop = null;
 let moles = [];
 let currentScore = 0;
 let isMoleGameActive = false; // Cờ kiểm soát game
+let hammerTimeout; // Biến kiểm soát búa
 
 // --- HÀM TẮT HẾT ÂM THANH (QUAN TRỌNG) ---
 // Chạy ngay khi tải trang để chắc chắn không có âm thanh ma
@@ -643,7 +629,7 @@ function renderTargetWord(item) {
 }
 
 function nextMoleRound() {
-    if (!isMoleGameActive) return; // Kiểm tra cờ
+    if (!isMoleGameActive) return; // Kiểm tra cờ trước khi chạy
     if (moleRemainingWords.length === 0) {
         win();
         return;
@@ -684,6 +670,7 @@ function peep(allVocab) {
 function bonk(moleEl, event) {
     if(!moleEl.classList.contains('up') || !isMoleGameActive) return;
     
+    // SỬA: Dùng clientX/Y vì búa là position: fixed
     let touchX = event.clientX || event.pageX;
     let touchY = event.clientY || event.pageY;
     spawnHammer(touchX, touchY);
@@ -709,11 +696,21 @@ function bonk(moleEl, event) {
 
 function spawnHammer(x, y) {
     const hammer = document.getElementById('cursor-hammer');
+    // Chỉnh vị trí búa để đầu búa đập đúng chỗ
     hammer.style.left = (x - 60) + 'px'; 
     hammer.style.top = (y - 70) + 'px';
+    
+    // Reset animation
     hammer.classList.remove('active');
-    void hammer.offsetWidth;
+    void hammer.offsetWidth; 
+    
     hammer.classList.add('active');
+    
+    // Tự động ẩn sau khi đập xong
+    clearTimeout(hammerTimeout);
+    hammerTimeout = setTimeout(() => {
+        hammer.classList.remove('active');
+    }, 150);
 }
 
 function showFloatingText(x, y, text, color) {
@@ -731,6 +728,12 @@ function updateScore(points) {
     currentScore += points;
     if(currentScore < 0) currentScore = 0;
     document.getElementById('score-display').innerText = currentScore;
+}
+
+function stopMoleGame() {
+    clearInterval(moleAudioLoop);
+    clearTimeout(moleLoop);
+    moles.forEach(m => m.classList.remove('up', 'bonked'));
 }
 
 function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
