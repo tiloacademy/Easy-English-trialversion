@@ -62,7 +62,7 @@ body {
     object-fit: contain; border-radius: 15px;
 }
 
-/* KHU VỰC CHỮ (Đã tối ưu: Dính liền các chữ) */
+/* KHU VỰC CHỮ */
 .info-area {
     height: 120px; flex-shrink: 0;
     display: flex; flex-direction: row;
@@ -85,7 +85,7 @@ body {
 }
 .sent-ipa { font-size: 16px; color: red; font-weight: bold; height: 20px; }
 .sent-text { font-size: 24px; color: #333; font-weight: bold; height: 30px; }
-.spacer { width: 15px; } /* Khoảng cách giữa các từ */
+.spacer { width: 15px; }
 
 .stars {
     height: 35px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0;
@@ -190,9 +190,16 @@ body {
     background: rgba(255,255,255,0.95); z-index: 100;
     flex-direction: column; align-items: center; justify-content: center;
 }
+/* Debug lỗi */
+#error-log {
+    position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8);
+    color: white; font-size: 12px; padding: 5px; text-align: center; display: none; z-index: 10000;
+}
 </style>
 </head>
 <body>
+    <div id="error-log"></div>
+
     <div id="menu-screen" style="display: flex;">
         <div class="menu-title"> 📚  CHỌN BÀI HỌC</div>
         <button class="btn-menu" onclick="startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
@@ -247,26 +254,43 @@ body {
     </div>
 
 <script>
-// --- KHỞI TẠO ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
-let currentUtterance = null;
+let currentUtterance = null; 
 
-// --- DỮ LIỆU BÀI HỌC ---
+// --- HÀM MỞ KHÓA ÂM THANH KHI BẤM CHỌN BÀI ---
+function unlockAudio() {
+    [audioWin, audioCorrect, audioWrong].forEach(snd => {
+        snd.muted = true; 
+        snd.play().then(() => {
+            snd.pause(); snd.currentTime = 0; snd.muted = false;
+        }).catch(e => console.log(e));
+    });
+    if(window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        let s = new SpeechSynthesisUtterance(" ");
+        s.volume = 0.1;
+        window.speechSynthesis.speak(s);
+    }
+}
 
 // BÀI 15
+// pre: "ear" -> Đọc "ear... gear"
 const lesson15 = [
-    { img: "gear.jpg", speak: "gear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
-    { img: "deer.jpg", speak: "deer", similar: ["dear"], parts: [{i:"ɪr", t:"deer"}] },
-    { img: "cheer.jpg", speak: "cheer", similar: ["chair"], parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
-    { img: "tear.jpg", speak: "tier", similar: ["tier", "tea"], parts: [{i:"t", t:"t"}, {i:"ɪr", t:"ear"}] },
-    { img: "ear.jpg", speak: "ear", similar: ["year"], parts: [{i:"ɪr", t:"ear"}] },
-    { img: "bear.jpg", speak: "bear", similar: ["bare"], parts: [{i:"b", t:"b"}, {i:"ɛr", t:"ear"}] },
-    { img: "pear.jpg", speak: "pear", similar: ["pair"], parts: [{i:"p", t:"p"}, {i:"ɛr", t:"ear"}] },
-    { img: "share.jpg", speak: "share", similar: ["chair"], parts: [{i:"ʃ", t:"sh"}, {i:"ɛr", t:"are"}] },
-    { img: "stair.jpg", speak: "stair", similar: ["stare"], parts: [{i:"", t:"st"}, {i:"ɛr", t:"air"}] },
-    { img: "chair.jpg", speak: "chair", similar: ["cheer"], parts: [{i:"tʃ", t:"ch"}, {i:"ɛr", t:"air"}] },
+    { img: "gear.jpg", speak: "gear", pre: "ear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
+    { img: "deer.jpg", speak: "deer", pre: "ear", similar: ["dear"], parts: [{i:"ɪr", t:"deer"}] },
+    { img: "cheer.jpg", speak: "cheer", pre: "ear", similar: ["chair"], parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
+    { img: "tear.jpg", speak: "tier", pre: "ear", similar: ["tier", "tea"], parts: [{i:"t", t:"t"}, {i:"ɪr", t:"ear"}] },
+    { img: "ear.jpg", speak: "ear", pre: "ear", similar: ["year"], parts: [{i:"ɪr", t:"ear"}] },
+    
+    // Nhóm /ɛr/ -> Đọc "air"
+    { img: "bear.jpg", speak: "bear", pre: "air", similar: ["bare"], parts: [{i:"b", t:"b"}, {i:"ɛr", t:"ear"}] },
+    { img: "pear.jpg", speak: "pear", pre: "air", similar: ["pair"], parts: [{i:"p", t:"p"}, {i:"ɛr", t:"ear"}] },
+    { img: "share.jpg", speak: "share", pre: "air", similar: ["chair"], parts: [{i:"ʃ", t:"sh"}, {i:"ɛr", t:"are"}] },
+    { img: "stair.jpg", speak: "stair", pre: "air", similar: ["stare"], parts: [{i:"", t:"st"}, {i:"ɛr", t:"air"}] },
+    { img: "chair.jpg", speak: "chair", pre: "air", similar: ["cheer"], parts: [{i:"tʃ", t:"ch"}, {i:"ɛr", t:"air"}] },
+    
     { type: "sent", img: "sentence_deer.jpg", speak: "The deer is near the chair", parts: [{i:"ðə", t:"The"}, {t:" "}, {i:"ɪr", t:"deer"}, {t:" "}, {i:"ɪz", t:"is"}, {t:" "}, {i:"ɪr", t:"near"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"tʃ ɛr", t:"chair."}] },
     { type: "sent", img: "sentence_bear.jpg", speak: "The bear shares the pear", parts: [{i:"ðə", t:"The"}, {t:" "}, {i:"ɛr", t:"bear"}, {t:" "}, {i:"ʃ ɛr z", t:"shares"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"ɛr", t:"pear."}] },
     { type: "game", title: "Game /ɪr/", pairs: ["gear", "deer", "cheer", "tear", "ear"] },
@@ -274,57 +298,44 @@ const lesson15 = [
 ];
 
 // BÀI 16
+// pre: "ow" (cho /aʊ/) và "oh" (cho /oʊ/)
 const lesson16 = [
-    { img: "shower.jpg", speak: "shower", similar: ["show"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
-    { img: "shout.jpg", speak: "shout", similar: ["out"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {i:"", t:"t"}] },
-    { img: "cow.jpg", speak: "cow", similar: ["how"], parts: [{i:"", t:"c"}, {i:"aʊ", t:"ow"}] },
-    { img: "brown.jpg", speak: "brown", similar: ["down"], parts: [{i:"", t:"br"}, {i:"aʊ", t:"ow"}, {i:"", t:"n"}] },
-    { img: "tower.jpg", speak: "tower", similar: ["power"], parts: [{i:"", t:"t"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
-    { img: "toe.jpg", speak: "toe", similar: ["tow"], parts: [{i:"", t:"t"}, {i:"oʊ", t:"oe"}] },
-    { img: "boat.jpg", speak: "boat", similar: ["boot"], parts: [{i:"", t:"b"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
-    { img: "coat.jpg", speak: "coat", similar: ["cat"], parts: [{i:"", t:"c"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
-    { img: "phone.jpg", speak: "phone", similar: ["fun"], parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
-    { img: "goat.jpg", speak: "goat", similar: ["got"], parts: [{i:"", t:"g"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
+    { img: "shower.jpg", speak: "shower", pre: "ow", similar: ["show"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
+    { img: "shout.jpg", speak: "shout", pre: "ow", similar: ["out"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {i:"", t:"t"}] },
+    { img: "cow.jpg", speak: "cow", pre: "ow", similar: ["how"], parts: [{i:"", t:"c"}, {i:"aʊ", t:"ow"}] },
+    { img: "brown.jpg", speak: "brown", pre: "ow", similar: ["down"], parts: [{i:"", t:"br"}, {i:"aʊ", t:"ow"}, {i:"", t:"n"}] },
+    { img: "tower.jpg", speak: "tower", pre: "ow", similar: ["power"], parts: [{i:"", t:"t"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
+    
+    // Nhóm /oʊ/ -> Đọc "oh"
+    { img: "toe.jpg", speak: "toe", pre: "oh", similar: ["tow"], parts: [{i:"", t:"t"}, {i:"oʊ", t:"oe"}] },
+    { img: "boat.jpg", speak: "boat", pre: "oh", similar: ["boot"], parts: [{i:"", t:"b"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
+    { img: "coat.jpg", speak: "coat", pre: "oh", similar: ["cat"], parts: [{i:"", t:"c"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
+    { img: "phone.jpg", speak: "phone", pre: "oh", similar: ["fun"], parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
+    { img: "goat.jpg", speak: "goat", pre: "oh", similar: ["got"], parts: [{i:"", t:"g"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
+    
     { type: "sent", img: "sentence_cow.jpg", speak: "The brown cow shouts at the mouse", parts: [{i:"ðə", t:"The"}, {t:" "}, {i:"aʊ", t:"brown"}, {t:" "}, {i:"aʊ", t:"cow"}, {t:" "}, {i:"aʊ", t:"shouts"}, {t:" "}, {i:"æ", t:"at"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"aʊ _", t:"mouse."}] },
     { type: "sent", img: "sentence_joe.jpg", speak: "Joe shows the slow goat the soap", parts: [{i:"dʒ oʊ", t:"Joe"}, {t:" "}, {i:"ʃ oʊ z", t:"shows"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"oʊ", t:"slow"}, {t:" "}, {i:"oʊ", t:"goat"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"oʊ", t:"soap."}] },
     { type: "game", title: "Game /aʊ/", pairs: ["cow", "brown", "shout", "tower", "shower"] },
     { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"] }
 ];
 
-// BÀI 17 (ĐÃ SỬA LỖI KHOẢNG CÁCH)
+// BÀI 17
+// pre: "A" (cho /eɪ/) và "I" (cho /aɪ/)
 const lesson17 = [
-    // Âm /eɪ/
-    { img: "face.jpg", speak: "face", similar: [], parts: [{i:"", t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
-    { img: "cake.jpg", speak: "cake", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
-    { img: "cave.jpg", speak: "cave", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"v"}, {i:"_", t:"e"}] },
-    { img: "baby.jpg", speak: "baby", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"b"}, {i:"i:", t:"y"}] },
-    { img: "baker.jpg", speak: "baker", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"ər", t:"er"}] },
-    // Câu /eɪ/ - Thêm {t:" "} để tạo khoảng cách giữa các từ
-    { type: "sent", img: "sentence_vase.jpg", speak: "Kate paints a vase", 
-      parts: [
-        {i:"", t:"K"}, {i:"eɪ", t:"a"}, {i:"", t:"t"}, {i:"_", t:"e"}, {t:" "}, 
-        {i:"", t:"p"}, {i:"eɪ", t:"ai"}, {i:"", t:"nts"}, {t:" "}, 
-        {i:"ə", t:"a"}, {t:" "}, 
-        {i:"", t:"v"}, {i:"eɪ", t:"a"}, {i:"", t:"s"}, {i:"_", t:"e."}
-      ] 
-    },
+    { img: "face.jpg", speak: "face", pre: "A", similar: [], parts: [{i:"", t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
+    { img: "cake.jpg", speak: "cake", pre: "A", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
+    { img: "cave.jpg", speak: "cave", pre: "A", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"v"}, {i:"_", t:"e"}] },
+    { img: "baby.jpg", speak: "baby", pre: "A", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"b"}, {i:"i:", t:"y"}] },
+    { img: "baker.jpg", speak: "baker", pre: "A", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"ər", t:"er"}] },
+    { type: "sent", img: "sentence_vase.jpg", speak: "Kate paints a vase", parts: [{i:"", t:"K"}, {i:"eɪ", t:"a"}, {i:"", t:"t"}, {i:"_", t:"e"}, {t:" "}, {i:"", t:"p"}, {i:"eɪ", t:"ai"}, {i:"", t:"nts"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"v"}, {i:"eɪ", t:"a"}, {i:"", t:"s"}, {i:"_", t:"e."}] },
     
-    // Âm /aɪ/
-    { img: "kite.jpg", speak: "kite", similar: [], parts: [{i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}] },
-    { img: "bike.jpg", speak: "bike", similar: [], parts: [{i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
-    { img: "tie.jpg", speak: "tie", similar: [], parts: [{i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"_", t:"e"}] },
-    { img: "pine.jpg", speak: "pine", similar: [], parts: [{i:"", t:"p"}, {i:"aɪ", t:"i"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
-    { img: "cry.jpg", speak: "cry", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
-    // Câu /aɪ/ - Thêm {t:" "} để tạo khoảng cách
-    { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", 
-      parts: [
-        {i:"ə", t:"A"}, {t:" "},
-        {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "},
-        {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "},
-        {i:"ə", t:"a"}, {t:" "},
-        {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}
-      ] 
-    },
+    // Nhóm /aɪ/ -> Đọc "I"
+    { img: "kite.jpg", speak: "kite", pre: "I", similar: [], parts: [{i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}] },
+    { img: "bike.jpg", speak: "bike", pre: "I", similar: [], parts: [{i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
+    { img: "tie.jpg", speak: "tie", pre: "I", similar: [], parts: [{i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"_", t:"e"}] },
+    { img: "pine.jpg", speak: "pine", pre: "I", similar: [], parts: [{i:"", t:"p"}, {i:"aɪ", t:"i"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
+    { img: "cry.jpg", speak: "cry", pre: "I", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
+    { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
     
     { type: "game", title: "Game /eɪ/", pairs: ["face", "cake", "cave", "baby", "baker"] },
     { type: "game", title: "Game /aɪ/", pairs: ["kite", "bike", "tie", "pine", "cry"] }
@@ -334,23 +345,6 @@ let currentData = [];
 let idx = 0;
 let timerInt, sec=0, flipped=false, lock=false, c1, c2, match=0, lastWord="";
 let recognition;
-
-// --- HÀM MỞ KHÓA ÂM THANH KHI CHỌN BÀI ---
-function unlockAudio() {
-    [audioWin, audioCorrect, audioWrong].forEach(snd => {
-        snd.muted = true; 
-        snd.play().then(() => {
-            snd.pause(); snd.currentTime = 0; snd.muted = false;
-        }).catch(e => console.log(e));
-    });
-    
-    if(window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        let s = new SpeechSynthesisUtterance(" ");
-        s.volume = 0.1;
-        window.speechSynthesis.speak(s);
-    }
-}
 
 function preloadImages() {
     try {
@@ -372,7 +366,7 @@ function startLesson(num) {
     else if(num === 17) currentData = lesson17;
     
     idx = 0;
-    unlockAudio(); // Mở khóa âm thanh ngay khi bấm nút
+    unlockAudio();
     preloadImages();
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('main-container').style.display = 'block';
@@ -385,7 +379,6 @@ function goHome() {
     window.speechSynthesis.cancel();
 }
 
-// --- RENDER GIAO DIỆN (ĐÃ SỬA LOGIC HIỂN THỊ) ---
 function render(i) {
     if(i < 0 || i >= currentData.length) return;
     idx = i;
@@ -413,7 +406,6 @@ function render(i) {
         `;
         let html = '';
         item.parts.forEach((p, index) => {
-            // NẾU LÀ DẤU CÁCH THÌ THÊM KHOẢNG TRỐNG
             if (p.t === " ") {
                 html += `<div class="spacer"></div>`;
             } else {
@@ -431,11 +423,17 @@ function render(i) {
 function nav(d) { render(idx + d); }
 function nextItem() { nav(1); }
 
+// --- HÀM ĐỌC MỚI: GHÉP ÂM + TỪ ---
 function playAudio() {
     const item = currentData[idx];
     if(item.type !== 'game') {
-        const fullText = item.speak || item.parts.map(p => p.t).join("");
-        speak(fullText);
+        let textToRead = item.speak || item.parts.map(p => p.t).join("");
+        
+        // Nếu có "pre" (âm đọc trước), thì ghép vào
+        if (item.pre) {
+            textToRead = item.pre + ". " + textToRead;
+        }
+        speak(textToRead);
     }
 }
 
