@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh </title>
+<title>Bé Học Tiếng Anh</title>
 <style>
 /* --- 1. CẤU HÌNH CỐ ĐỊNH --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -193,7 +193,7 @@ body {
 /* Chuột ngoi lên */
 .mole.up { top: 0%; } 
 
-/* SỬA LỖI HÌNH ẢNH: CĂN TỪ TRÊN XUỐNG ĐỂ HỞ MẶT */
+/* THẺ ẢNH */
 .mole-card {
     width: 120%; 
     height: 60%; 
@@ -320,7 +320,6 @@ body {
     </div>
 
 <script>
-// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
@@ -400,32 +399,48 @@ let isMoleGameActive = false; // Cờ kiểm soát game
 let isAudioAllowed = false; // CỜ QUAN TRỌNG: Kiểm soát âm thanh toàn cục
 let hammerTimeout;
 
-// --- HÀM TẮT HẾT ÂM THANH VÀ VÒNG LẶP ---
-function stopGameLoops() {
-    isMoleGameActive = false;
+// --- HÀM TẮT HẾT ÂM THANH (QUAN TRỌNG) ---
+// Chạy ngay khi tải trang để chắc chắn không có âm thanh ma
+window.onload = function() {
+    stopAllAudio();
+}
+
+// Hàm này dùng để CẤM TIỆT âm thanh (khi ra Menu hoặc thoát Game)
+function stopAllAudio() {
+    isMoleGameActive = false; // Tắt cờ game
+    isAudioAllowed = false; // CẤM mọi âm thanh phát ra
+    
+    window.speechSynthesis.cancel();
     clearInterval(moleAudioLoop);
     clearTimeout(moleLoop);
     
-    // Ẩn chuột
     const allMoles = document.querySelectorAll('.mole');
     allMoles.forEach(m => m.classList.remove('up', 'bonked'));
     
-    // Ẩn búa
+    // Ẩn búa ngay lập tức
     const hammer = document.getElementById('cursor-hammer');
     if(hammer) {
         hammer.classList.remove('active');
         clearTimeout(hammerTimeout);
     }
+    
+    moleAudioLoop = null; 
 }
 
-// Hàm này dùng để thoát ra ngoài Menu (tắt hẳn mọi thứ)
-function goHome() {
-    stopGameLoops();
-    isAudioAllowed = false; // CẤM mọi âm thanh phát ra
-    window.speechSynthesis.cancel();
+// Hàm này chỉ dừng vòng lặp game, KHÔNG cấm âm thanh (dùng khi chuyển bài học)
+function stopGameLoops() {
+    isMoleGameActive = false;
+    clearInterval(moleAudioLoop);
+    clearTimeout(moleLoop);
     
-    document.getElementById('main-container').style.display = 'none';
-    document.getElementById('menu-screen').style.display = 'flex';
+    const allMoles = document.querySelectorAll('.mole');
+    allMoles.forEach(m => m.classList.remove('up', 'bonked'));
+    
+    const hammer = document.getElementById('cursor-hammer');
+    if(hammer) {
+        hammer.classList.remove('active');
+        clearTimeout(hammerTimeout);
+    }
 }
 
 function preloadImages() {
@@ -437,14 +452,11 @@ function preloadImages() {
 }
 
 function startLesson(num) {
-    // Reset trạng thái
-    stopGameLoops(); 
-    isAudioAllowed = true; // Bắt đầu cho phép âm thanh
-    
+    stopGameLoops(); // Chỉ dừng game, không dừng audio tổng
+    isAudioAllowed = true; // Bật cầu dao âm thanh
     if(num === 15) currentData = lesson15;
     else if(num === 16) currentData = lesson16;
     else if(num === 17) currentData = lesson17;
-    
     idx = 0;
     preloadImages();
     document.getElementById('menu-screen').style.display = 'none';
@@ -452,10 +464,15 @@ function startLesson(num) {
     render(0);
 }
 
+function goHome() {
+    stopAllAudio(); // CẮT ĐỨT ÂM THANH KHI RA HOME
+    document.getElementById('main-container').style.display = 'none';
+    document.getElementById('menu-screen').style.display = 'flex';
+}
+
 function render(i) {
-    // Mỗi lần chuyển slide: Dừng loop cũ nhưng KHÔNG tắt quyền đọc
-    stopGameLoops();
-    window.speechSynthesis.cancel(); 
+    stopGameLoops(); // Dừng game nếu đang chạy
+    window.speechSynthesis.cancel(); // Dừng từ đang đọc dở
     
     if(i < 0 || i >= currentData.length) return;
     idx = i;
@@ -538,7 +555,7 @@ function initGame() {
 
 // --- GAME 1: FLIP ---
 function initFlipGame() {
-    stopGameLoops(); // Dọn dẹp
+    stopGameLoops();
     document.getElementById('tower').style.display = 'flex';
     document.getElementById('whack-wrapper').style.display = 'none';
     const item = currentData[idx];
