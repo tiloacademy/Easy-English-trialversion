@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh - Whack a Mole 3D</title>
+<title>Bé Học Tiếng Anh - Farm Whack 3D</title>
 <style>
 /* --- 1. CẤU HÌNH CỐ ĐỊNH --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #87CEEB; /* Nền trời xanh */
+    background-color: #87CEEB;
     margin: 0; padding: 0;
     height: 100vh; width: 100vw; overflow: hidden;
     display: flex; flex-direction: column;
 }
 
-/* --- 2. MENU (Hiện ngay lập tức) --- */
+/* --- 2. MENU CHÍNH (Hiện ngay) --- */
 #menu-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #fff; z-index: 9999;
-    display: flex; /* Hiện luôn */
+    display: flex;
     flex-direction: column; align-items: center; justify-content: center; gap: 15px;
 }
 .menu-title { font-size: 32px; color: #ff6f00; font-weight: bold; margin-bottom: 20px; }
@@ -93,123 +93,116 @@ body {
     flex-direction: column; align-items: center; justify-content: center;
 }
 
-/* --- GAME 1: FLIP (LẬT BÀI) --- */
+/* --- GAME 1: FLIP --- */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
-.card-inner {
-    position: relative; width: 100%; height: 100%; transition: transform 0.4s;
-    transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-}
+.card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.4s; transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
 .card-flip.flipped .card-inner { transform: rotateY(180deg); }
 .card-flip.matched .card-inner { opacity: 0; pointer-events: none; }
-.face {
-    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    border: 2px solid #5d4037;
-}
+.face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid #5d4037; }
 .front { background: #8d6e63; color: #3e2723; font-size: 6vh; font-weight: 900; }
 .back { background: white; transform: rotateY(180deg); padding: 2px; }
 .back img { width: 95%; height: 95%; object-fit: contain; }
-.game-card-text {
-    display: flex; flex-direction: row; align-items: center; justify-content: center;
-    height: 100%; width: 100%; flex-wrap: wrap;
-}
+.game-card-text { display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%; width: 100%; flex-wrap: wrap; }
 .gc-block { display: flex; flex-direction: column; align-items: center; margin: 0 1px; }
 .gc-ipa { color: red; font-weight: bold; font-size: 1.8vh; height: 2vh; }
 .gc-word { color: #333; font-weight: bold; font-size: 2.5vh; }
 
-/* --- GAME 2: WHACK-A-MOLE PRO 3D --- */
+/* --- GAME 2: WHACK-A-MOLE 3D FARM THEME --- */
 #whack-wrapper {
     flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
     overflow: hidden;
-    /* Nền trời và cỏ */
-    background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 30%, #76c7c0 30%, #4caf50 30%, #4caf50 100%);
+    /* Nền Nông Trại Hoạt Hình */
+    background: url('https://img.freepik.com/free-vector/cartoon-farm-landscape-with-green-field_107791-1913.jpg') no-repeat center bottom;
+    background-size: cover;
 }
 
 .wood-sign {
-    background: #8d6e63; border: 4px solid #5d4037; color: white;
+    /* Bảng gỗ rustic hơn */
+    background: url('https://img.freepik.com/free-vector/wooden-plank-textured-background_53876-114720.jpg');
+    background-size: cover;
+    border: none; color: #5d2e0c;
     padding: 10px 20px; border-radius: 10px; font-weight: bold;
-    box-shadow: 0 5px 0 rgba(0,0,0,0.3); text-align: center;
-    min-width: 150px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4); text-align: center;
+    min-width: 150px; text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
 }
 
-.hud-row {
-    display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px; z-index: 5;
-}
-
-.target-word { font-size: 24px; color: #ffeb3b; text-transform: uppercase; }
-.score-text { font-size: 24px; color: #fff; }
+.hud-row { display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px; z-index: 5; }
+.target-word { font-size: 24px; color: #d35400; text-transform: uppercase; font-weight: 900; }
+.score-text { font-size: 24px; color: #27ae60; font-weight: 900; }
 
 .game-field-3d {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    width: 90%; max-width: 400px;
-    /* 3D Effect */
-    transform: perspective(800px) rotateX(25deg);
-    padding: 20px;
-    background: #795548; /* Đất */
-    border-radius: 15px; border: 5px solid #5d4037;
-    box-shadow: 0 15px 0 #3e2723, 0 20px 20px rgba(0,0,0,0.5);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+    width: 90%; max-width: 420px;
+    /* 3D Effect & Texture Đất */
+    transform: perspective(800px) rotateX(30deg);
+    padding: 25px;
+    background-image: url('https://img.freepik.com/free-photo/soil-texture-background_1101-628.jpg'); /* Texture đất */
+    background-size: cover;
+    border-radius: 20px;
+    border: 8px solid #4a8c2a; /* Viền cỏ */
+    box-shadow: 0 20px 0 #2e5a1c, 0 25px 25px rgba(0,0,0,0.6);
 }
 
 .hole {
     position: relative; aspect-ratio: 1;
-    background: #3e2723; /* Lỗ */
+    background: #2b1b13; /* Lỗ tối màu */
     border-radius: 50%;
-    box-shadow: inset 0 10px 15px black, 0 2px 0 rgba(255,255,255,0.2);
-    overflow: hidden;
+    box-shadow: inset 0 10px 20px black, 0 3px 0 rgba(255,255,255,0.1);
+    overflow: hidden; border: 3px solid #3e2723;
 }
 
 .mole {
-    position: absolute; top: 100%; left: 10%; width: 80%; height: 90%;
-    background: #D2691E; /* Chuột */
-    border-radius: 40% 40% 10% 10%;
-    transition: top 0.15s ease-out;
+    position: absolute; top: 100%; left: 10%; width: 80%; height: 95%;
+    background: #D2691E;
+    border-radius: 45% 45% 10% 10%;
+    transition: top 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bật lên nảy hơn */
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     padding-top: 5px; cursor: pointer;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
-.mole::before { content: '👀'; font-size: 18px; position: absolute; top: 2px; }
-.mole::after { content: '🐽'; font-size: 14px; position: absolute; top: 18px; }
-.mole.up { top: 10%; }
+.mole::before { content: '👀'; font-size: 20px; position: absolute; top: 5px; }
+.mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 22px; }
+.mole.up { top: 5%; }
 
 .mole-card {
-    width: 90%; height: 55%;
-    background: white; border: 2px solid #fff; border-radius: 8px;
+    width: 95%; height: 55%;
+    background: white; border: 3px solid #fff; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    z-index: 2; margin-top: 35px; /* Vị trí cầm thẻ */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 2; margin-top: 40px;
 }
 .mole-card img { width: 95%; height: 95%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP */
+/* BÚA ĐẬP CUTE HƠN */
 .hammer {
-    position: absolute; width: 80px; height: 80px; pointer-events: none; z-index: 999;
-    background-image: url('https://img.icons8.com/emoji/96/hammer-emoji.png');
+    position: absolute; width: 100px; height: 100px; pointer-events: none; z-index: 999;
+    /* Hình búa gỗ hoạt hình */
+    background-image: url('https://img.icons8.com/external-flaticons-flat-flat-icons/96/external-hammer-farm-flaticons-flat-flat-icons.png');
     background-size: contain; background-repeat: no-repeat;
-    transform-origin: bottom right;
-    display: none;
+    transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
 }
 .hammer.active { display: block; animation: hammer-hit 0.15s ease-in; }
 @keyframes hammer-hit {
     0% { transform: rotate(30deg); }
-    50% { transform: rotate(-45deg) scale(0.9); }
+    50% { transform: rotate(-50deg) scale(0.9); }
     100% { transform: rotate(0deg); }
 }
 
 /* ĐIỂM BAY */
 .floating-text {
-    position: absolute; font-weight: bold; font-size: 24px;
+    position: absolute; font-weight: 900; font-size: 28px;
     pointer-events: none; z-index: 1000;
     animation: floatUp 0.8s ease-out forwards;
-    text-shadow: 0 2px 2px black;
+    text-shadow: 2px 2px 0px black, -2px -2px 0px white;
 }
 @keyframes floatUp {
     0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+    100% { opacity: 0; transform: translateY(-60px) scale(1.5); }
 }
 
-.mole.bonked { filter: brightness(1.2) sepia(1) hue-rotate(-50deg) saturate(3); transition: none; }
+.mole.bonked { filter: brightness(1.3) sepia(0.5) hue-rotate(-30deg) saturate(2); transition: none; transform: scale(0.95); }
 </style>
 </head>
 <body>
@@ -256,11 +249,11 @@ body {
             <div id="whack-wrapper" style="display:none;">
                 <div class="hud-row">
                     <div class="wood-sign">
-                        <small style="color:#ddd">TÌM:</small><br>
+                        <small>MỤC TIÊU:</small><br>
                         <span id="target-word-display" class="target-word">...</span>
                     </div>
-                    <div class="wood-sign" style="background:#27ae60; border-color:#1e8449;">
-                        <small style="color:#ddd">ĐIỂM:</small><br>
+                    <div class="wood-sign">
+                        <small>ĐIỂM SỐ:</small><br>
                         <span id="score-display" class="score-text">0</span>
                     </div>
                 </div>
@@ -282,9 +275,9 @@ body {
                 <button class="btn-action btn-nav" style="width: 60%; border-radius: 30px; font-size: 20px; box-shadow: 0 4px #e67e22; background-color: #e67e22;" onclick="initGame()"> ↻  Chơi lại</button>
             </div>
             <div id="win-modal">
-                <h1 style="color:green; font-size:36px; margin-bottom: 10px;">KẾT THÚC!  🎉 </h1>
-                <h2 style="color:#d35400; font-size:40px; margin: 5px 0;">Điểm: <span id="final-score">0</span></h2>
-                <p id="win-msg" style="font-size:20px; color:#555; margin-bottom: 30px;">Hoàn thành trong 00:00</p>
+                <h1 style="color:green; font-size:36px; margin-bottom: 10px;">HOÀN THÀNH!  🌾 </h1>
+                <h2 style="color:#d35400; font-size:40px; margin: 5px 0;">Tổng điểm: <span id="final-score">0</span></h2>
+                <p id="win-msg" style="font-size:20px; color:#555; margin-bottom: 30px;">Thời gian: 00:00</p>
                 <button class="btn-action btn-nav" style="width:auto; padding: 0 40px;" onclick="initGame()">Chơi lại</button>
                 <br><br>
                 <button class="btn-action btn-listen" style="width:auto; padding: 0 40px;" onclick="nextItem()">Bài Tiếp  ➡ </button>
@@ -298,7 +291,21 @@ const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
 let currentUtterance = null; 
 
-// --- DỮ LIỆU ---
+function unlockAudio() {
+    [audioWin, audioCorrect, audioWrong].forEach(snd => {
+        snd.muted = true; 
+        snd.play().then(() => {
+            snd.pause(); snd.currentTime = 0; snd.muted = false;
+        }).catch(e => {});
+    });
+    if(window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        let s = new SpeechSynthesisUtterance(" ");
+        s.volume = 0.1;
+        window.speechSynthesis.speak(s);
+    }
+}
+
 // BÀI 15
 const lesson15 = [
     { img: "gear.jpg", speak: "gear", pre: "ear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
@@ -335,7 +342,7 @@ const lesson16 = [
     { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"] }
 ];
 
-// BÀI 17
+// BÀI 17 - ĐÃ TÁCH 2 GAME
 const lesson17 = [
     { img: "face.jpg", speak: "face", pre: "A", similar: [], parts: [{i:"", t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
     { img: "cake.jpg", speak: "cake", pre: "A", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
@@ -351,7 +358,10 @@ const lesson17 = [
     { img: "cry.jpg", speak: "cry", pre: "I", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
     { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
     
-    { type: "game", title: "Game Whack-a-Mole", gameType: "mole" } 
+    // GAME RIÊNG CHO /eɪ/
+    { type: "game", title: "Săn Chuột âm /eɪ/", gameType: "mole", phoneme: "eɪ" },
+    // GAME RIÊNG CHO /aɪ/
+    { type: "game", title: "Săn Chuột âm /aɪ/", gameType: "mole", phoneme: "aɪ" } 
 ];
 
 let currentData = [];
@@ -381,6 +391,7 @@ function startLesson(num) {
     else if(num === 17) currentData = lesson17;
     
     idx = 0;
+    unlockAudio();
     preloadImages();
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('main-container').style.display = 'block';
@@ -461,13 +472,13 @@ function speak(txt) {
 function enterGame() {
     document.getElementById('learning-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
-    const currentLessonGame = currentData.find(i => i.type === 'game');
+    const currentLessonGame = currentData[idx];
     if (currentLessonGame.gameType === 'mole') initMoleGame();
     else initFlipGame();
 }
 
 function initGame() {
-    const currentLessonGame = currentData.find(i => i.type === 'game');
+    const currentLessonGame = currentData[idx];
     if (currentLessonGame.gameType === 'mole') initMoleGame();
     else initFlipGame();
 }
@@ -503,6 +514,7 @@ function initFlipGame() {
             cards.push({ id: key, type: 'text', content: htmlText, speak: original.speak });
         }
     });
+    
     cards.sort(() => 0.5 - Math.random());
     const rows = [3, 2, 3, 2];
     let cCount = 0; let num = 1;
@@ -549,7 +561,7 @@ function checkFlip() {
 }
 function resetFlip() { flipped=false; lock=false; c1=null; c2=null; }
 
-// --- GAME 2: WHACK-A-MOLE PRO 3D ---
+// --- GAME 2: WHACK-A-MOLE PRO 3D (TÁCH ÂM) ---
 function initMoleGame() {
     document.getElementById('tower').style.display = 'none';
     document.getElementById('whack-wrapper').style.display = 'flex';
@@ -559,8 +571,17 @@ function initMoleGame() {
     sec = 0;
     currentScore = 0;
     updateScore(0);
+
+    // LỌC TỪ THEO ÂM CỦA GAME HIỆN TẠI
+    const currentGameItem = currentData[idx];
+    const targetPhoneme = currentGameItem.phoneme; // 'eɪ' hoặc 'aɪ'
+
+    moleRemainingWords = lesson17.filter(wordItem => {
+        // Chỉ lấy từ vựng có chứa âm mục tiêu
+        if (!wordItem.img || wordItem.type === 'sent') return false;
+        return wordItem.parts.some(p => p.i.includes(targetPhoneme));
+    }).sort(() => 0.5 - Math.random());
     
-    moleRemainingWords = lesson17.filter(i => i.img && i.type !== 'sent').sort(() => 0.5 - Math.random());
     if (moleRemainingWords.length === 0) return;
     
     stopMoleGame();
@@ -580,6 +601,7 @@ function nextMoleRound() {
     clearInterval(moleAudioLoop);
     moleAudioLoop = setInterval(() => { speak(moleTarget.speak); }, 2500);
     
+    // Kho nhiễu: Lấy tất cả các từ (không phải câu)
     const allVocab = [...lesson15, ...lesson16, ...lesson17].filter(i => i.img && i.type !== 'sent');
     peep(allVocab);
 }
@@ -625,8 +647,8 @@ function bonk(moleEl, event) {
 
 function spawnHammer(x, y) {
     const hammer = document.getElementById('cursor-hammer');
-    hammer.style.left = (x - 40) + 'px';
-    hammer.style.top = (y - 60) + 'px';
+    hammer.style.left = (x - 50) + 'px';
+    hammer.style.top = (y - 50) + 'px';
     hammer.classList.remove('active');
     void hammer.offsetWidth;
     hammer.classList.add('active');
