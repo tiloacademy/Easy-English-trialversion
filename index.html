@@ -193,16 +193,16 @@ body {
 /* Chuột ngoi lên */
 .mole.up { top: 0%; } 
 
-/* SỬA LỖI HÌNH ẢNH: ĐẨY THẺ XUỐNG DƯỚI (Top 45%) ĐỂ HỞ MẶT */
+/* SỬA LỖI HÌNH ẢNH: CĂN TỪ TRÊN XUỐNG ĐỂ HỞ MẶT */
 .mole-card {
-    width: 120%; /* Thẻ Rộng hơn */
-    height: 60%; /* Cao vừa phải */
+    width: 120%; /* Rộng */
+    height: 60%; /* Vừa đủ */
     background: white; border: 3px solid #eee; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     z-index: 2; 
     position: absolute;
-    top: 45%; /* Quan trọng: Cách đỉnh 45% -> Hở mặt, che bụng */
+    top: 45%; /* Cách đỉnh 45% -> Hở mặt chuột */
     left: -10%; /* Căn giữa */
     transform: rotate(-3deg);
 }
@@ -320,6 +320,7 @@ body {
     </div>
 
 <script>
+// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
@@ -396,7 +397,8 @@ let moleAudioLoop = null;
 let moles = [];
 let currentScore = 0;
 let isMoleGameActive = false; // Cờ kiểm soát game
-let isAudioAllowed = false; // Cờ kiểm soát âm thanh toàn cục
+let isAudioAllowed = false; // CỜ QUAN TRỌNG: Kiểm soát âm thanh toàn cục
+let hammerTimeout;
 
 // --- HÀM TẮT HẾT ÂM THANH (QUAN TRỌNG) ---
 window.onload = function() {
@@ -404,13 +406,23 @@ window.onload = function() {
 }
 
 function stopAllAudio() {
-    isMoleGameActive = false; // Tắt game
-    isAudioAllowed = false; // CẤM mọi âm thanh phát ra
+    isMoleGameActive = false; 
+    isAudioAllowed = false; // Tắt hẳn âm thanh
+    
     window.speechSynthesis.cancel();
     clearInterval(moleAudioLoop);
     clearTimeout(moleLoop);
+    
     const allMoles = document.querySelectorAll('.mole');
     allMoles.forEach(m => m.classList.remove('up', 'bonked'));
+    
+    // Ẩn búa ngay lập tức
+    const hammer = document.getElementById('cursor-hammer');
+    if(hammer) {
+        hammer.classList.remove('active');
+        clearTimeout(hammerTimeout);
+    }
+    
     moleAudioLoop = null; 
 }
 
@@ -436,13 +448,13 @@ function startLesson(num) {
 }
 
 function goHome() {
-    stopAllAudio(); // CẮT ÂM
+    stopAllAudio(); // CẮT ÂM VÀ ẨN BÚA
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
 }
 
 function render(i) {
-    // Chỉ tắt âm thanh vòng lặp game, nhưng vẫn cho phép đọc từ mới
+    // Chỉ tắt vòng lặp game, nhưng vẫn giữ quyền cho phép đọc từ mới
     window.speechSynthesis.cancel(); 
     clearInterval(moleAudioLoop);
     clearTimeout(moleLoop);
@@ -500,7 +512,7 @@ function playAudio() {
 }
 
 function speak(txt) {
-    // CHỐT CHẶN AN TOÀN: Nếu đang cấm âm thanh thì không đọc
+    // CHỐT CHẶN TUYỆT ĐỐI: Không cho phép đọc nếu cờ đang tắt
     if (!isAudioAllowed) return;
     
     window.speechSynthesis.cancel();
@@ -710,9 +722,17 @@ function spawnHammer(x, y) {
     const hammer = document.getElementById('cursor-hammer');
     hammer.style.left = (x - 60) + 'px'; 
     hammer.style.top = (y - 70) + 'px';
+    
     hammer.classList.remove('active');
-    void hammer.offsetWidth;
+    void hammer.offsetWidth; 
+    
     hammer.classList.add('active');
+    
+    // Tự động ẩn búa sau 150ms
+    clearTimeout(hammerTimeout);
+    hammerTimeout = setTimeout(() => {
+        hammer.classList.remove('active');
+    }, 150);
 }
 
 function showFloatingText(x, y, text, color) {
@@ -730,6 +750,12 @@ function updateScore(points) {
     currentScore += points;
     if(currentScore < 0) currentScore = 0;
     document.getElementById('score-display').innerText = currentScore;
+}
+
+function stopMoleGame() {
+    clearInterval(moleAudioLoop);
+    clearTimeout(moleLoop);
+    moles.forEach(m => m.classList.remove('up', 'bonked'));
 }
 
 function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
@@ -755,8 +781,8 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
-    isMoleGameActive = false; // Ngừng game
-    clearInterval(moleAudioLoop); // Tắt đọc
+    stopAllAudio(); // Quan trọng: Dừng âm thanh game
+    isAudioAllowed = true; // Cho phép âm thanh chiến thắng
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
@@ -766,10 +792,11 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    isMoleGameActive = false;
-    clearInterval(moleAudioLoop);
+    stopAllAudio(); // Quan trọng: Dừng âm thanh game
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
+    // Mở lại audio cho màn hình học
+    isAudioAllowed = true;
     nav(-1);
 }
 
