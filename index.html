@@ -14,26 +14,12 @@ body {
     display: flex; flex-direction: column;
 }
 
-/* --- MÀN HÌNH CHÀO --- */
-#start-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); z-index: 99999;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-}
-.btn-start-big {
-    background: #27ae60; color: white; border: 4px solid white;
-    padding: 20px 60px; border-radius: 50px;
-    font-size: 30px; font-weight: bold; cursor: pointer;
-    animation: pulse 1.5s infinite;
-}
-
 /* --- 2. MENU --- */
 #menu-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #fff; z-index: 9999;
-    display: none;
-    flex-direction: column; align-items: center; justify-content: center; gap: 15px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 15px;
 }
 .menu-title { font-size: 32px; color: #ff6f00; font-weight: bold; margin-bottom: 20px; }
 .btn-menu {
@@ -102,7 +88,7 @@ body {
 }
 .btn-nav:active { transform: translateY(2px); box-shadow: none; }
 
-/* --- 5. GIAO DIỆN GAME CHUNG --- */
+/* --- 4. GAME SCREEN --- */
 #game-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: #fff3e0; z-index: 20; flex-direction: column;
@@ -129,7 +115,7 @@ body {
     flex-direction: column; align-items: center; justify-content: center;
 }
 
-/* --- GAME 1: LẬT BÀI (FLIP) --- */
+/* --- GAME 1: FLIP (LẬT BÀI) --- */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
@@ -155,43 +141,72 @@ body {
 .gc-ipa { color: red; font-weight: bold; font-size: 1.8vh; height: 2vh; }
 .gc-word { color: #333; font-weight: bold; font-size: 2.5vh; }
 
-/* --- GAME 2: ĐẬP CHUỘT (WHACK-A-MOLE) --- */
-#whack-container {
+/* --- GAME 2: ĐẬP CHUỘT 3D (WHACK-A-MOLE) --- */
+#whack-wrapper {
     flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; /* Cắt phần thừa 3D */
+    background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 20%, #8bc34a 20%, #8bc34a 100%); /* Bầu trời và cỏ */
 }
-.target-display {
-    font-size: 24px; font-weight: bold; color: #d35400; margin-bottom: 10px;
-    background: #fff; padding: 5px 20px; border-radius: 20px; border: 2px solid #d35400;
+.target-board {
+    font-size: 24px; font-weight: bold; color: white; margin-bottom: 20px;
+    background: #d35400; padding: 10px 30px; border-radius: 15px; border: 4px solid #fff;
+    box-shadow: 0 5px 0 #a04000; text-transform: uppercase;
 }
-.hole-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
-    width: 90%; max-width: 400px;
+.game-field-3d {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    width: 85%; max-width: 400px;
+    /* TẠO HIỆU ỨNG 3D NGHIÊNG */
+    transform: perspective(600px) rotateX(30deg);
+    padding: 20px;
+    background: #5d4037; /* Màu đất */
+    border-radius: 10px;
+    box-shadow: 0 20px 0 #3e2723;
 }
 .hole {
-    position: relative; overflow: hidden;
-    background: #8d6e63; border-radius: 50%;
-    aspect-ratio: 1; border: 5px solid #5d4037;
-    box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+    position: relative; aspect-ratio: 1;
+    background: #2e1c15; /* Lỗ đen */
+    border-radius: 50%;
+    box-shadow: inset 0 10px 10px black;
+    overflow: hidden; /* Che phần thân dưới chuột */
+    border-bottom: 3px solid rgba(255,255,255,0.1);
 }
 .mole {
-    position: absolute; top: 100%; left: 5%; width: 90%; height: 90%;
-    background: #f1c40f; border-radius: 45%;
-    display: flex; align-items: center; justify-content: center;
-    transition: top 0.2s; cursor: pointer;
-    border: 3px solid #f39c12;
+    position: absolute; top: 100%; left: 10%; width: 80%; height: 100%;
+    background: #8d6e63; /* Màu da chuột */
+    border-radius: 40% 40% 0 0;
+    transition: top 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
 }
-.mole.up { top: 5%; }
-.mole img { width: 80%; height: 80%; object-fit: contain; pointer-events: none; }
+.mole::after {
+    /* Mũi chuột */
+    content: ''; position: absolute; top: 30px; width: 20px; height: 15px;
+    background: #3e2723; border-radius: 50%;
+}
+.mole::before {
+    /* Mắt chuột */
+    content: '👀'; position: absolute; top: 5px; font-size: 20px;
+}
+.mole.up { top: 10%; } /* Chuột chui lên */
 
-#error-log {
-    position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8);
-    color: white; font-size: 12px; padding: 5px; text-align: center; display: none; z-index: 10000;
+.mole-card {
+    width: 80%; height: 50%;
+    background: white; border: 2px solid #fff; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 2; margin-top: 25px; /* Để thẻ ở vị trí tay cầm */
 }
+.mole-card img {
+    width: 90%; height: 90%; object-fit: contain; pointer-events: none;
+}
+/* Hiệu ứng búa đập (Chuột đổi màu khi bị đánh) */
+.mole.bonked { background: #e74c3c; top: 10% !important; transition: none; }
+
 </style>
 </head>
 <body>
-    <div id="error-log"></div>
-
     <div id="menu-screen" style="display: flex;">
         <div class="menu-title"> 📚  CHỌN BÀI HỌC</div>
         <button class="btn-menu" onclick="startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
@@ -234,16 +249,17 @@ body {
             
             <div id="tower" class="tower-container" style="display:none;"></div>
             
-            <div id="whack-container" style="display:none;">
-                <div class="target-display">Săn tìm: <span id="target-word-display" style="color:blue;">...</span></div>
-                <div class="hole-grid">
-                    <div class="hole"><div class="mole" onclick="bonk(this)"><img src=""></div></div>
-                    <div class="hole"><div class="mole" onclick="bonk(this)"><img src=""></div></div>
-                    <div class="hole"><div class="mole" onclick="bonk(this)"><img src=""></div></div>
-                    <div class="hole"><div class="mole" onclick="bonk(this)"><img src=""></div></div>
-                    <div class="hole"><div class="mole" onclick="bonk(this)"><img src=""></div></div>
-                    <div class="hole"><div class="mole" onclick="bonk(this)"><img src=""></div></div>
+            <div id="whack-wrapper" style="display:none;">
+                <div class="target-board">Tìm: <span id="target-word-display" style="color:#ffeb3b; font-size:28px;">...</span></div>
+                <div class="game-field-3d">
+                    <div class="hole"><div class="mole" onclick="bonk(this)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this)"><div class="mole-card"><img src=""></div></div></div>
+                    <div class="hole"><div class="mole" onclick="bonk(this)"><div class="mole-card"><img src=""></div></div></div>
                 </div>
+                <div style="margin-top:20px; color:#5d4037; font-weight:bold;">Đập chuột đang cầm hình đúng!</div>
             </div>
 
             <div class="game-footer">
@@ -265,13 +281,12 @@ const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
 let currentUtterance = null; 
 
-// --- HÀM MỞ KHÓA ÂM THANH ---
 function unlockAudio() {
     [audioWin, audioCorrect, audioWrong].forEach(snd => {
         snd.muted = true; 
         snd.play().then(() => {
             snd.pause(); snd.currentTime = 0; snd.muted = false;
-        }).catch(e => console.log(e));
+        }).catch(e => {});
     });
     if(window.speechSynthesis) {
         window.speechSynthesis.cancel();
@@ -333,7 +348,7 @@ const lesson17 = [
     { img: "cry.jpg", speak: "cry", pre: "I", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
     { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
     
-    // CẤU HÌNH GAME CHO BÀI 17
+    // GAME MỚI CHO BÀI 17
     { type: "game", title: "Game Whack-a-Mole", gameType: "mole" } 
 ];
 
@@ -342,21 +357,17 @@ let idx = 0;
 let timerInt, sec=0, flipped=false, lock=false, c1, c2, match=0, lastWord="";
 let recognition;
 
-// --- BIẾN CHO GAME WHACK A MOLE ---
-let moleScore = 0;
+// --- BIẾN GAME MOLE ---
+let moleRemainingWords = [];
 let moleTarget = null;
-let moleTimer = null;
 let moleLoop = null;
-let audioLoop = null;
+let moleAudioLoop = null;
 let moles = [];
 
 function preloadImages() {
     try {
-        // Tải ảnh từ tất cả các bài để làm dữ liệu nhiễu
-        [lesson15, lesson16, lesson17].forEach(lesson => {
-            lesson.forEach(item => {
-                if (item.img) new Image().src = item.img;
-            });
+        [lesson15, lesson16, lesson17].forEach(l => {
+            l.forEach(item => { if (item.img) new Image().src = item.img; });
         });
     } catch(e) {}
 }
@@ -378,7 +389,7 @@ function goHome() {
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('menu-screen').style.display = 'flex';
     window.speechSynthesis.cancel();
-    stopMoleGame(); // Dừng game nếu thoát
+    stopMoleGame();
 }
 
 function render(i) {
@@ -445,35 +456,24 @@ function speak(txt) {
     }
 }
 
-// --- LOGIC CHUYỂN GAME ---
 function enterGame() {
     document.getElementById('learning-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
-    
-    // Kiểm tra loại game dựa trên dữ liệu bài học
-    const currentLessonGame = currentData.find(i => i.type === 'game');
-    
-    if (currentLessonGame.gameType === 'mole') {
-        initMoleGame(); // Bài 17 chạy game đập chuột
-    } else {
-        initFlipGame(); // Bài 15, 16 chạy game lật bài
-    }
-}
-
-function initGame() {
-    // Hàm dùng chung cho nút "Chơi lại"
     const currentLessonGame = currentData.find(i => i.type === 'game');
     if (currentLessonGame.gameType === 'mole') initMoleGame();
     else initFlipGame();
 }
 
-// ==========================================
-// GAME 1: FLIP (LẬT BÀI - CHO BÀI 15, 16)
-// ==========================================
+function initGame() {
+    const currentLessonGame = currentData.find(i => i.type === 'game');
+    if (currentLessonGame.gameType === 'mole') initMoleGame();
+    else initFlipGame();
+}
+
+// --- GAME 1: FLIP ---
 function initFlipGame() {
     document.getElementById('tower').style.display = 'flex';
-    document.getElementById('whack-container').style.display = 'none';
-    
+    document.getElementById('whack-wrapper').style.display = 'none';
     const item = currentData[idx];
     const tower = document.getElementById('tower');
     tower.innerHTML = '';
@@ -548,83 +548,90 @@ function checkFlip() {
 }
 function resetFlip() { flipped=false; lock=false; c1=null; c2=null; }
 
-
-// ==========================================
-// GAME 2: WHACK-A-MOLE (ĐẬP CHUỘT - CHO BÀI 17)
-// ==========================================
+// --- GAME 2: WHACK-A-MOLE 3D (CƠ CHẾ MỚI) ---
 function initMoleGame() {
     document.getElementById('tower').style.display = 'none';
-    document.getElementById('whack-container').style.display = 'flex';
+    document.getElementById('whack-wrapper').style.display = 'flex';
     document.getElementById('win-modal').style.display = 'none';
     
     moles = document.querySelectorAll('.mole');
-    moleScore = 0;
     sec = 0;
     
-    // 1. Chọn từ mục tiêu (Target) từ Bài 17
-    // Lọc ra các từ vựng (bỏ câu và game)
-    const vocabList = lesson17.filter(i => i.img && i.type !== 'sent');
-    const randomTarget = vocabList[Math.floor(Math.random() * vocabList.length)];
-    moleTarget = randomTarget; // Lưu từ mục tiêu
+    // 1. Lấy danh sách từ của Bài 17 để làm nhiệm vụ
+    // Filter chỉ lấy từ vựng (bỏ câu và game)
+    moleRemainingWords = lesson17.filter(i => i.img && i.type !== 'sent').sort(() => 0.5 - Math.random());
     
-    // Hiển thị mục tiêu
-    document.getElementById('target-word-display').innerText = moleTarget.speak.toUpperCase();
+    if (moleRemainingWords.length === 0) return; // An toàn
     
-    // 2. Tạo kho ảnh (Gồm mục tiêu + Nhiễu từ bài 15, 16, 17)
-    // Gom tất cả từ vựng lại
-    const allVocab = [...lesson15, ...lesson16, ...lesson17].filter(i => i.img && i.type !== 'sent');
-    
-    // Bắt đầu game loop
-    stopMoleGame(); // Reset trước khi chạy
+    stopMoleGame();
     startTimer();
     
-    // Đọc từ mục tiêu liên tục mỗi 2.5 giây
+    // Bắt đầu vòng chơi đầu tiên
+    nextMoleRound();
+}
+
+function nextMoleRound() {
+    if (moleRemainingWords.length === 0) {
+        win();
+        stopMoleGame();
+        return;
+    }
+    
+    // Lấy từ tiếp theo trong danh sách nhiệm vụ
+    moleTarget = moleRemainingWords.pop();
+    
+    // Hiển thị và Đọc
+    document.getElementById('target-word-display').innerText = moleTarget.speak.toUpperCase();
     speak(moleTarget.speak);
-    audioLoop = setInterval(() => {
+    
+    clearInterval(moleAudioLoop);
+    moleAudioLoop = setInterval(() => {
         speak(moleTarget.speak);
     }, 2500);
     
-    // Chuột chui lên mỗi 0.8 - 1.5 giây
+    // Bắt đầu chuột ngoi lên
+    const allVocab = [...lesson15, ...lesson16, ...lesson17].filter(i => i.img && i.type !== 'sent');
     peep(allVocab);
 }
 
 function peep(allVocab) {
-    const time = randomTime(800, 1500);
+    const time = randomTime(1000, 1800); // Tốc độ vừa phải
     const hole = randomHole(moles);
     
-    // Quyết định xem chuột này cầm hình gì?
-    // 40% cơ hội là hình đúng (Target), 60% là hình sai (Nhiễu)
+    // 40% là hình đúng, 60% là hình nhiễu
     let isTarget = Math.random() < 0.4;
     let moleImgData = isTarget ? moleTarget : allVocab[Math.floor(Math.random() * allVocab.length)];
     
-    // Gán ảnh vào chuột
+    // Gán ảnh
     const imgEl = hole.querySelector('img');
     imgEl.src = moleImgData.img;
-    hole.dataset.speak = moleImgData.speak; // Lưu từ để check
+    hole.dataset.speak = moleImgData.speak;
     
     hole.classList.add('up');
     
     moleLoop = setTimeout(() => {
         hole.classList.remove('up');
-        if (moleScore < 5) peep(allVocab); // Nếu chưa thắng thì tiếp tục
+        // Nếu chưa hết game thì tiếp tục peep
+        if (document.getElementById('win-modal').style.display === 'none') {
+            peep(allVocab);
+        }
     }, time);
 }
 
 function bonk(moleEl) {
-    if(!moleEl.classList.contains('up')) return; // Không đập được khi đang thụt
+    if(!moleEl.classList.contains('up')) return;
     
     const clickedWord = moleEl.dataset.speak;
     
     if (clickedWord === moleTarget.speak) {
         // ĐÚNG
         audioCorrect.play().catch(e=>{});
-        moleScore++;
-        moleEl.classList.remove('up'); // Thụt xuống ngay
-        
-        if (moleScore >= 5) {
-            win();
-            stopMoleGame();
-        }
+        moleEl.classList.add('bonked'); // Hiệu ứng bị đập
+        setTimeout(() => {
+            moleEl.classList.remove('up', 'bonked');
+            clearTimeout(moleLoop); // Dừng peep cũ
+            nextMoleRound(); // Chuyển sang từ tiếp theo
+        }, 500);
     } else {
         // SAI
         audioWrong.play().catch(e=>{});
@@ -633,15 +640,12 @@ function bonk(moleEl) {
 }
 
 function stopMoleGame() {
-    clearInterval(audioLoop);
+    clearInterval(moleAudioLoop);
     clearTimeout(moleLoop);
-    moles.forEach(m => m.classList.remove('up'));
+    moles.forEach(m => m.classList.remove('up', 'bonked'));
 }
 
-function randomTime(min, max) {
-    return Math.round(Math.random() * (max - min) + min);
-}
-
+function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
 let lastHole;
 function randomHole(moles) {
     const idx = Math.floor(Math.random() * moles.length);
@@ -672,13 +676,13 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    stopMoleGame(); // Dừng Whack a mole nếu có
+    stopMoleGame();
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
 }
 
-// --- MIC & SPEECH RECOGNITION (NÂNG CẤP) ---
+// --- MIC ---
 function startListening() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return alert("Trình duyệt không hỗ trợ");
@@ -716,15 +720,12 @@ function levenshteinDistance(a, b) {
 function checkResult(heardArray) {
     const item = currentData[idx];
     const targetRaw = item.speak.toLowerCase().replace(/[.,!?]/g, "").trim();
-    
-    // TẠO DANH SÁCH ĐÁP ÁN CHẤP NHẬN ĐƯỢC
     let validAnswers = [targetRaw];
     if (item.pre) {
         let preClean = item.pre.toLowerCase().trim();
         validAnswers.push(preClean + " " + targetRaw);
         validAnswers.push(preClean + targetRaw);
     }
-
     let maxScore = 0; 
     for (let text of heardArray) {
         let userText = text.trim();
@@ -755,7 +756,6 @@ function checkResult(heardArray) {
         }
         if (bestSubScore > maxScore) maxScore = bestSubScore;
     }
-
     let finalStars = 2; let msg = "Try again!";
     if (maxScore >= 90) { finalStars = 5; msg = "Excellent! 🎉"; } 
     else if (maxScore >= 70) { finalStars = 4; msg = "Good job! 👍"; } 
