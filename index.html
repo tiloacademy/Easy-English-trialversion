@@ -85,10 +85,10 @@ body {
     width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px;
 }
 .game-footer {
-    height: 120px; /* Tăng chiều cao footer */
+    height: 120px;
     display: flex; justify-content: center; align-items: center;
     background: white; border-top: 1px solid #ccc;
-    padding-bottom: 50px; /* ĐẨY NÚT LÊN CAO KHỎI THANH ĐIỀU HƯỚNG */
+    padding-bottom: 50px;
 }
 #win-modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -96,7 +96,7 @@ body {
     flex-direction: column; align-items: center; justify-content: center;
 }
 
-/* --- GAME 1: FLIP (LẬT BÀI) --- */
+/* --- GAME 1: FLIP --- */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
@@ -128,7 +128,7 @@ body {
     overflow: hidden;
     background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #8bc34a 40%, #8bc34a 100%);
     position: relative;
-    padding-bottom: 20px; /* Khoảng cách an toàn dưới */
+    padding-bottom: 20px;
 }
 #whack-wrapper::before { content: '☁️'; font-size: 60px; position: absolute; top: 30px; left: 20px; opacity: 0.8; }
 #whack-wrapper::after { content: '☁️'; font-size: 50px; position: absolute; top: 60px; right: 40px; opacity: 0.8; }
@@ -179,6 +179,7 @@ body {
     border: 2px solid #5d4037;
 }
 
+/* --- CHỈNH SỬA CHUỘT VÀ THẺ --- */
 .mole {
     position: absolute; top: 100%; left: 10%; width: 80%; height: 95%;
     background: #D2691E;
@@ -188,31 +189,31 @@ body {
     padding-top: 5px; cursor: pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
+/* Mắt và mũi chuột */
 .mole::before { content: '👀'; font-size: 20px; position: absolute; top: 5px; }
-.mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 22px; }
-.mole.up { top: 5%; }
+.mole::after { content: '🐽'; font-size: 16px; position: absolute; top: 25px; }
 
-/* --- THẺ ẢNH MAX SIZE --- */
+/* Chuột ngoi cao hơn để không bị che bởi đất khi gắn thẻ thấp */
+.mole.up { top: 2%; } 
+
+/* Thẻ to hơn và hạ thấp xuống ngực */
 .mole-card {
-    width: 120%; /* Rộng hơn cả con chuột */
-    height: 70%; /* Cao lên */
-    background: white; border: 2px solid #ddd; border-radius: 10px;
+    width: 130%; /* Rộng hẳn ra */
+    height: 65%;
+    background: white; border: 3px solid #eee; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    z-index: 2; margin-top: 20px; /* Kéo lên cao hơn */
-    padding: 0; /* Bỏ padding */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    z-index: 2; 
+    margin-top: 45px; /* Hạ thấp xuống để lộ mặt chuột */
+    transform: rotate(-3deg);
 }
-.mole-card img { 
-    width: 100%; height: 100%; 
-    object-fit: contain; /* Đảm bảo hình trọn vẹn */
-    pointer-events: none; 
-}
+.mole-card img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
 
-/* BÚA ĐẬP CUTE - FIXED POSITION ĐỂ KHÔNG BỊ TRÔI */
+/* BÚA ĐẬP (Fix hiển thị) */
 .hammer {
-    position: fixed; /* Quan trọng: Fix theo màn hình */
+    position: fixed; 
     width: 100px; height: 100px; pointer-events: none; 
-    z-index: 999999; /* Luôn nổi trên cùng */
+    z-index: 100000;
     background-image: url('https://img.icons8.com/external-flaticons-flat-flat-icons/96/external-hammer-farm-flaticons-flat-flat-icons.png');
     background-size: contain; background-repeat: no-repeat;
     transform-origin: bottom right; display: none; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
@@ -225,8 +226,7 @@ body {
 }
 
 .floating-text {
-    position: fixed; /* Fix theo màn hình */
-    font-weight: 900; font-size: 28px;
+    position: fixed; font-weight: 900; font-size: 28px;
     pointer-events: none; z-index: 1000;
     animation: floatUp 0.8s ease-out forwards;
     text-shadow: 2px 2px 0px black, -2px -2px 0px white;
@@ -320,7 +320,6 @@ body {
     </div>
 
 <script>
-// --- KHỞI TẠO ÂM THANH ---
 const audioWin = new Audio("win.mp3");
 const audioCorrect = new Audio("correct.mp3");
 const audioWrong = new Audio("wrong.mp3");
@@ -411,6 +410,7 @@ function stopAllAudio() {
     clearInterval(moleAudioLoop);    // Tắt vòng lặp đọc "Pine"
     clearTimeout(moleLoop);          // Tắt chuột chui
     if(moles) moles.forEach(m => m.classList.remove('up', 'bonked'));
+    moleAudioLoop = null; // Reset biến
 }
 
 function startLesson(num) {
@@ -737,7 +737,7 @@ function startTimer() {
 }
 function win() {
     clearInterval(timerInt);
-    stopMoleGame(); // Quan trọng: Dừng game khi thắng
+    stopAllAudio(); // Quan trọng: Dừng âm thanh game
     let timeStr = document.getElementById('timer').innerText;
     document.getElementById('win-msg').innerText = "Thời gian: " + timeStr;
     document.getElementById('final-score').innerText = currentScore;
@@ -747,7 +747,7 @@ function win() {
 }
 function exitGame() {
     clearInterval(timerInt);
-    stopMoleGame(); // Quan trọng: Dừng game khi thoát
+    stopAllAudio(); // Quan trọng: Dừng âm thanh game
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('learning-screen').style.display = 'flex';
     nav(-1);
