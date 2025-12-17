@@ -704,12 +704,17 @@ const App = {
     },
 
     enterGame: function() {
-        // Lấy data từ LearningEngine chuyển sang GameEngine
+        // 1. Chuyển giao diện (ĐÂY LÀ PHẦN ĐÃ SỬA)
+        document.getElementById('learning-screen').style.display = 'none'; 
+        document.getElementById('game-screen').style.display = 'flex';
+
+        // 2. Lấy data từ LearningEngine chuyển sang GameEngine
         const item = LearningEngine.currentData[LearningEngine.idx];
         
         // DataPool cho game (loại bỏ câu văn)
         const vocabList = LearningEngine.currentData.filter(i => i.img && i.type !== 'sent');
         
+        // 3. Bắt đầu game
         GameEngine.start(item, vocabList);
     },
 
