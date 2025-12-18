@@ -92,6 +92,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
         <button class="btn-menu" onclick="App.startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
         <button class="btn-menu" onclick="App.startLesson(16)">Bài 16: /aʊ/ & /oʊ/</button>
         <button class="btn-menu" onclick="App.startLesson(17)">Bài 17: /eɪ/ & /aɪ/</button>
+        <button class="btn-menu" onclick="App.startLesson(18)">Bài 18: /ɔɪ/ & /t̬/</button>
     </div>
 
     <div id="main-container" style="display: none;">
@@ -211,11 +212,51 @@ const DataEngine = {
         { type: "game", title: "Săn Chuột âm /eɪ/", gameType: "mole", phoneme: "eɪ" },
         { type: "game", title: "Săn Chuột âm /aɪ/", gameType: "mole", phoneme: "aɪ" } 
     ],
-    
+    lesson18: [
+        // --- Âm /ɔɪ/ (Vẫn giữ pre: "oy" vì máy đọc tốt âm này) ---
+        { img: "coin.jpg", speak: "coin", pre: "oy", similar: [], parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
+        { img: "point.jpg", speak: "point", pre: "oy", similar: [], parts: [{i:"p", t:"p"}, {i:"ɔɪ", t:"oi"}, {i:"n t", t:"nt"}] },
+        { img: "joy.jpg", speak: "joy", pre: "oy", similar: [], parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "boy.jpg", speak: "boy", pre: "oy", similar: [], parts: [{i:"b", t:"b"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "toy.jpg", speak: "toy", pre: "oy", similar: [], parts: [{i:"t", t:"t"}, {i:"ɔɪ", t:"oy"}] },
+        
+        // Câu ví dụ /ɔɪ/
+        { type: "sent", img: "sentence_boy.jpg", speak: "A boy drops a coin and a toy", parts: [
+            {i:"ə", t:"A"}, {t:" "}, 
+            {i:"b ɔɪ", t:"boy"}, {t:" "}, 
+            {i:"d r ɒ p s", t:"drops"}, {t:" "}, 
+            {i:"ə", t:"a"}, {t:" "}, 
+            {i:"k ɔɪ n", t:"coin"}, {t:" "}, 
+            {i:"æ n d", t:"and"}, {t:" "}, 
+            {i:"ə", t:"a"}, {t:" "}, 
+            {i:"t ɔɪ", t:"toy."}
+        ]},
+
+        // --- Âm /t̬/ (Flap T) - ĐÃ BỎ "pre" ĐỂ TRÁNH ĐỌC SAI ---
+        { img: "otter.jpg", speak: "otter", pre: "", similar: [], parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
+        { img: "butter.jpg", speak: "butter", pre: "", similar: [], parts: [{i:"b", t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"tter"}] },
+        { img: "kitty.jpg", speak: "kitty", pre: "", similar: [], parts: [{i:"k", t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i:", t:"y"}] },
+        { img: "party.jpg", speak: "party", pre: "", similar: [], parts: [{i:"p", t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i:", t:"y"}] },
+        { img: "city.jpg", speak: "city", pre: "", similar: [], parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i:", t:"y"}] },
+
+        // Câu ví dụ /t̬/
+        { type: "sent", img: "sentence_peter.jpg", speak: "Peter got butter in the party", parts: [
+            {i:"P i: t̬ ər", t:"Peter"}, {t:" "}, 
+            {i:"g ɒ t", t:"got"}, {t:" "}, 
+            {i:"b ʌ t̬ ər", t:"butter"}, {t:" "}, 
+            {i:"ɪ n", t:"in"}, {t:" "}, 
+            {i:"ð ə", t:"the"}, {t:" "}, 
+            {i:"p ɑːr t̬ i:", t:"party."}
+        ]},
+
+        // Placeholder cho Game (Sắp ra mắt)
+        { type: "game", title: "Game Bài 18 (Sắp ra mắt)", pairs: [] } 
+    ],
     getLesson: function(num) {
         if(num === 15) return this.lesson15;
         if(num === 16) return this.lesson16;
         if(num === 17) return this.lesson17;
+        if(num === 18) return this.lesson18;
         return [];
     }
 };
@@ -738,3 +779,4 @@ window.onload = function() {
 </script>
 </body>
 </html>
+
