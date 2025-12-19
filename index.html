@@ -51,10 +51,10 @@ box-shadow: 0 4px #d35400; }
 
 /* UI Game Chung */
 #game-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff3e0; z-index: 20; flex-direction: column; }
-.game-header { height: 70px; display: flex; justify-content: center; align-items: center; position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd; flex-shrink: 0; }
+.game-header { height: 60px; display: flex; justify-content: center; align-items: center; position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd; flex-shrink: 0; }
 .timer-badge { background: white; border: 3px solid #d35400; color: #d35400; padding: 5px 25px; border-radius: 25px; font-size: 24px; font-weight: bold; }
 .btn-close { position: absolute; right: 10px; background: #c0392b; color: white; width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px; }
-.game-footer { height: 120px; display: flex; justify-content: center; align-items: center; background: white; border-top: 1px solid #ccc; padding-bottom: 50px; flex-shrink: 0;}
+.game-footer { height: 100px; display: flex; justify-content: center; align-items: center; background: white; border-top: 1px solid #ccc; padding-bottom: 30px; flex-shrink: 0;}
 #win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
 
 /* CSS Game Cũ (Mole/Flip) */
@@ -98,112 +98,109 @@ box-shadow: 0 4px #d35400; }
 .mole.bonked { filter: brightness(1.3) sepia(0.5) hue-rotate(-30deg) saturate(2); transition: none; transform: scale(0.95); }
 
 /* =========================================
-   --- CSS GAME RẮN (ĐÃ CẬP NHẬT MỚI) ---
+   --- CSS ĐÃ CẬP NHẬT GIAO DIỆN MỚI ---
 ========================================= */
 #snake-game-container {
     flex: 1; width: 100%; display: none; flex-direction: column; align-items: center; justify-content: flex-start;
-    
-    /* 1. NỀN GAME: Màu xanh cỏ dễ chịu */
-    background: #4caf50; 
-    /* Nếu bạn muốn dùng ảnh nền, hãy bỏ comment dòng dưới và sửa tên file */
-    /* background-image: url('snake-bg.jpg'); background-size: cover; */
-    
+    /* Nền cỏ xanh nhạt dịu mắt với pattern chấm cỏ */
+    background-color: #dcedc8;
+    background-image: radial-gradient(#8bc34a 2px, transparent 2.5px);
+    background-size: 30px 30px; /* Khoảng cách giữa các đốm cỏ */
     position: relative; overflow: hidden;
 }
 
-/* Thanh thông tin phía trên */
 #snake-target-bar {
     width: 95%; background: rgba(255,255,255,0.95); padding: 5px 15px; border-radius: 12px;
     margin-top: 10px; display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 20; height: 65px; flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 20; height: 60px; flex-shrink: 0;
 }
-.target-label { font-weight: bold; color: #555; font-size: 14px; margin-right: 5px; }
-/* Chứa từ và phiên âm, căn giữa */
+.target-label { font-weight: bold; color: #555; font-size: 16px; margin-right: 5px; }
 #snake-target-content { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-#snake-score { font-size: 20px; font-weight: bold; color: #27ae60; }
+#snake-score { font-size: 22px; font-weight: bold; color: #27ae60; }
 
-/* Bàn cờ (Vùng chơi) */
+.btn-pause { background: #f39c12; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 3px #d35400; }
+.btn-pause:active { transform: translateY(2px); box-shadow: none; }
+
 #snake-board {
-    margin: 10px auto;
-    width: 95vw; max-width: 400px; /* Mở rộng tối đa */
-    height: 60vh; /* Chiếm 60% chiều cao màn hình */
-    background-color: rgba(0, 0, 0, 0.1); /* Hơi tối để phân biệt */
-    border: 3px solid rgba(255, 255, 255, 0.5);
-    border-radius: 8px;
+    margin: 5px auto;
+    width: 95vw; flex: 1; max-width: 450px;
+    /* Bỏ màu nền của bàn cờ để hiện cỏ xanh */
+    background-color: transparent;
+    /* Bỏ viền dày để thoáng hơn */
+    border: none;
     display: grid;
     position: relative;
     z-index: 10;
 }
 
-.grid-cell { width: 100%; height: 100%; position: relative; }
+/* Bỏ viền ô lưới để rắn trông như đang bò trên cỏ thật */
+.grid-cell { width: 100%; height: 100%; position: relative; border: none; }
 
-/* RẮN: Chỉ dùng ảnh */
+/* RẮN: Hiển thị trọn vẹn, không cắt góc */
 .snake-part {
     width: 100%; height: 100%;
     background-image: url('snake-body.png'); 
-    background-size: cover; background-repeat: no-repeat;
+    background-size: contain; /* QUAN TRỌNG: Hiển thị toàn bộ ảnh */
+    background-repeat: no-repeat;
+    background-position: center;
     z-index: 5;
 }
 .snake-head {
     background-image: url('snake-head.png');
     z-index: 6; transform-origin: center center; transition: transform 0.1s linear; 
+    background-size: contain; /* QUAN TRỌNG */
+    background-repeat: no-repeat;
+    background-position: center;
 }
 .head-up { transform: rotate(180deg); }
 .head-down { transform: rotate(0deg); }
 .head-left { transform: rotate(90deg); }
 .head-right { transform: rotate(-90deg); }
 
-/* MỒI: Ảnh to, bỏ chữ */
+/* MỒI: Ảnh SIÊU TO */
 .food-item {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 2; pointer-events: none;
 }
 .food-img { 
-    width: 130%; height: 130%; /* Phóng to ảnh mồi */
+    width: 250%; height: 250%; /* Phóng to 2.5 lần ô lưới */
     object-fit: contain; 
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); 
-    z-index: 1; opacity: 1; /* Rõ nét */
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); 
+    z-index: 1; opacity: 1;
 }
 .food-core { 
-    position: absolute; top: -5px; right: -5px; font-size: 12px; 
-    background: white; border-radius: 50%; padding: 2px; z-index: 3;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    position: absolute; top: 0px; right: 0px; font-size: 10px; 
+    background: white; border-radius: 50%; padding: 1px; z-index: 3; opacity: 0.9;
+    border: 1px solid #ccc;
 }
 
-/* NÚT TẠM DỪNG */
-.btn-pause {
-    background: #f1c40f; border: none; width: 35px; height: 35px; border-radius: 50%;
-    font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+/* BỘ ĐIỀU KHIỂN: Trong suốt, đè lên phần dưới */
+#d-pad {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    width: 180px; height: 140px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr;
+    gap: 10px; z-index: 50; touch-action: none;
+    opacity: 0.6;
 }
+.d-btn {
+    background: rgba(255, 255, 255, 0.4); border: 2px solid white;
+    border-radius: 15px; color: #333; font-size: 30px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.d-btn:active { background: rgba(255, 255, 255, 0.8); transform: scale(0.95); }
+.d-up { grid-column: 2; grid-row: 1; }
+.d-left { grid-column: 1; grid-row: 2; }
+.d-right { grid-column: 3; grid-row: 2; }
+.d-down { grid-column: 2; grid-row: 2; }
 
-/* MÀN HÌNH PAUSE (Overlay) */
+/* Modal Tạm Dừng */
 #pause-modal {
     display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6); z-index: 100;
     flex-direction: column; align-items: center; justify-content: center;
 }
-#pause-modal h2 { color: white; font-size: 30px; margin-bottom: 20px; text-shadow: 0 2px 4px black; }
-
-/* BỘ ĐIỀU KHIỂN: Trong suốt, nằm đè lên dưới cùng */
-#d-pad {
-    position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
-    width: 140px; height: 140px;
-    display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
-    gap: 2px; z-index: 50; touch-action: none;
-    opacity: 0.6; /* Trong suốt */
-}
-.d-btn {
-    background: rgba(255, 255, 255, 0.3); border: 2px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px; color: white; font-size: 24px;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
-.d-btn:active { background: rgba(255, 255, 255, 0.8); transform: scale(0.9); }
-.d-up { grid-column: 2; grid-row: 1; }
-.d-left { grid-column: 1; grid-row: 2; }
-.d-right { grid-column: 3; grid-row: 2; }
-.d-down { grid-column: 2; grid-row: 3; }
+.pause-text { color: white; font-size: 40px; font-weight: bold; margin-bottom: 20px; text-shadow: 0 2px 4px black; }
 </style>
 </head>
 <body>
@@ -213,7 +210,7 @@ box-shadow: 0 4px #d35400; }
 <button class="btn-menu" onclick="App.startLesson(15)">Bài 15: /ɪr/ & /ɛr/</button>
 <button class="btn-menu" onclick="App.startLesson(16)">Bài 16: /aʊ/ & /oʊ/</button>
 <button class="btn-menu" onclick="App.startLesson(17)">Bài 17: /eɪ/ & /aɪ/</button>
-<button class="btn-menu" onclick="App.startLesson(18)">Bài 18: /ɔɪ/ & /t̬/ (Game Rắn)</button>
+<button class="btn-menu" onclick="App.startLesson(18)">Bài 18: /ɔɪ/ & /t̬/</button>
 </div>
 <div id="main-container" style="display: none;">
 <div id="learning-screen">
@@ -237,8 +234,9 @@ box-shadow: 0 4px #d35400; }
 </div>
 <div id="game-screen" style="display: none;">
 <div class="game-header">
-<div class="timer-badge">  ⏱  ️ <span id="timer">00:00</span></div>
-<button class="btn-close" onclick="App.exitGame()">  ✕  </button>
+    <div style="width:40px;"></div>
+    <div class="timer-badge">  ⏱  ️ <span id="timer">00:00</span></div>
+    <button class="btn-close" onclick="App.exitGame()">  ✕  </button>
 </div>
 
 <div id="tower" class="tower-container" style="display:none;"></div>
@@ -261,30 +259,28 @@ box-shadow: 0 4px #d35400; }
 </div>
 
 <div id="snake-game-container">
-    <div id="pause-modal">
-        <h2>TẠM DỪNG</h2>
-        <button class="btn-action btn-game-entry" onclick="SnakeEngine.togglePause()"> ▶ Tiếp tục</button>
-    </div>
-
     <div id="snake-target-bar">
-        <div style="display:flex; align-items:center;">
-            <div class="target-label">Săn từ:</div>
-            <div id="snake-target-content">
-                </div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <button class="btn-pause" onclick="SnakeEngine.togglePause()">⏸</button>
-            <div>🏆 <span id="snake-score">0</span></div>
-        </div>
+        <button class="btn-pause" onclick="SnakeEngine.togglePause()">⏸</button>
+        <div class="target-label">Săn từ:</div>
+        <div id="snake-target-content"></div>
+        <div>🏆 <span id="snake-score">0</span></div>
     </div>
     
     <div id="snake-board"></div>
     
     <div id="d-pad">
+        <div></div>
         <div class="d-btn d-up" onclick="SnakeEngine.changeDirection('up')">⬆️</div>
+        <div></div>
+        
         <div class="d-btn d-left" onclick="SnakeEngine.changeDirection('left')">⬅️</div>
-        <div class="d-btn d-right" onclick="SnakeEngine.changeDirection('right')">➡️</div>
         <div class="d-btn d-down" onclick="SnakeEngine.changeDirection('down')">⬇️</div>
+        <div class="d-btn d-right" onclick="SnakeEngine.changeDirection('right')">➡️</div>
+    </div>
+
+    <div id="pause-modal">
+        <div class="pause-text">TẠM DỪNG</div>
+        <button class="btn-menu" style="width:auto;" onclick="SnakeEngine.togglePause()">▶ Tiếp tục chơi</button>
     </div>
 </div>
 
@@ -348,32 +344,27 @@ lesson17: [
 { img: "tie.jpg", speak: "tie", pre: "I", similar: [], parts: [{i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"_", t:"e"}] },
 { img: "pine.jpg", speak: "pine", pre: "I", similar: [], parts: [{i:"", t:"p"}, {i:"aɪ", t:"i"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
 { img: "cry.jpg", speak: "cry", pre: "I", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
-{ type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
+{ type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"b", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
 { type: "game", title: "Săn Chuột âm /eɪ/", gameType: "mole", phoneme: "eɪ" },
 { type: "game", title: "Săn Chuột âm /aɪ/", gameType: "mole", phoneme: "aɪ" }
 ],
 lesson18: [
-// --- Âm /ɔɪ/ (Vẫn giữ pre: "oy" vì máy đọc tốt âm này) ---
 { img: "coin.jpg", speak: "coin", pre: "oy", similar: [], parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
 { img: "point.jpg", speak: "point", pre: "oy", similar: [], parts: [{i:"p", t:"p"}, {i:"ɔɪ", t:"oi"}, {i:"n t", t:"nt"}] },
 { img: "joy.jpg", speak: "joy", pre: "oy", similar: [], parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
 { img: "boy.jpg", speak: "boy", pre: "oy", similar: [], parts: [{i:"b", t:"b"}, {i:"ɔɪ", t:"oy"}] },
 { img: "toy.jpg", speak: "toy", pre: "oy", similar: [], parts: [{i:"t", t:"t"}, {i:"ɔɪ", t:"oy"}] },
-// Câu ví dụ /ɔɪ/
 { type: "sent", img: "sentence_boy.jpg", speak: "A boy drops a coin and a toy", parts: [
 {i:"ə", t:"A"}, {t:" "}, {i:"b ɔɪ", t:"boy"}, {t:" "}, {i:"d r ɒ p s", t:"drops"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k ɔɪ n", t:"coin"}, {t:" "}, {i:"æ n d", t:"and"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"t ɔɪ", t:"toy."}
 ]},
-// --- Âm /t̬/ (Flap T) ---
 { img: "otter.jpg", speak: "otter", pre: "", similar: [], parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
 { img: "butter.jpg", speak: "butter", pre: "", similar: [], parts: [{i:"b", t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
 { img: "kitty.jpg", speak: "kitty", pre: "", similar: [], parts: [{i:"k", t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i:", t:"y"}] },
 { img: "party.jpg", speak: "party", pre: "", similar: [], parts: [{i:"p", t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i:", t:"y"}] },
 { img: "city.jpg", speak: "city", pre: "", similar: [], parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i:", t:"y"}] },
-// Câu ví dụ /t̬/
 { type: "sent", img: "sentence_peter.jpg", speak: "Peter got butter in the party", parts: [
 {i:"P i: t̬ ər", t:"Peter"}, {t:" "}, {i:"g ɒ t", t:"got"}, {t:" "}, {i:"b ʌ t̬ ər", t:"butter"}, {t:" "}, {i:"ɪ n", t:"in"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"p ɑːr t̬ i:", t:"party."}
 ]},
-// --- GAME RẮN ---
 { type: "game", title: "Rắn Săn Chữ /ɔɪ/", gameType: "snake", phoneme: "ɔɪ" },
 { type: "game", title: "Rắn Săn Chữ /t̬/", gameType: "snake", phoneme: "t̬" }
 ],
@@ -482,18 +473,22 @@ showFloatingText: function(x, y, text, color) { const el = document.createElemen
 win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("Excellent job!"); document.getElementById('win-msg').innerText = "Thời gian: " + document.getElementById('timer').innerText; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
-// ======================================================
-// --- SNAKE ENGINE ĐÃ NÂNG CẤP ---
-// ======================================================
 const SnakeEngine = {
-    active: false, isPaused: false, gameLoopId: null, audioInterval: null,
+    active: false, paused: false,
+    gameLoopId: null, audioLoopId: null,
     boardSize: 15, snake: [], direction: {x: 0, y: 0}, nextDirection: {x: 0, y: 0}, 
-    foods: [], score: 0, speed: 300, targetPhoneme: "", currentTargetWord: null,
+    foods: [], score: 0, speed: 300, 
+    targetPhoneme: "", currentTargetWord: null,
     poolCorrect: [], poolWrong: [],
 
     start: function(config, dataPool) {
-        this.stop(); this.active = true; this.isPaused = false; this.score = 0; this.speed = 350;
+        this.stop(); 
+        this.active = true; 
+        this.paused = false;
+        this.score = 0; 
+        this.speed = 350;
         this.targetPhoneme = config.phoneme;
+        
         this.poolCorrect = dataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         this.poolWrong = dataPool.filter(w => !w.parts || !w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         
@@ -511,9 +506,8 @@ const SnakeEngine = {
         this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
 
         this.createBoard();
-        this.spawnFoods();
+        this.spawnFoods(); 
         
-        // Bắt đầu vòng lặp game và âm thanh
         this.gameLoop();
         this.startAudioLoop();
     },
@@ -521,34 +515,31 @@ const SnakeEngine = {
     stop: function() { 
         this.active = false; 
         clearTimeout(this.gameLoopId); 
-        clearInterval(this.audioInterval); 
+        clearInterval(this.audioLoopId);
     },
 
     togglePause: function() {
         if (!this.active) return;
-        this.isPaused = !this.isPaused;
-        
+        this.paused = !this.paused;
         const modal = document.getElementById('pause-modal');
-        if (this.isPaused) {
+        if (this.paused) {
             modal.style.display = 'flex';
-            clearInterval(this.audioInterval); // Dừng đọc
+            clearInterval(this.audioLoopId); 
         } else {
             modal.style.display = 'none';
-            this.gameLoop(); // Chạy tiếp game
-            this.startAudioLoop(); // Chạy tiếp đọc
+            this.gameLoop(); 
+            this.startAudioLoop();
         }
     },
 
     startAudioLoop: function() {
-        clearInterval(this.audioInterval);
-        // Đọc ngay lập tức một lần
+        clearInterval(this.audioLoopId);
         if(this.currentTargetWord) AudioEngine.playTTS(this.currentTargetWord.speak);
-        // Lặp lại mỗi 2.5 giây
-        this.audioInterval = setInterval(() => {
-            if (this.active && !this.isPaused && this.currentTargetWord) {
+        this.audioLoopId = setInterval(() => {
+            if (this.active && !this.paused && this.currentTargetWord) {
                 AudioEngine.playTTS(this.currentTargetWord.speak);
             }
-        }, 2500);
+        }, 4000);
     },
 
     createBoard: function() {
@@ -561,8 +552,8 @@ const SnakeEngine = {
     },
 
     gameLoop: function() {
-        if (!this.active || this.isPaused) return; // Nếu pause thì không làm gì
-        
+        if (!this.active || this.paused) return;
+
         this.direction = this.nextDirection;
         const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
 
@@ -578,13 +569,12 @@ const SnakeEngine = {
             if (food.isCorrect) {
                 ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score;
                 AudioEngine.playEffect('correct'); 
-                // Không đọc ở đây nữa vì đã có loop đọc liên tục
-                
                 if (this.speed > 150) this.speed -= 10;
-                this.foods.splice(foodIndex, 1); this.spawnFoods(); // Sinh mồi mới -> Từ mới -> Loop đọc từ mới
+                this.foods.splice(foodIndex, 1); this.spawnFoods();
+                this.startAudioLoop(); 
                 if (this.score >= 100) { this.win(); return; }
             } else {
-                AudioEngine.playEffect('wrong'); this.showGameOver(`Sai rồi! "${food.word}" không phải từ cần tìm.`); return;
+                AudioEngine.playEffect('wrong'); this.showGameOver(`Sai rồi! "${food.word}" không phải từ cần tìm!`); return;
             }
         }
         if (!ate) this.snake.pop();
@@ -601,15 +591,13 @@ const SnakeEngine = {
 
     spawnFoods: function() {
         this.foods = [];
-        // Chọn từ đúng ngẫu nhiên
-        this.currentTargetWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)];
-        
-        // Reset lại loop âm thanh với từ mới
-        this.startAudioLoop();
+        const correctWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)];
+        this.currentTargetWord = correctWord; 
 
-        const wrongWords = this.poolWrong.sort(() => 0.5 - Math.random()).slice(0, 2);
+        const wrongWords = this.poolWrong.sort(() => 0.5 - Math.random()).slice(0, 2); 
+        
         const itemsToSpawn = [
-            { ...this.currentTargetWord, isCorrect: true, icon: '🍎' }, 
+            { ...correctWord, isCorrect: true, icon: '🍎' }, 
             { ...wrongWords[0], isCorrect: false, icon: '🍄' }
         ];
         if (wrongWords[1]) itemsToSpawn.push({ ...wrongWords[1], isCorrect: false, icon: '💣' });
@@ -617,15 +605,22 @@ const SnakeEngine = {
         itemsToSpawn.forEach(item => {
             let pos;
             do { pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; } while (this.isOccupied(pos));
-            this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon });
+            
+            this.foods.push({ 
+                x: pos.x, y: pos.y, 
+                img: item.img, 
+                word: item.speak, 
+                isCorrect: item.isCorrect, 
+                icon: item.icon 
+            });
         });
 
-        // UPDATE GIAO DIỆN THANH MỤC TIÊU
         let ipaStr = "";
-        if (this.currentTargetWord.parts) { ipaStr = this.currentTargetWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); }
+        if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); }
+        
         document.getElementById('snake-target-content').innerHTML = 
             `<div style="color:red; font-size:14px;">/${ipaStr}/</div>
-             <div style="color:#d35400; font-size:24px; font-weight:900;">${this.currentTargetWord.speak}</div>`;
+             <div style="color:#d35400; font-size:24px; font-weight:900;">${correctWord.speak}</div>`;
     },
 
     isOccupied: function(pos) {
@@ -639,7 +634,6 @@ const SnakeEngine = {
         const cells = document.querySelectorAll('.grid-cell');
         cells.forEach(c => { c.className = 'grid-cell'; c.innerHTML = ''; });
         
-        // Mồi chỉ hiện ảnh
         this.foods.forEach(f => {
             const idx = f.y * this.boardSize + f.x;
             if (cells[idx]) {
@@ -652,12 +646,10 @@ const SnakeEngine = {
             }
         });
 
-        // Rắn chỉ hiện ảnh
         this.snake.forEach((part, index) => {
             const idx = part.y * this.boardSize + part.x;
             if (cells[idx]) {
-                const div = document.createElement('div'); 
-                div.classList.add('snake-part');
+                const div = document.createElement('div'); div.classList.add('snake-part');
                 if (index === 0) {
                     div.classList.add('snake-head');
                     if (this.direction.y === -1) div.classList.add('head-down');
@@ -671,6 +663,7 @@ const SnakeEngine = {
     },
 
     changeDirection: function(newDirName) {
+        if (this.paused) return; 
         let newDir = {x:0, y:0};
         if (newDirName === 'up') newDir = {x: 0, y: -1}; if (newDirName === 'down') newDir = {x: 0, y: 1};
         if (newDirName === 'left') newDir = {x: -1, y: 0}; if (newDirName === 'right') newDir = {x: 1, y: 0};
