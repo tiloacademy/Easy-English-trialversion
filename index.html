@@ -10,6 +10,7 @@
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #87CEEB; margin: 0; padding: 0; height: 100vh; width: 100vw;
 overflow: hidden; display: flex; flex-direction: column; user-select: none; }
 
+/* --- MÀN HÌNH MENU (GIAO DIỆN CŨ - NÚT BẤM) --- */
 #menu-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; flex-direction: column;
 align-items: center; justify-content: center; gap: 15px; }
 .menu-title { font-size: 32px; color: #ff6f00; font-weight: bold; margin-bottom: 20px; }
@@ -134,18 +135,18 @@ box-shadow: 0 4px #d35400; }
 
 .grid-cell { width: 100%; height: 100%; position: relative; border: none; }
 
-/* RẮN: Z-INDEX CAO NHẤT ĐỂ ĐÈ LÊN MỒI */
+/* RẮN: Z-INDEX CAO NHẤT (1000) ĐỂ ĐÈ LÊN MỌI THỨ */
 .snake-part {
     width: 100%; height: 100%;
     background-image: url('snake-body.png'); 
     background-size: contain; 
     background-repeat: no-repeat;
     background-position: center;
-    z-index: 100; /* Rắn nằm trên mồi */
+    z-index: 1000 !important; /* QUAN TRỌNG: Nổi lên trên */
 }
 .snake-head {
     background-image: url('snake-head.png');
-    z-index: 101; /* Đầu rắn cao nhất */
+    z-index: 1001 !important; /* Đầu rắn cao nhất */
     transform-origin: center center; transition: transform 0.1s linear; 
     background-size: contain; 
     background-repeat: no-repeat;
@@ -156,15 +157,15 @@ box-shadow: 0 4px #d35400; }
 .head-left { transform: rotate(90deg); }
 .head-right { transform: rotate(-90deg); }
 
-/* MỒI: Z-INDEX THẤP HƠN RẮN */
+/* MỒI: Z-INDEX THẤP HƠN RẮN NHƯNG CAO HƠN NỀN */
 .food-item {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 10; /* Thấp hơn rắn */
+    z-index: 10; /* Thấp hơn rắn (1000) */
     pointer-events: none;
 }
 .food-img { 
-    width: 350%; height: 350%; /* PHÓNG ĐẠI TỐI ĐA */
+    width: 350%; height: 350%; /* Hình to */
     object-fit: contain; 
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); 
     z-index: 10; opacity: 1;
@@ -568,11 +569,17 @@ const SnakeEngine = {
         itemsToSpawn.forEach(item => {
             let pos; do { 
                 pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; 
-                // Kiểm tra xem vị trí này có sát vách với mồi nào đã có không
-                let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1);
-                if (isTooClose) continue; // Nếu quá gần thì random lại
+                // CHECK VÙNG AN TOÀN (SAFE ZONE) CHO NÚT BẤM
+                // Bàn cờ 15x15. Nút bấm ở giữa đáy.
+                // Loại bỏ: y >= 11 (4 hàng cuối) VÀ x >= 4 && x <= 10 (7 cột giữa)
+                let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10);
                 
-            } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1)); // Check lại lần nữa cho chắc
+                if (isSafeZone) continue; // Nếu trúng vùng an toàn thì random lại ngay
+                
+                let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1);
+                if (isTooClose) continue; 
+                
+            } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1));
             
             this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon });
         });
@@ -585,7 +592,7 @@ const SnakeEngine = {
         this.foods.forEach(f => {
             const idx = f.y * this.boardSize + f.x;
             if (cells[idx]) { 
-                const zIndex = f.isCorrect ? 50 : 10; // Mồi đúng nổi cao hơn mồi sai
+                const zIndex = 10; 
                 cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; 
             }
         });
