@@ -51,11 +51,11 @@ box-shadow: 0 4px #d35400; }
 
 /* UI Game Chung */
 #game-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff3e0; z-index: 20; flex-direction: column; }
-.game-header { height: 60px; display: flex; justify-content: center; align-items: center; position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd; flex-shrink: 0; }
+.game-header { height: 60px; display: flex; justify-content: center; align-items: center; position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd; flex-shrink: 0; z-index: 200; }
 .timer-badge { background: white; border: 3px solid #d35400; color: #d35400; padding: 5px 25px; border-radius: 25px; font-size: 24px; font-weight: bold; }
 .btn-close { position: absolute; right: 10px; background: #c0392b; color: white; width: 45px; height: 45px; border-radius: 50%; border: none; font-weight: bold; font-size: 20px; }
-.game-footer { height: 100px; display: flex; justify-content: center; align-items: center; background: white; border-top: 1px solid #ccc; padding-bottom: 30px; flex-shrink: 0;}
-#win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+.game-footer { height: 100px; display: flex; justify-content: center; align-items: center; background: white; border-top: 1px solid #ccc; padding-bottom: 30px; flex-shrink: 0; z-index: 200;}
+#win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 300; flex-direction: column; align-items: center; justify-content: center; }
 
 /* CSS Game Cũ (Mole/Flip) */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
@@ -112,7 +112,7 @@ box-shadow: 0 4px #d35400; }
 #snake-target-bar {
     width: 95%; background: rgba(255,255,255,0.95); padding: 5px 15px; border-radius: 12px;
     margin-top: 10px; display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 20; height: 60px; flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 200; height: 60px; flex-shrink: 0;
 }
 .target-label { font-weight: bold; color: #555; font-size: 16px; margin-right: 5px; }
 #snake-target-content { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -134,18 +134,18 @@ box-shadow: 0 4px #d35400; }
 
 .grid-cell { width: 100%; height: 100%; position: relative; border: none; }
 
-/* RẮN */
+/* RẮN: Z-INDEX CAO NHẤT ĐỂ ĐÈ LÊN MỒI */
 .snake-part {
     width: 100%; height: 100%;
     background-image: url('snake-body.png'); 
     background-size: contain; 
     background-repeat: no-repeat;
     background-position: center;
-    z-index: 20; /* Tăng Z-index để rắn nổi lên trên mồi */
+    z-index: 100; /* Rắn nằm trên mồi */
 }
 .snake-head {
     background-image: url('snake-head.png');
-    z-index: 21; /* Đầu rắn cao nhất */
+    z-index: 101; /* Đầu rắn cao nhất */
     transform-origin: center center; transition: transform 0.1s linear; 
     background-size: contain; 
     background-repeat: no-repeat;
@@ -156,22 +156,22 @@ box-shadow: 0 4px #d35400; }
 .head-left { transform: rotate(90deg); }
 .head-right { transform: rotate(-90deg); }
 
-/* MỒI: Ảnh SIÊU TO KHỔNG LỒ (5x) */
+/* MỒI: Z-INDEX THẤP HƠN RẮN */
 .food-item {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 5; /* Thấp hơn rắn (20) */
+    z-index: 10; /* Thấp hơn rắn */
     pointer-events: none;
 }
 .food-img { 
-    width: 500%; height: 500%; /* PHÓNG ĐẠI TỐI ĐA */
+    width: 350%; height: 350%; /* PHÓNG ĐẠI TỐI ĐA */
     object-fit: contain; 
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); 
-    z-index: 5; opacity: 1;
+    z-index: 10; opacity: 1;
 }
 .food-core { 
     position: absolute; top: 0px; right: 0px; font-size: 10px; 
-    background: white; border-radius: 50%; padding: 1px; z-index: 6; opacity: 0.9;
+    background: white; border-radius: 50%; padding: 1px; z-index: 11; opacity: 0.9;
     border: 1px solid #ccc;
 }
 
@@ -180,7 +180,7 @@ box-shadow: 0 4px #d35400; }
     position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
     width: 180px; height: 140px;
     display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr;
-    gap: 10px; z-index: 50; touch-action: none;
+    gap: 10px; z-index: 200; touch-action: none;
     opacity: 0.6;
 }
 .d-btn {
@@ -197,7 +197,7 @@ box-shadow: 0 4px #d35400; }
 /* Modal Tạm Dừng */
 #pause-modal {
     display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); z-index: 100;
+    background: rgba(0,0,0,0.6); z-index: 300;
     flex-direction: column; align-items: center; justify-content: center;
 }
 .pause-text { color: white; font-size: 40px; font-weight: bold; margin-bottom: 20px; text-shadow: 0 2px 4px black; }
@@ -478,10 +478,10 @@ const GameEngine = {
 const SnakeEngine = {
     active: false, paused: false, gameLoopId: null, audioLoopId: null, boardSize: 15, snake: [], direction: {x: 0, y: 0}, nextDirection: {x: 0, y: 0}, 
     foods: [], score: 0, speed: 300, targetPhoneme: "", currentTargetWord: null, poolCorrect: [], poolWrong: [],
-    lives: 3, // Thêm biến mạng
+    lives: 3,
 
     start: function(config, dataPool) {
-        this.stop(); this.active = true; this.paused = false; this.score = 0; this.speed = 350; this.lives = 3; this.targetPhoneme = config.phoneme;
+        this.stop(); this.active = true; this.paused = false; this.score = 0; this.speed = 550; this.lives = 3; this.targetPhoneme = config.phoneme;
         this.poolCorrect = dataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         this.poolWrong = dataPool.filter(w => !w.parts || !w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         if (this.poolCorrect.length === 0) return alert("Thiếu dữ liệu âm /" + this.targetPhoneme + "/");
@@ -512,11 +512,9 @@ const SnakeEngine = {
         if (this.lives <= 0) {
             this.showGameOver(msg + " Hết mạng rồi!");
         } else {
-            // Reset vị trí rắn, giữ nguyên điểm
             const center = Math.floor(this.boardSize / 2);
             this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}];
             this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
-            // Thông báo nhỏ (toast) hoặc chỉ cần reset là đủ
         }
     },
     gameLoop: function() {
@@ -525,7 +523,6 @@ const SnakeEngine = {
         const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
         if (this.isCollision(head)) { 
             this.handleDeath("Rắn đụng tường!"); 
-            // Nếu chưa chết hẳn thì vẽ lại và return để đợi loop sau
             if(this.lives > 0) { this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; }
             else return;
         }
@@ -537,17 +534,15 @@ const SnakeEngine = {
             if (food.isCorrect) {
                 ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score;
                 AudioEngine.playEffect('correct'); 
-                // Tăng tốc độ: Giảm thời gian delay, tối thiểu 100ms
-                if (this.speed > 100) this.speed -= 10;
+                if (this.speed > 150) this.speed -= 20; 
                 
                 this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop();
                 if (this.score >= 100) { this.win(); return; }
             } else { 
                 this.handleDeath(`Sai rồi! "${food.word}" không phải từ cần tìm!`);
                 if(this.lives > 0) {
-                     // Nếu ăn sai nhưng còn mạng: Xóa mồi sai đó đi, cắt đuôi (vì ko tính là ăn), tiếp tục chạy
                      this.foods.splice(foodIndex, 1);
-                     this.snake.pop(); // Phải pop vì unshift ở trên đã làm dài ra
+                     this.snake.pop(); 
                      this.draw();
                      this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); 
                      return;
@@ -564,14 +559,21 @@ const SnakeEngine = {
         const correctWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)];
         this.currentTargetWord = correctWord; 
         
-        // Lọc bỏ các từ là thẻ bài (card.jpg) khỏi danh sách sai
+        // Lọc bỏ hình card
         const validWrongPool = this.poolWrong.filter(w => !w.img.includes("card.jpg"));
         const wrongWords = validWrongPool.sort(() => 0.5 - Math.random()).slice(0, 2); 
         
         const itemsToSpawn = [{ ...correctWord, isCorrect: true, icon: '🍎' }, { ...wrongWords[0], isCorrect: false, icon: '🍄' }];
         if (wrongWords[1]) itemsToSpawn.push({ ...wrongWords[1], isCorrect: false, icon: '💣' });
         itemsToSpawn.forEach(item => {
-            let pos; do { pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; } while (this.isOccupied(pos));
+            let pos; do { 
+                pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; 
+                // Kiểm tra xem vị trí này có sát vách với mồi nào đã có không
+                let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1);
+                if (isTooClose) continue; // Nếu quá gần thì random lại
+                
+            } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1)); // Check lại lần nữa cho chắc
+            
             this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon });
         });
         let ipaStr = ""; if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); }
@@ -582,7 +584,10 @@ const SnakeEngine = {
         const cells = document.querySelectorAll('.grid-cell'); cells.forEach(c => { c.className = 'grid-cell'; c.innerHTML = ''; });
         this.foods.forEach(f => {
             const idx = f.y * this.boardSize + f.x;
-            if (cells[idx]) { cells[idx].innerHTML = `<div class="food-item"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; }
+            if (cells[idx]) { 
+                const zIndex = f.isCorrect ? 50 : 10; // Mồi đúng nổi cao hơn mồi sai
+                cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; 
+            }
         });
         this.snake.forEach((part, index) => {
             const idx = part.y * this.boardSize + part.x;
