@@ -133,20 +133,27 @@ box-shadow: 0 4px #d35400; }
     z-index: 10;
 }
 
-.grid-cell { width: 100%; height: 100%; position: relative; border: none; }
+/* Kích hoạt stacking context cho mỗi ô */
+.grid-cell { 
+    width: 100%; height: 100%; 
+    position: relative; 
+    border: none; 
+}
 
-/* RẮN: Z-INDEX CAO NHẤT (1000) ĐỂ ĐÈ LÊN MỌI THỨ */
+/* RẮN: DÙNG POSITION ABSOLUTE ĐỂ KÍCH HOẠT Z-INDEX 20 */
 .snake-part {
     width: 100%; height: 100%;
+    position: absolute; top: 0; left: 0;
     background-image: url('snake-body.png'); 
     background-size: contain; 
     background-repeat: no-repeat;
     background-position: center;
-    z-index: 1000 !important; /* QUAN TRỌNG: Nổi lên trên */
+    z-index: 20; /* Cao hơn food (10) */
 }
 .snake-head {
+    position: absolute; top: 0; left: 0;
     background-image: url('snake-head.png');
-    z-index: 1001 !important; /* Đầu rắn cao nhất */
+    z-index: 21; /* Đầu rắn cao nhất */
     transform-origin: center center; transition: transform 0.1s linear; 
     background-size: contain; 
     background-repeat: no-repeat;
@@ -157,11 +164,11 @@ box-shadow: 0 4px #d35400; }
 .head-left { transform: rotate(90deg); }
 .head-right { transform: rotate(-90deg); }
 
-/* MỒI: Z-INDEX THẤP HƠN RẮN NHƯNG CAO HƠN NỀN */
+/* MỒI: Z-INDEX 10 */
 .food-item {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 10; /* Thấp hơn rắn (1000) */
+    z-index: 10; /* Thấp hơn rắn */
     pointer-events: none;
 }
 .food-img { 
@@ -560,7 +567,6 @@ const SnakeEngine = {
         const correctWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)];
         this.currentTargetWord = correctWord; 
         
-        // Lọc bỏ hình card
         const validWrongPool = this.poolWrong.filter(w => !w.img.includes("card.jpg"));
         const wrongWords = validWrongPool.sort(() => 0.5 - Math.random()).slice(0, 2); 
         
@@ -569,12 +575,11 @@ const SnakeEngine = {
         itemsToSpawn.forEach(item => {
             let pos; do { 
                 pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; 
-                // CHECK VÙNG AN TOÀN (SAFE ZONE) CHO NÚT BẤM
-                // Bàn cờ 15x15. Nút bấm ở giữa đáy.
-                // Loại bỏ: y >= 11 (4 hàng cuối) VÀ x >= 4 && x <= 10 (7 cột giữa)
-                let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10);
                 
-                if (isSafeZone) continue; // Nếu trúng vùng an toàn thì random lại ngay
+                // --- LOGIC TRÁNH VÙNG NÚT BẤM (SAFE ZONE) ---
+                // Nút bấm nằm ở giữa đáy: Hàng 11, 12, 13, 14. Cột 4 đến 10.
+                let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10);
+                if (isSafeZone) continue; 
                 
                 let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1);
                 if (isTooClose) continue; 
