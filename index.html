@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Bé Học Tiếng Anh</title>
 <style>
+/* ======================================================
+   APP VERSION: 1.0 (Final)
+   RELEASE DATE: 2025-12-20
+   NOTE: Phiên bản ổn định với Game Rắn (Z-index fix, Safe zone) 
+   và Game Đập Chuột (Endless, Speed up).
+   ====================================================== */
+
 /* --- CSS CƠ BẢN --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #87CEEB; margin: 0; padding: 0; height: 100vh; width: 100vw;
@@ -133,7 +140,12 @@ box-shadow: 0 4px #d35400; }
     z-index: 10;
 }
 
-.grid-cell { width: 100%; height: 100%; position: relative; border: none; }
+/* Kích hoạt stacking context cho mỗi ô */
+.grid-cell { 
+    width: 100%; height: 100%; 
+    position: relative; 
+    border: none; 
+}
 
 /* RẮN: Z-INDEX CAO NHẤT (1000) ĐỂ ĐÈ LÊN MỌI THỨ */
 .snake-part {
@@ -159,11 +171,11 @@ box-shadow: 0 4px #d35400; }
 .head-left { transform: rotate(90deg); }
 .head-right { transform: rotate(-90deg); }
 
-/* MỒI: Z-INDEX THẤP HƠN RẮN NHƯNG CAO HƠN NỀN */
+/* MỒI: Z-INDEX 10 */
 .food-item {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 10; /* Thấp hơn rắn (1000) */
+    z-index: 10; /* Thấp hơn rắn */
     pointer-events: none;
 }
 .food-img { 
