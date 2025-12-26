@@ -3,17 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh</title>
+<title>Bé Học Tiếng Anh (v1.3)</title>
 <style>
-/* ======================================================
-   APP VERSION: 1.2 (Full Architecture)
-   RELEASE DATE: 2025-12-20
-   STRUCTURE:
-   1. VIEW (HTML/CSS)
-   2. DATA ENGINE (24 Lessons)
-   3. LOGIC ENGINES (Audio, Game, Snake, Learning)
-   ====================================================== */
-
 /* --- CSS CƠ BẢN --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #87CEEB; margin: 0; padding: 0; height: 100vh; width: 100vw;
@@ -27,7 +18,7 @@ align-items: center; justify-content: flex-start; gap: 10px; overflow-y: auto; p
 box-shadow: 0 5px #ccebfd; cursor: pointer; width: 90%; max-width: 400px; transition: transform 0.1s; margin-bottom: 5px; flex-shrink: 0; }
 .btn-menu:active { transform: scale(0.95); background: #f0f8ff; }
 
-/* --- CONTAINER CHÍNH --- */
+/* --- MAIN CONTAINER --- */
 #main-container { width: 100%; height: 100%; position: relative; }
 #learning-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column;
 padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
@@ -189,7 +180,6 @@ box-shadow: 0 4px #d35400; }
 <div id="cursor-hammer" class="hammer"></div>
 
 <div id="menu-screen">
-    <div class="menu-title"> 📚  CHỌN BÀI HỌC</div>
     </div>
 
 <div id="main-container" style="display: none;">
@@ -275,347 +265,372 @@ box-shadow: 0 4px #d35400; }
 
 <script>
 /* ==========================================================================
-   PHẦN 3: LOGIC & DỮ LIỆU
+   PHẦN 1: DỮ LIỆU & CẤU HÌNH (DATA ENGINE)
    ========================================================================== */
+   
+/* DANH SÁCH BÀI HỌC TRÊN MENU */
+const LevelMap = [
+    { id: 1, type: 'learn', label: 'Bài 1: /t/ & /d/', color: '#58cc02' },
+    { id: 2, type: 'learn', label: 'Bài 2: /p/ & /b/', color: '#58cc02' },
+    { id: 3, type: 'learn', label: 'Bài 3: /æ/ & /ɪ/', color: '#58cc02' },
+    { id: 4, type: 'learn', label: 'Bài 4: /ʌ/ & /ɑ:/', color: '#58cc02' },
+    { id: 5, type: 'learn', label: 'Bài 5: /e/', color: '#58cc02' },
+    { id: 6, type: 'learn', label: 'Bài 6: /k/ & /g/', color: '#58cc02' },
+    { id: 7, type: 'learn', label: 'Bài 7: /f/ & /v/', color: '#58cc02' },
+    { id: 8, type: 'learn', label: 'Bài 8: /s/ & /z/', color: '#58cc02' },
+    { id: 9, type: 'learn', label: 'Bài 9: /ʃ/ & /ʒ/', color: '#58cc02' },
+    { id: 10, type: 'learn', label: 'Bài 10: /tʃ/ & /dʒ/', color: '#58cc02' },
+    { id: 11, type: 'learn', label: 'Bài 11: Ôn tập', color: '#ff9600' },
+    { id: 12, type: 'learn', label: 'Bài 12: /i:/ & /ɪ/', color: '#58cc02' },
+    { id: 13, type: 'learn', label: 'Bài 13: /ʊ/ & /u:/', color: '#58cc02' },
+    { id: 14, type: 'learn', label: 'Bài 14: /ɑ:r/ & /ɔ:r/', color: '#58cc02' },
+    { id: 15, type: 'learn', label: 'Bài 15: /ə/ & /ɜːr/', color: '#58cc02' },
+    { id: 16, type: 'learn', label: 'Bài 16: /ɪr/ & /er/', color: '#58cc02' },
+    { id: 17, type: 'learn', label: 'Bài 17: /aʊ/ & /oʊ/', color: '#58cc02' },
+    { id: 18, type: 'learn', label: 'Bài 18: /eɪ/ & /aɪ/', color: '#58cc02' },
+    { id: 19, type: 'learn', label: 'Bài 19: /ɔɪ/ & /t̬/', color: '#58cc02' },
+    { id: 20, type: 'learn', label: 'Bài 20: /m/ & /n/', color: '#58cc02' },
+    { id: 21, type: 'learn', label: 'Bài 21: /ŋ/ & /h/', color: '#58cc02' },
+    { id: 22, type: 'learn', label: 'Bài 22: /r/ & /l/', color: '#58cc02' },
+    { id: 23, type: 'learn', label: 'Bài 23: /j/ & /w/', color: '#58cc02' },
+    { id: 24, type: 'learn', label: 'Bài 24: /θ/ & /ð/', color: '#58cc02' }
+];
 
-/* === [DÁN PHẦN 2 - DATA ENGINE VÀO ĐÂY] === */
-/* --- DATA ENGINE (FULL 24 LESSONS) --- */
+/* NỘI DUNG CHI TIẾT 24 BÀI */
 const DataEngine = {
-    // --- GIAI ĐOẠN 1: CÁC BÀI CƠ BẢN (Chỉ từ vựng) ---
     lesson1: [
-        { img: "tap.jpg", speak: "tap", parts: [{i:"t", t:"t"}, {i:"æ p", t:"ap"}] },
-        { img: "top.jpg", speak: "top", parts: [{i:"t", t:"t"}, {i:"ɒ p", t:"op"}] },
-        { img: "pot.jpg", speak: "pot", parts: [{i:"p", t:"p"}, {i:"ɒ", t:"o"}, {i:"t", t:"t"}] },
-        { img: "to.jpg", speak: "to", parts: [{i:"t", t:"t"}, {i:"u:", t:"o"}] },
-        { img: "tin.jpg", speak: "tin", parts: [{i:"t", t:"t"}, {i:"ɪ n", t:"in"}] },
-        { img: "dog.jpg", speak: "dog", parts: [{i:"d", t:"d"}, {i:"ɒ ɡ", t:"og"}] },
-        { img: "dad.jpg", speak: "dad", parts: [{i:"d", t:"d"}, {i:"æ d", t:"ad"}] },
-        { img: "dig.jpg", speak: "dig", parts: [{i:"d", t:"d"}, {i:"ɪ ɡ", t:"ig"}] },
-        { img: "duck.jpg", speak: "duck", parts: [{i:"d", t:"d"}, {i:"ʌ k", t:"uck"}] },
-        { img: "do.jpg", speak: "do", parts: [{i:"d", t:"d"}, {i:"u:", t:"o"}] },
+        { img: "tap.jpg", speak: "tap", parts: [{t:"t"}, {i:"æ", t:"a"}, {t:"p"}] },
+        { img: "top.jpg", speak: "top", parts: [{t:"t"}, {i:"ɑ", t:"o"}, {t:"p"}] },
+        { img: "pot.jpg", speak: "pot", parts: [{t:"p"}, {i:"ɑ", t:"o"}, {t:"t"}] },
+        { img: "to.jpg", speak: "to", parts: [{t:"t"}, {i:"u:", t:"o"}] },
+        { img: "tin.jpg", speak: "tin", parts: [{t:"t"}, {i:"ɪ", t:"i"}, {t:"n"}] },
+        { img: "dog.jpg", speak: "dog", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {t:"g"}] },
+        { img: "dad.jpg", speak: "dad", parts: [{t:"d"}, {i:"æ", t:"a"}, {t:"d"}] },
+        { img: "dig.jpg", speak: "dig", parts: [{t:"d"}, {i:"ɪ", t:"i"}, {t:"g"}] },
+        { img: "duck.jpg", speak: "duck", parts: [{t:"d"}, {i:"ʌ", t:"u"}, {i:"k", t:"ck"}] },
+        { img: "do.jpg", speak: "do", parts: [{t:"d"}, {i:"u:", t:"o"}] },
         { type: "game", title: "Game /t/ & /d/", pairs: ["tap", "dog", "top", "dad", "pot"], img: "tap.jpg" }
     ],
     lesson2: [
-        { img: "pen.jpg", speak: "pen", parts: [{i:"p", t:"p"}, {i:"e n", t:"en"}] },
-        { img: "pig.jpg", speak: "pig", parts: [{i:"p", t:"p"}, {i:"ɪ ɡ", t:"ig"}] },
-        { img: "pot.jpg", speak: "pot", parts: [{i:"p", t:"p"}, {i:"ɒ t", t:"ot"}] },
-        { img: "pull.jpg", speak: "pull", parts: [{i:"p", t:"p"}, {i:"ʊ l", t:"ull"}] },
-        { img: "pin.jpg", speak: "pin", parts: [{i:"p", t:"p"}, {i:"ɪ n", t:"in"}] },
-        { img: "bag.jpg", speak: "bag", parts: [{i:"b", t:"b"}, {i:"æ ɡ", t:"ag"}] },
-        { img: "book.jpg", speak: "book", parts: [{i:"b", t:"b"}, {i:"ʊ k", t:"ook"}] },
-        { img: "bat.jpg", speak: "bat", parts: [{i:"b", t:"b"}, {i:"æ t", t:"at"}] },
-        { img: "box.jpg", speak: "box", parts: [{i:"b", t:"b"}, {i:"ɒ k s", t:"ox"}] },
-        { img: "bin.jpg", speak: "bin", parts: [{i:"b", t:"b"}, {i:"ɪ n", t:"in"}] },
+        { img: "pen.jpg", speak: "pen", parts: [{t:"p"}, {i:"e", t:"e"}, {t:"n"}] },
+        { img: "pig.jpg", speak: "pig", parts: [{t:"p"}, {i:"ɪ", t:"i"}, {t:"g"}] },
+        { img: "pot.jpg", speak: "pot", parts: [{t:"p"}, {i:"ɑ", t:"o"}, {t:"t"}] },
+        { img: "pull.jpg", speak: "pull", parts: [{t:"p"}, {i:"ʊ", t:"u"}, {t:"ll"}] },
+        { img: "pin.jpg", speak: "pin", parts: [{t:"p"}, {i:"ɪ", t:"i"}, {t:"n"}] },
+        { img: "bag.jpg", speak: "bag", parts: [{t:"b"}, {i:"æ", t:"a"}, {t:"g"}] },
+        { img: "book.jpg", speak: "book", parts: [{t:"b"}, {i:"ʊ", t:"oo"}, {t:"k"}] },
+        { img: "bat.jpg", speak: "bat", parts: [{t:"b"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "box.jpg", speak: "box", parts: [{t:"b"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}] },
+        { img: "bin.jpg", speak: "bin", parts: [{t:"b"}, {i:"ɪ", t:"i"}, {t:"n"}] },
         { type: "game", title: "Game /p/ & /b/", pairs: ["pen", "bag", "pig", "book", "pin"], img: "pen.jpg" }
     ],
     lesson3: [
-        { img: "bat.jpg", speak: "bat", parts: [{i:"b", t:"b"}, {i:"æ t", t:"at"}] },
-        { img: "dad.jpg", speak: "dad", parts: [{i:"d", t:"d"}, {i:"æ d", t:"ad"}] },
-        { img: "pat.jpg", speak: "pat", parts: [{i:"p", t:"p"}, {i:"æ t", t:"at"}] },
-        { img: "tap.jpg", speak: "tap", parts: [{i:"t", t:"t"}, {i:"æ p", t:"ap"}] },
-        { img: "bad.jpg", speak: "bad", parts: [{i:"b", t:"b"}, {i:"æ d", t:"ad"}] },
-        { img: "dip.jpg", speak: "dip", parts: [{i:"d", t:"d"}, {i:"ɪ p", t:"ip"}] },
-        { img: "bit.jpg", speak: "bit", parts: [{i:"b", t:"b"}, {i:"ɪ t", t:"it"}] },
-        { img: "pit.jpg", speak: "pit", parts: [{i:"p", t:"p"}, {i:"ɪ t", t:"it"}] },
-        { img: "tip.jpg", speak: "tip", parts: [{i:"t", t:"t"}, {i:"ɪ p", t:"ip"}] },
-        { img: "bib.jpg", speak: "bib", parts: [{i:"b", t:"b"}, {i:"ɪ b", t:"ib"}] },
+        { img: "bat.jpg", speak: "bat", parts: [{t:"b"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "dad.jpg", speak: "dad", parts: [{t:"d"}, {i:"æ", t:"a"}, {t:"d"}] },
+        { img: "pat.jpg", speak: "pat", parts: [{t:"p"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "tap.jpg", speak: "tap", parts: [{t:"t"}, {i:"æ", t:"a"}, {t:"p"}] },
+        { img: "bad.jpg", speak: "bad", parts: [{t:"b"}, {i:"æ", t:"a"}, {t:"d"}] },
+        { img: "dip.jpg", speak: "dip", parts: [{t:"d"}, {i:"ɪ", t:"i"}, {t:"p"}] },
+        { img: "bit.jpg", speak: "bit", parts: [{t:"b"}, {i:"ɪ", t:"i"}, {t:"t"}] },
+        { img: "pit.jpg", speak: "pit", parts: [{t:"p"}, {i:"ɪ", t:"i"}, {t:"t"}] },
+        { img: "tip.jpg", speak: "tip", parts: [{t:"t"}, {i:"ɪ", t:"i"}, {t:"p"}] },
+        { img: "bib.jpg", speak: "bib", parts: [{t:"b"}, {i:"ɪ", t:"i"}, {t:"b"}] },
         { type: "game", title: "Game /æ/ & /ɪ/", pairs: ["bat", "dip", "dad", "bit", "tap"], img: "bat.jpg" }
     ],
     lesson4: [
-        { img: "duck.jpg", speak: "duck", parts: [{i:"d", t:"d"}, {i:"ʌ k", t:"uck"}] },
-        { img: "but.jpg", speak: "but", parts: [{i:"b", t:"b"}, {i:"ʌ t", t:"ut"}] },
-        { img: "tub.jpg", speak: "tub", parts: [{i:"t", t:"t"}, {i:"ʌ b", t:"ub"}] },
-        { img: "cup.jpg", speak: "cup", parts: [{i:"c", t:"c"}, {i:"ʌ p", t:"up"}] },
-        { img: "bud.jpg", speak: "bud", parts: [{i:"b", t:"b"}, {i:"ʌ d", t:"ud"}] },
-        { img: "dot.jpg", speak: "dot", parts: [{i:"d", t:"d"}, {i:"ɑː t", t:"ot"}] },
-        { img: "top.jpg", speak: "top", parts: [{i:"t", t:"t"}, {i:"ɑː p", t:"op"}] },
-        { img: "pot.jpg", speak: "pot", parts: [{i:"p", t:"p"}, {i:"ɑː t", t:"ot"}] },
-        { img: "dog.jpg", speak: "dog", parts: [{i:"d", t:"d"}, {i:"ɑː ɡ", t:"og"}] },
-        { img: "Bob.jpg", speak: "Bob", parts: [{i:"B", t:"B"}, {i:"ɑː b", t:"ob"}] },
+        { img: "duck.jpg", speak: "duck", parts: [{t:"d"}, {i:"ʌ", t:"u"}, {i:"k", t:"ck"}] },
+        { img: "but.jpg", speak: "but", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {t:"t"}] },
+        { img: "tub.jpg", speak: "tub", parts: [{t:"t"}, {i:"ʌ", t:"u"}, {t:"b"}] },
+        { img: "cup.jpg", speak: "cup", parts: [{i:"k", t:"c"}, {i:"ʌ", t:"u"}, {t:"p"}] },
+        { img: "bud.jpg", speak: "bud", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {t:"d"}] },
+        { img: "dot.jpg", speak: "dot", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {t:"t"}] },
+        { img: "top.jpg", speak: "top", parts: [{t:"t"}, {i:"ɑ", t:"o"}, {t:"p"}] },
+        { img: "pot.jpg", speak: "pot", parts: [{t:"p"}, {i:"ɑ", t:"o"}, {t:"t"}] },
+        { img: "dog.jpg", speak: "dog", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {t:"g"}] },
+        { img: "Bob.jpg", speak: "Bob", parts: [{t:"B"}, {i:"ɑ", t:"o"}, {t:"b"}] },
         { type: "game", title: "Game /ʌ/ & /ɑ:/", pairs: ["duck", "dot", "cup", "pot", "tub"], img: "duck.jpg" }
     ],
     lesson5: [
-        { img: "Ted.jpg", speak: "Ted", parts: [{i:"T", t:"T"}, {i:"e d", t:"ed"}] },
-        { img: "pen.jpg", speak: "pen", parts: [{i:"p", t:"p"}, {i:"e n", t:"en"}] },
-        { img: "ten.jpg", speak: "ten", parts: [{i:"t", t:"t"}, {i:"e n", t:"en"}] },
-        { img: "bed.jpg", speak: "bed", parts: [{i:"b", t:"b"}, {i:"e d", t:"ed"}] },
-        { img: "pet.jpg", speak: "pet", parts: [{i:"p", t:"p"}, {i:"e t", t:"et"}] },
+        { img: "Ted.jpg", speak: "Ted", parts: [{t:"T"}, {i:"e", t:"e"}, {t:"d"}] },
+        { img: "pen.jpg", speak: "pen", parts: [{t:"p"}, {i:"e", t:"e"}, {t:"n"}] },
+        { img: "ten.jpg", speak: "ten", parts: [{t:"t"}, {i:"e", t:"e"}, {t:"n"}] },
+        { img: "bed.jpg", speak: "bed", parts: [{t:"b"}, {i:"e", t:"e"}, {t:"d"}] },
+        { img: "pet.jpg", speak: "pet", parts: [{t:"p"}, {i:"e", t:"e"}, {t:"t"}] },
         { type: "game", title: "Game /e/", pairs: ["Ted", "pen", "ten", "bed", "pet"], img: "bed.jpg" }
     ],
     lesson6: [
-        { img: "cat.jpg", speak: "cat", parts: [{i:"k", t:"c"}, {i:"æ t", t:"at"}] },
-        { img: "kid.jpg", speak: "kid", parts: [{i:"k", t:"k"}, {i:"ɪ d", t:"id"}] },
-        { img: "cap.jpg", speak: "cap", parts: [{i:"k", t:"c"}, {i:"æ p", t:"ap"}] },
-        { img: "cot.jpg", speak: "cot", parts: [{i:"k", t:"c"}, {i:"ɒ t", t:"ot"}] },
-        { img: "cup.jpg", speak: "cup", parts: [{i:"k", t:"c"}, {i:"ʌ p", t:"up"}] },
-        { img: "gap.jpg", speak: "gap", parts: [{i:"g", t:"g"}, {i:"æ p", t:"ap"}] },
-        { img: "got.jpg", speak: "got", parts: [{i:"g", t:"g"}, {i:"ɒ t", t:"ot"}] },
-        { img: "dig.jpg", speak: "dig", parts: [{i:"d", t:"d"}, {i:"ɪ ɡ", t:"ig"}] },
-        { img: "dog.jpg", speak: "dog", parts: [{i:"d", t:"d"}, {i:"ɒ ɡ", t:"og"}] },
-        { img: "get.jpg", speak: "get", parts: [{i:"g", t:"g"}, {i:"e t", t:"et"}] },
+        { img: "cat.jpg", speak: "cat", parts: [{i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "kid.jpg", speak: "kid", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {t:"d"}] },
+        { img: "cap.jpg", speak: "cap", parts: [{i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"p"}] },
+        { img: "cot.jpg", speak: "cot", parts: [{i:"k", t:"c"}, {i:"ɑ", t:"o"}, {t:"t"}] },
+        { img: "cup.jpg", speak: "cup", parts: [{i:"k", t:"c"}, {i:"ʌ", t:"u"}, {t:"p"}] },
+        { img: "gap.jpg", speak: "gap", parts: [{t:"g"}, {i:"æ", t:"a"}, {t:"p"}] },
+        { img: "got.jpg", speak: "got", parts: [{t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}] },
+        { img: "dig.jpg", speak: "dig", parts: [{t:"d"}, {i:"ɪ", t:"i"}, {t:"g"}] },
+        { img: "dog.jpg", speak: "dog", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {t:"g"}] },
+        { img: "get.jpg", speak: "get", parts: [{t:"g"}, {i:"e", t:"e"}, {t:"t"}] },
         { type: "game", title: "Game /k/ & /g/", pairs: ["cat", "gap", "kid", "got", "cup"], img: "cat.jpg" }
     ],
 
-    // --- GIAI ĐOẠN 2: TỪ VỰNG + CÂU (Bài 7 - 24) ---
+    // --- GIAI ĐOẠN 2: TỪ VỰNG + CÂU ---
     lesson7: [
-        { img: "fog.jpg", speak: "fog", parts: [{i:"f", t:"f"}, {i:"ɒ g", t:"og"}] },
-        { img: "fit.jpg", speak: "fit", parts: [{i:"f", t:"f"}, {i:"ɪ t", t:"it"}] },
-        { img: "fig.jpg", speak: "fig", parts: [{i:"f", t:"f"}, {i:"ɪ g", t:"ig"}] },
-        { img: "fat.jpg", speak: "fat", parts: [{i:"f", t:"f"}, {i:"æ t", t:"at"}] },
-        { img: "fed.jpg", speak: "fed", parts: [{i:"f", t:"f"}, {i:"e d", t:"ed"}] },
-        { img: "vat.jpg", speak: "vat", parts: [{i:"v", t:"v"}, {i:"æ t", t:"at"}] },
-        { img: "vet.jpg", speak: "vet", parts: [{i:"v", t:"v"}, {i:"e t", t:"et"}] },
-        { img: "van.jpg", speak: "van", parts: [{i:"v", t:"v"}, {i:"æ n", t:"an"}] },
-        { type: "sent", img: "sentence_fed.jpg", speak: "Bob fed a fat dog", parts: [{i:"B ɒ b", t:"Bob"}, {t:" "}, {i:"f e d", t:"fed"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"f æ t", t:"fat"}, {t:" "}, {i:"d ɒ g", t:"dog."}] },
-        { type: "sent", img: "sentence_cat.jpg", speak: "A cat got a big cap", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"k æ t", t:"cat"}, {t:" "}, {i:"g ɒ t", t:"got"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"b ɪ g", t:"big"}, {t:" "}, {i:"k æ p", t:"cap."}] },
+        { img: "fog.jpg", speak: "fog", parts: [{t:"f"}, {i:"ɑ", t:"o"}, {t:"g"}] },
+        { img: "fit.jpg", speak: "fit", parts: [{t:"f"}, {i:"ɪ", t:"i"}, {t:"t"}] },
+        { img: "fig.jpg", speak: "fig", parts: [{t:"f"}, {i:"ɪ", t:"i"}, {t:"g"}] },
+        { img: "fat.jpg", speak: "fat", parts: [{t:"f"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "fed.jpg", speak: "fed", parts: [{t:"f"}, {i:"e", t:"e"}, {t:"d"}] },
+        { img: "vat.jpg", speak: "vat", parts: [{t:"v"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "vet.jpg", speak: "vet", parts: [{t:"v"}, {i:"e", t:"e"}, {t:"t"}] },
+        { img: "van.jpg", speak: "van", parts: [{t:"v"}, {i:"æ", t:"a"}, {t:"n"}] },
+        { type: "sent", img: "sentence_fed.jpg", speak: "Bob fed a fat dog", parts: [{t:"B"}, {i:"ɑ", t:"o"}, {t:"b"}, {t:" "}, {t:"f"}, {i:"e", t:"e"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"d"}, {i:"ɑ", t:"o"}, {t:"g."}] },
+        { type: "sent", img: "sentence_cat.jpg", speak: "A cat got a big cap", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"p."}] },
         { type: "game", title: "Game /f/ & /v/", pairs: ["fog", "vat", "fit", "vet", "fat"], img: "fog.jpg" }
     ],
     lesson8: [
-        { img: "bus.jpg", speak: "bus", parts: [{i:"b", t:"b"}, {i:"ʌ s", t:"us"}] },
-        { img: "kiss.jpg", speak: "kiss", parts: [{i:"k", t:"k"}, {i:"ɪ s", t:"iss"}] },
-        { img: "sick.jpg", speak: "sick", parts: [{i:"s", t:"s"}, {i:"ɪ k", t:"ick"}] },
-        { img: "sock.jpg", speak: "sock", parts: [{i:"s", t:"s"}, {i:"ɒ k", t:"ock"}] },
-        { img: "sit.jpg", speak: "sit", parts: [{i:"s", t:"s"}, {i:"ɪ t", t:"it"}] },
-        { img: "zip.jpg", speak: "zip", parts: [{i:"z", t:"z"}, {i:"ɪ p", t:"ip"}] },
-        { img: "zigzag.jpg", speak: "zigzag", parts: [{i:"z", t:"z"}, {i:"ɪ g", t:"ig"}, {i:"z", t:"z"}, {i:"æ g", t:"ag"}] },
-        { img: "bugs.jpg", speak: "bugs", parts: [{i:"b", t:"b"}, {i:"ʌ g z", t:"ugs"}] },
-        { img: "dogs.jpg", speak: "dogs", parts: [{i:"d", t:"d"}, {i:"ɒ g z", t:"ogs"}] },
-        { img: "is.jpg", speak: "is", parts: [{i:"ɪ z", t:"is"}] },
-        { type: "sent", img: "sentence_pig.jpg", speak: "A pig gets a cup", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"p ɪ g", t:"pig"}, {t:" "}, {i:"g e t s", t:"gets"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k ʌ p", t:"cup."}] },
-        { type: "sent", img: "sentence_duck.jpg", speak: "A duck sits on the bed", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"d ʌ k", t:"duck"}, {t:" "}, {i:"s ɪ t s", t:"sits"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"b e d", t:"bed."}] },
-        { type: "sent", img: "sentence_dad.jpg", speak: "Dad digs a pit", parts: [{i:"d æ d", t:"Dad"}, {t:" "}, {i:"d ɪ g s", t:"digs"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"p ɪ t", t:"pit."}] },
+        { img: "bus.jpg", speak: "bus", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {t:"s"}] },
+        { img: "kiss.jpg", speak: "kiss", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {t:"ss"}] },
+        { img: "sick.jpg", speak: "sick", parts: [{t:"s"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}] },
+        { img: "sock.jpg", speak: "sock", parts: [{t:"s"}, {i:"ɑ", t:"o"}, {i:"k", t:"ck"}] },
+        { img: "sit.jpg", speak: "sit", parts: [{t:"s"}, {i:"ɪ", t:"i"}, {t:"t"}] },
+        { img: "zip.jpg", speak: "zip", parts: [{t:"z"}, {i:"ɪ", t:"i"}, {t:"p"}] },
+        { img: "zigzag.jpg", speak: "zigzag", parts: [{t:"z"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:"z"}, {i:"æ", t:"a"}, {t:"g"}] },
+        { img: "bugs.jpg", speak: "bugs", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {t:"g"}, {i:"z", t:"s"}] },
+        { img: "dogs.jpg", speak: "dogs", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {t:"g"}, {i:"z", t:"s"}] },
+        { img: "is.jpg", speak: "is", parts: [{i:"ɪ", t:"i"}, {i:"z", t:"s"}] },
+        { type: "sent", img: "sentence_pig.jpg", speak: "A pig gets a cup", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"p"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:" "}, {t:"g"}, {i:"e", t:"e"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"ʌ", t:"u"}, {t:"p."}] },
+        { type: "sent", img: "sentence_duck.jpg", speak: "A duck sits on the bed", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"d"}, {i:"ʌ", t:"u"}, {i:"k", t:"ck"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {i:"e", t:"e"}, {t:"d."}] },
+        { type: "sent", img: "sentence_dad.jpg", speak: "Dad digs a pit", parts: [{t:"D"}, {i:"æ", t:"a"}, {t:"d"}, {t:" "}, {t:"d"}, {i:"ɪ", t:"i"}, {t:"g"}, {i:"z", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"p"}, {i:"ɪ", t:"i"}, {t:"t."}] },
         { type: "game", title: "Game /s/ & /z/", pairs: ["bus", "zip", "sick", "bugs", "sit"], img: "bus.jpg" }
     ],
     lesson9: [
-        { img: "shop.jpg", speak: "shop", parts: [{i:"ʃ", t:"sh"}, {i:"ɒ p", t:"op"}] },
-        { img: "ship.jpg", speak: "ship", parts: [{i:"ʃ", t:"sh"}, {i:"ɪ p", t:"ip"}] },
-        { img: "fish.jpg", speak: "fish", parts: [{i:"f", t:"f"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}] },
-        { img: "dish.jpg", speak: "dish", parts: [{i:"d", t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}] },
-        { img: "measure.jpg", speak: "measure", parts: [{i:"m", t:"m"}, {i:"ɛ", t:"ea"}, {i:"ʒ ər", t:"sure"}] },
-        { img: "treasure.jpg", speak: "treasure", parts: [{i:"t r", t:"tr"}, {i:"ɛ", t:"ea"}, {i:"ʒ ər", t:"sure"}] },
-        { img: "vision.jpg", speak: "vision", parts: [{i:"v", t:"v"}, {i:"ɪ", t:"i"}, {i:"ʒ ən", t:"sion"}] },
-        { type: "sent", img: "sentence_shells.jpg", speak: "She sells seashells on the seashore", parts: [{i:"ʃ i:", t:"She"}, {t:" "}, {i:"s ɛ l z", t:"sells"}, {t:" "}, {i:"s i: ʃ ɛ l z", t:"seashells"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"s i: ʃ ɔ:r", t:"seashore."}] },
-        { type: "sent", img: "sentence_fish.jpg", speak: "A fat fish sits on a treasure bag", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"f æ t", t:"fat"}, {t:" "}, {i:"f ɪ ʃ", t:"fish"}, {t:" "}, {i:"s ɪ t s", t:"sits"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"t r ɛ ʒ ər", t:"treasure"}, {t:" "}, {i:"b æ ɡ", t:"bag."}] },
-        { type: "game", title: "Game /ʃ/ & /ʒ/", pairs: ["shop", "ship", "fish", "dish", "treasure"], img: "fish.jpg" }
+        { img: "shop.jpg", speak: "shop", parts: [{i:"ʃ", t:"sh"}, {i:"ɑ", t:"o"}, {t:"p"}] },
+        { img: "ship.jpg", speak: "ship", parts: [{i:"ʃ", t:"sh"}, {i:"ɪ", t:"i"}, {t:"p"}] },
+        { img: "fish.jpg", speak: "fish", parts: [{t:"f"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}] },
+        { img: "dish.jpg", speak: "dish", parts: [{t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}] },
+        { img: "measure.jpg", speak: "measure", parts: [{t:"m"}, {i:"e", t:"ea"}, {i:"ʒ", t:"s"}, {i:"ər", t:"ure"}] },
+        { img: "treasure.jpg", speak: "treasure", parts: [{t:"t"}, {t:"r"}, {i:"e", t:"ea"}, {i:"ʒ", t:"s"}, {i:"ər", t:"ure"}] },
+        { img: "vision.jpg", speak: "vision", parts: [{t:"v"}, {i:"ɪ", t:"i"}, {i:"ʒ", t:"s"}, {i:"ən", t:"ion"}] },
+        { type: "sent", img: "sentence_shells.jpg", speak: "She sells seashells on the seashore", parts: [{i:"ʃ", t:"Sh"}, {i:"i:", t:"e"}, {t:" "}, {t:"s"}, {i:"e", t:"e"}, {t:"ll"}, {i:"z", t:"s"}, {t:" "}, {t:"s"}, {i:"i:", t:"ea"}, {i:"ʃ", t:"sh"}, {i:"e", t:"e"}, {t:"ll"}, {i:"z", t:"s"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"s"}, {i:"i:", t:"ea"}, {i:"ʃ", t:"sh"}, {i:"ɔ:r", t:"ore."}] },
+        { type: "sent", img: "sentence_fish.jpg", speak: "A fat fish sits on a treasure bag", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"t"}, {t:"r"}, {i:"e", t:"ea"}, {i:"ʒ", t:"s"}, {i:"ər", t:"ure"}, {t:" "}, {t:"b"}, {i:"æ", t:"a"}, {t:"g."}] },
+        { type: "game", title: "Game /ʃ/ & /ʒ/", pairs: ["shop", "measure", "ship", "treasure", "fish"], img: "fish.jpg" }
     ],
     lesson10: [
-        { img: "chick.jpg", speak: "chick", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ k", t:"ick"}] },
-        { img: "chop.jpg", speak: "chop", parts: [{i:"tʃ", t:"ch"}, {i:"ɒ p", t:"op"}] },
-        { img: "chin.jpg", speak: "chin", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ n", t:"in"}] },
-        { img: "chip.jpg", speak: "chip", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ p", t:"ip"}] },
-        { img: "chat.jpg", speak: "chat", parts: [{i:"tʃ", t:"ch"}, {i:"æ t", t:"at"}] },
-        { img: "jam.jpg", speak: "jam", parts: [{i:"dʒ", t:"j"}, {i:"æ m", t:"am"}] },
-        { img: "jet.jpg", speak: "jet", parts: [{i:"dʒ", t:"j"}, {i:"ɛ t", t:"et"}] },
-        { img: "jug.jpg", speak: "jug", parts: [{i:"dʒ", t:"j"}, {i:"ʌ ɡ", t:"ug"}] },
-        { img: "Jack.jpg", speak: "Jack", parts: [{i:"dʒ", t:"J"}, {i:"æ k", t:"ack"}] },
-        { img: "job.jpg", speak: "job", parts: [{i:"dʒ", t:"j"}, {i:"ɒ b", t:"ob"}] },
-        { type: "sent", img: "sentence_cheerful.jpg", speak: "Cheerful children chase chatty chicks", parts: [{i:"tʃ ɪr f ə l", t:"Cheerful"}, {t:" "}, {i:"tʃ ɪ l d r ə n", t:"children"}, {t:" "}, {i:"tʃ eɪ s", t:"chase"}, {t:" "}, {i:"tʃ æ t i", t:"chatty"}, {t:" "}, {i:"tʃ ɪ k s", t:"chicks."}] },
-        { type: "sent", img: "sentence_jack_jill.jpg", speak: "Jack and Jill juggle juicy ginger jars", parts: [{i:"dʒ æ k", t:"Jack"}, {t:" "}, {i:"æ n d", t:"and"}, {t:" "}, {i:"dʒ ɪ l", t:"Jill"}, {t:" "}, {i:"dʒ ʌ ɡ l", t:"juggle"}, {t:" "}, {i:"dʒ u: s i", t:"juicy"}, {t:" "}, {i:"dʒ ɪ n dʒ ər", t:"ginger"}, {t:" "}, {i:"dʒ ɑ:r z", t:"jars."}] },
-        { type: "sent", img: "sentence_chick.jpg", speak: "The chick checks the jam", parts: [{i:"ð ə", t:"The"}, {t:" "}, {i:"tʃ ɪ k", t:"chick"}, {t:" "}, {i:"tʃ ɛ k s", t:"checks"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"dʒ æ m", t:"jam."}] },
+        { img: "chick.jpg", speak: "chick", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}] },
+        { img: "chop.jpg", speak: "chop", parts: [{i:"tʃ", t:"ch"}, {i:"ɑ", t:"o"}, {t:"p"}] },
+        { img: "chin.jpg", speak: "chin", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {t:"n"}] },
+        { img: "chip.jpg", speak: "chip", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {t:"p"}] },
+        { img: "chat.jpg", speak: "chat", parts: [{i:"tʃ", t:"ch"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "jam.jpg", speak: "jam", parts: [{i:"dʒ", t:"j"}, {i:"æ", t:"a"}, {t:"m"}] },
+        { img: "jet.jpg", speak: "jet", parts: [{i:"dʒ", t:"j"}, {i:"e", t:"e"}, {t:"t"}] },
+        { img: "jug.jpg", speak: "jug", parts: [{i:"dʒ", t:"j"}, {i:"ʌ", t:"u"}, {t:"g"}] },
+        { img: "Jack.jpg", speak: "Jack", parts: [{i:"dʒ", t:"J"}, {i:"æ", t:"a"}, {i:"k", t:"ck"}] },
+        { img: "job.jpg", speak: "job", parts: [{i:"dʒ", t:"j"}, {i:"ɑ", t:"o"}, {t:"b"}] },
+        { type: "sent", img: "sentence_cheerful.jpg", speak: "Cheerful children chase chatty chicks", parts: [{i:"tʃ", t:"Ch"}, {i:"ɪr", t:"eer"}, {t:"f"}, {i:"ə", t:"u"}, {t:"l"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {t:"l"}, {t:"d"}, {t:"r"}, {i:"ə", t:"e"}, {t:"n"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"eɪ", t:"a"}, {t:"s"}, {i:"_", t:"e"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"æ", t:"a"}, {t:"tt"}, {i:"i", t:"y"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:"s."}] },
+        { type: "sent", img: "sentence_jack_jill.jpg", speak: "Jack and Jill juggle juicy ginger jars", parts: [{i:"dʒ", t:"J"}, {i:"æ", t:"a"}, {i:"k", t:"ck"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"dʒ", t:"J"}, {i:"ɪ", t:"i"}, {t:"ll"}, {t:" "}, {i:"dʒ", t:"j"}, {i:"ʌ", t:"u"}, {t:"gg"}, {t:"l"}, {i:"_", t:"e"}, {t:" "}, {i:"dʒ", t:"j"}, {i:"u:", t:"ui"}, {i:"s", t:"c"}, {i:"i", t:"y"}, {t:" "}, {i:"dʒ", t:"g"}, {i:"ɪ", t:"in"}, {t:"n"}, {i:"dʒ", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"dʒ", t:"j"}, {i:"ɑ:r", t:"ar"}, {t:"s."}] },
+        { type: "sent", img: "sentence_chick.jpg", speak: "The chick checks the jam", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"e", t:"e"}, {i:"k", t:"ck"}, {t:"s"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {i:"dʒ", t:"j"}, {i:"æ", t:"a"}, {t:"m."}] },
         { type: "game", title: "Game /tʃ/ & /dʒ/", pairs: ["chick", "jam", "chop", "jug", "Jack"], img: "chick.jpg" }
     ],
     lesson11: [
-        { type: "sent", img: "sentence_Jack.jpg", speak: "Jack got a fish on the dish", parts: [{i:"dʒ æ k", t:"Jack"}, {t:" "}, {i:"g ɒ t", t:"got"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"f ɪ ʃ", t:"fish"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"d ɪ ʃ", t:"dish."}] },
-        { type: "sent", img: "sentence_vet.jpg", speak: "The vet fed the chick on a big ship", parts: [{i:"ð ə", t:"The"}, {t:" "}, {i:"v e t", t:"vet"}, {t:" "}, {i:"f e d", t:"fed"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"tʃ ɪ k", t:"chick"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"b ɪ g", t:"big"}, {t:" "}, {i:"ʃ ɪ p", t:"ship."}] },
-        { type: "sent", img: "sentence_bugs.jpg", speak: "Cats and dogs catch bugs on a big bus", parts: [{i:"k æ t s", t:"Cats"}, {t:" "}, {i:"æ n d", t:"and"}, {t:" "}, {i:"d ɒ g s", t:"dogs"}, {t:" "}, {i:"k æ tʃ", t:"catch"}, {t:" "}, {i:"b ʌ g z", t:"bugs"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"b ɪ g", t:"big"}, {t:" "}, {i:"b ʌ s", t:"bus."}] }
+        { type: "sent", img: "sentence_Jack.jpg", speak: "Jack got a fish on the dish", parts: [{i:"dʒ", t:"J"}, {i:"æ", t:"a"}, {i:"k", t:"ck"}, {t:" "}, {t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"f"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh."}] },
+        { type: "sent", img: "sentence_vet.jpg", speak: "The vet fed the chick on a big ship", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"v"}, {i:"e", t:"e"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"e", t:"e"}, {t:"d"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"ɪ", t:"i"}, {t:"p."}] },
+        { type: "sent", img: "sentence_bugs.jpg", speak: "Cats and dogs catch bugs on a big bus", parts: [{i:"k", t:"C"}, {i:"æ", t:"a"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"d"}, {i:"ɑ", t:"o"}, {t:"g"}, {t:"s"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {i:"tʃ", t:"tch"}, {t:" "}, {t:"b"}, {i:"ʌ", t:"u"}, {t:"g"}, {t:"s"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:" "}, {t:"b"}, {i:"ʌ", t:"u"}, {t:"s."}] }
     ],
     lesson12: [
-        { img: "sea.jpg", speak: "sea", parts: [{i:"s", t:"s"}, {i:"i:", t:"ea"}] },
-        { img: "sheep.jpg", speak: "sheep", parts: [{i:"ʃ", t:"sh"}, {i:"i: p", t:"eep"}] },
-        { img: "feet.jpg", speak: "feet", parts: [{i:"f", t:"f"}, {i:"i: t", t:"eet"}] },
-        { img: "bee.jpg", speak: "bee", parts: [{i:"b", t:"b"}, {i:"i:", t:"ee"}] },
-        { img: "eat.jpg", speak: "eat", parts: [{i:"i: t", t:"eat"}] },
-        { type: "sent", img: "sentence_sheep.jpg", speak: "The sheep sees a bee", parts: [{i:"ð ə", t:"The"}, {t:" "}, {i:"ʃ i: p", t:"sheep"}, {t:" "}, {i:"s i: z", t:"sees"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"b i:", t:"bee."}] },
-        { type: "sent", img: "sentence_she.jpg", speak: "She keeps a big seed", parts: [{i:"ʃ i:", t:"She"}, {t:" "}, {i:"k i: p s", t:"keeps"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"b ɪ g", t:"big"}, {t:" "}, {i:"s i: d", t:"seed."}] },
+        { img: "sea.jpg", speak: "sea", parts: [{t:"s"}, {i:"i:", t:"ea"}] },
+        { img: "sheep.jpg", speak: "sheep", parts: [{i:"ʃ", t:"sh"}, {i:"i:", t:"eep"}] },
+        { img: "feet.jpg", speak: "feet", parts: [{t:"f"}, {i:"i:", t:"ee"}, {t:"t"}] },
+        { img: "bee.jpg", speak: "bee", parts: [{t:"b"}, {i:"i:", t:"ee"}] },
+        { img: "eat.jpg", speak: "eat", parts: [{i:"i:", t:"ea"}, {t:"t"}] },
+        { type: "sent", img: "sentence_sheep.jpg", speak: "The sheep sees a bee", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"i:", t:"eep"}, {t:" "}, {t:"s"}, {i:"i:", t:"ee"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"i:", t:"ee."}] },
+        { type: "sent", img: "sentence_she.jpg", speak: "She keeps a big seed", parts: [{i:"ʃ", t:"Sh"}, {i:"i:", t:"e"}, {t:" "}, {t:"k"}, {i:"i:", t:"ee"}, {t:"p"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:" "}, {t:"s"}, {i:"i:", t:"ee"}, {t:"d."}] },
         { type: "game", title: "Game /i:/ & /ɪ/", pairs: ["sea", "sheep", "feet", "bee", "eat"], img: "sheep.jpg" }
     ],
     lesson13: [
-        { img: "put.jpg", speak: "put", parts: [{i:"p", t:"p"}, {i:"ʊ t", t:"ut"}] },
-        { img: "bush.jpg", speak: "bush", parts: [{i:"b", t:"b"}, {i:"ʊ ʃ", t:"ush"}] },
-        { img: "book.jpg", speak: "book", parts: [{i:"b", t:"b"}, {i:"ʊ k", t:"ook"}] },
-        { img: "foot.jpg", speak: "foot", parts: [{i:"f", t:"f"}, {i:"ʊ t", t:"oot"}] },
-        { img: "cook.jpg", speak: "cook", parts: [{i:"k", t:"c"}, {i:"ʊ k", t:"ook"}] },
-        { img: "boot.jpg", speak: "boot", parts: [{i:"b", t:"b"}, {i:"u: t", t:"oot"}] },
-        { img: "food.jpg", speak: "food", parts: [{i:"f", t:"f"}, {i:"u: d", t:"ood"}] },
-        { img: "goose.jpg", speak: "goose", parts: [{i:"g", t:"g"}, {i:"u: s", t:"oose"}] },
-        { img: "zoo.jpg", speak: "zoo", parts: [{i:"z", t:"z"}, {i:"u:", t:"oo"}] },
-        { img: "shoot.jpg", speak: "shoot", parts: [{i:"ʃ", t:"sh"}, {i:"u: t", t:"oot"}] },
-        { type: "sent", img: "sentence_book.jpg", speak: "Bob put the book in the bush", parts: [{i:"B ɒ b", t:"Bob"}, {t:" "}, {i:"p ʊ t", t:"put"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"b ʊ k", t:"book"}, {t:" "}, {i:"ɪ n", t:"in"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"b ʊ ʃ", t:"bush."}] },
-        { type: "sent", img: "sentence_goose.jpg", speak: "The goose eats food at the zoo", parts: [{i:"ð ə", t:"The"}, {t:" "}, {i:"g u: s", t:"goose"}, {t:" "}, {i:"i: t s", t:"eats"}, {t:" "}, {i:"f u: d", t:"food"}, {t:" "}, {i:"æ t", t:"at"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"z u:", t:"zoo."}] },
+        { img: "put.jpg", speak: "put", parts: [{t:"p"}, {i:"ʊ", t:"u"}, {t:"t"}] },
+        { img: "bush.jpg", speak: "bush", parts: [{t:"b"}, {i:"ʊ", t:"u"}, {i:"ʃ", t:"sh"}] },
+        { img: "book.jpg", speak: "book", parts: [{t:"b"}, {i:"ʊ", t:"oo"}, {t:"k"}] },
+        { img: "foot.jpg", speak: "foot", parts: [{t:"f"}, {i:"ʊ", t:"oo"}, {t:"t"}] },
+        { img: "cook.jpg", speak: "cook", parts: [{i:"k", t:"c"}, {i:"ʊ", t:"oo"}, {t:"k"}] },
+        { img: "boot.jpg", speak: "boot", parts: [{t:"b"}, {i:"u:", t:"oo"}, {t:"t"}] },
+        { img: "food.jpg", speak: "food", parts: [{t:"f"}, {i:"u:", t:"oo"}, {t:"d"}] },
+        { img: "goose.jpg", speak: "goose", parts: [{t:"g"}, {i:"u:", t:"oo"}, {t:"s"}, {i:"_", t:"e"}] },
+        { img: "zoo.jpg", speak: "zoo", parts: [{t:"z"}, {i:"u:", t:"oo"}] },
+        { img: "shoot.jpg", speak: "shoot", parts: [{i:"ʃ", t:"sh"}, {i:"u:", t:"oo"}, {t:"t"}] },
+        { type: "sent", img: "sentence_book.jpg", speak: "Bob put the book in the bush", parts: [{t:"B"}, {i:"ɑ", t:"o"}, {t:"b"}, {t:" "}, {t:"p"}, {i:"ʊ", t:"u"}, {t:"t"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {i:"ʊ", t:"oo"}, {t:"k"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {i:"ʊ", t:"u"}, {i:"ʃ", t:"sh."}] },
+        { type: "sent", img: "sentence_goose.jpg", speak: "The goose eats food at the zoo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"g"}, {i:"u:", t:"oo"}, {t:"s"}, {i:"_", t:"e"}, {t:" "}, {i:"i:", t:"ea"}, {t:"t"}, {t:"s"}, {t:" "}, {t:"f"}, {i:"u:", t:"oo"}, {t:"d"}, {t:" "}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"z"}, {i:"u:", t:"oo."}] },
         { type: "game", title: "Game /ʊ/ & /u:/", pairs: ["put", "boot", "bush", "food", "book"], img: "book.jpg" }
     ],
     lesson14: [
-        { img: "shark.jpg", speak: "shark", parts: [{i:"ʃ", t:"sh"}, {i:"ɑ:r k", t:"ark"}] },
-        { img: "star.jpg", speak: "star", parts: [{i:"s t", t:"st"}, {i:"ɑ:r", t:"ar"}] },
-        { img: "cart.jpg", speak: "cart", parts: [{i:"k", t:"c"}, {i:"ɑ:r t", t:"art"}] },
+        { img: "shark.jpg", speak: "shark", parts: [{i:"ʃ", t:"sh"}, {i:"ɑ:r", t:"ar"}, {t:"k"}] },
+        { img: "star.jpg", speak: "star", parts: [{t:"s"}, {t:"t"}, {i:"ɑ:r", t:"ar"}] },
+        { img: "cart.jpg", speak: "cart", parts: [{i:"k", t:"c"}, {i:"ɑ:r", t:"ar"}, {t:"t"}] },
         { img: "car.jpg", speak: "car", parts: [{i:"k", t:"c"}, {i:"ɑ:r", t:"ar"}] },
-        { img: "park.jpg", speak: "park", parts: [{i:"p", t:"p"}, {i:"ɑ:r k", t:"ark"}] },
-        { img: "torch.jpg", speak: "torch", parts: [{i:"t", t:"t"}, {i:"ɔ:r tʃ", t:"orch"}] },
-        { img: "shorts.jpg", speak: "shorts", parts: [{i:"ʃ", t:"sh"}, {i:"ɔ:r t s", t:"orts"}] },
-        { img: "board.jpg", speak: "board", parts: [{i:"b", t:"b"}, {i:"ɔ:r d", t:"oard"}] },
-        { img: "door.jpg", speak: "door", parts: [{i:"d", t:"d"}, {i:"ɔ:r", t:"oor"}] },
-        { img: "fork.jpg", speak: "fork", parts: [{i:"f", t:"f"}, {i:"ɔ:r k", t:"ork"}] },
-        { type: "sent", img: "sentence_shark.jpg", speak: "A shark put a star in the jar", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"ʃ ɑ:r k", t:"shark"}, {t:" "}, {i:"p ʊ t", t:"put"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"s t ɑ:r", t:"star"}, {t:" "}, {i:"ɪ n", t:"in"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"dʒ ɑ:r", t:"jar."}] },
-        { type: "sent", img: "sentence_fork.jpg", speak: "A short fork drops on the floor", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"ʃ ɔ:r t", t:"short"}, {t:" "}, {i:"f ɔ:r k", t:"fork"}, {t:" "}, {i:"d r ɒ p s", t:"drops"}, {t:" "}, {i:"ɒ n", t:"on"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"f l ɔ:r", t:"floor."}] },
+        { img: "park.jpg", speak: "park", parts: [{t:"p"}, {i:"ɑ:r", t:"ar"}, {t:"k"}] },
+        { img: "torch.jpg", speak: "torch", parts: [{t:"t"}, {i:"ɔ:r", t:"or"}, {i:"tʃ", t:"ch"}] },
+        { img: "shorts.jpg", speak: "shorts", parts: [{i:"ʃ", t:"sh"}, {i:"ɔ:r", t:"or"}, {t:"t"}, {t:"s"}] },
+        { img: "board.jpg", speak: "board", parts: [{t:"b"}, {i:"ɔ:r", t:"oar"}, {t:"d"}] },
+        { img: "door.jpg", speak: "door", parts: [{t:"d"}, {i:"ɔ:r", t:"oor"}] },
+        { img: "fork.jpg", speak: "fork", parts: [{t:"f"}, {i:"ɔ:r", t:"or"}, {t:"k"}] },
+        { type: "sent", img: "sentence_shark.jpg", speak: "A shark put a star in the jar", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"ɑ:r", t:"ar"}, {t:"k"}, {t:" "}, {t:"p"}, {i:"ʊ", t:"u"}, {t:"t"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"s"}, {t:"t"}, {i:"ɑ:r", t:"ar"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {i:"dʒ", t:"j"}, {i:"ɑ:r", t:"ar."}] },
+        { type: "sent", img: "sentence_fork.jpg", speak: "A short fork drops on the floor", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"ɔ:r", t:"or"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔ:r", t:"or"}, {t:"k"}, {t:" "}, {t:"d"}, {t:"r"}, {i:"ɑ", t:"o"}, {t:"p"}, {t:"s"}, {t:" "}, {i:"ɑ", t:"o"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ɔ:r", t:"oor."}] },
         { type: "game", title: "Game /ɑ:r/ & /ɔ:r/", pairs: ["shark", "torch", "star", "door", "car"], img: "shark.jpg" }
     ],
     lesson15: [
-        { img: "salad.jpg", speak: "salad", parts: [{i:"s æ", t:"sal"}, {i:"l ə d", t:"ad"}] },
-        { img: "lemon.jpg", speak: "lemon", parts: [{i:"l e", t:"lem"}, {i:"m ə n", t:"on"}] },
-        { img: "chicken.jpg", speak: "chicken", parts: [{i:"tʃ ɪ", t:"chick"}, {i:"k ə n", t:"en"}] },
-        { img: "kitchen.jpg", speak: "kitchen", parts: [{i:"k ɪ t", t:"kitch"}, {i:"tʃ ə n", t:"en"}] },
-        { img: "panda.jpg", speak: "panda", parts: [{i:"p æ n", t:"pan"}, {i:"d ə", t:"da"}] },
-        { img: "banana.jpg", speak: "banana", parts: [{i:"b ə", t:"ba"}, {i:"n æ", t:"na"}, {i:"n ə", t:"na"}] },
-        { img: "badminton.jpg", speak: "badminton", parts: [{i:"b æ d", t:"bad"}, {i:"m ɪ n", t:"min"}, {i:"t ə n", t:"ton"}] },
-        { img: "elephant.jpg", speak: "elephant", parts: [{i:"e", t:"e"}, {i:"l ə", t:"le"}, {i:"f ə n t", t:"phant"}] },
-        { img: "teacher.jpg", speak: "teacher", parts: [{i:"t i:", t:"teach"}, {i:"tʃ ər", t:"er"}] },
-        { img: "doctor.jpg", speak: "doctor", parts: [{i:"d ɒ k", t:"doc"}, {i:"t ər", t:"tor"}] },
-        { img: "burger.jpg", speak: "burger", parts: [{i:"b 3:r", t:"bur"}, {i:"g ər", t:"ger"}] },
-        { img: "sister.jpg", speak: "sister", parts: [{i:"s ɪ s", t:"sis"}, {i:"t ər", t:"ter"}] },
-        { img: "rubber.jpg", speak: "rubber", parts: [{i:"r ʌ", t:"rub"}, {i:"b ər", t:"ber"}] },
-        { img: "lizard.jpg", speak: "lizard", parts: [{i:"l ɪ", t:"liz"}, {i:"z ər d", t:"ard"}] },
-        { img: "under.jpg", speak: "under", parts: [{i:"ʌ n", t:"un"}, {i:"d ər", t:"der"}] },
-        { img: "superman.jpg", speak: "superman", parts: [{i:"s u:", t:"su"}, {i:"p ər", t:"per"}, {i:"m æ n", t:"man"}] },
-        { type: "game", title: "Game /ə/ & /3:r/", pairs: ["salad", "teacher", "lemon", "doctor", "panda"], img: "panda.jpg" }
+        { img: "salad.jpg", speak: "salad", parts: [{t:"s"}, {i:"æ", t:"a"}, {t:"l"}, {i:"ə", t:"a"}, {t:"d"}] },
+        { img: "lemon.jpg", speak: "lemon", parts: [{t:"l"}, {i:"e", t:"e"}, {t:"m"}, {i:"ə", t:"o"}, {t:"n"}] },
+        { img: "chicken.jpg", speak: "chicken", parts: [{i:"tʃ", t:"ch"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {i:"ə", t:"e"}, {t:"n"}] },
+        { img: "kitchen.jpg", speak: "kitchen", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {i:"tʃ", t:"tch"}, {i:"ə", t:"e"}, {t:"n"}] },
+        { img: "panda.jpg", speak: "panda", parts: [{t:"p"}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {i:"ə", t:"a"}] },
+        { img: "banana.jpg", speak: "banana", parts: [{t:"b"}, {i:"ə", t:"a"}, {t:"n"}, {i:"æ", t:"a"}, {t:"n"}, {i:"ə", t:"a"}] },
+        { img: "badminton.jpg", speak: "badminton", parts: [{t:"b"}, {i:"æ", t:"a"}, {t:"d"}, {t:"m"}, {i:"ɪ", t:"i"}, {t:"n"}, {t:"t"}, {i:"ə", t:"o"}, {t:"n"}] },
+        { img: "elephant.jpg", speak: "elephant", parts: [{i:"e", t:"e"}, {t:"l"}, {i:"ə", t:"e"}, {i:"f", t:"ph"}, {i:"ə", t:"a"}, {t:"n"}, {t:"t"}] },
+        { img: "teacher.jpg", speak: "teacher", parts: [{t:"t"}, {i:"i:", t:"ea"}, {i:"tʃ", t:"ch"}, {i:"ər", t:"er"}] },
+        { img: "doctor.jpg", speak: "doctor", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {i:"k", t:"c"}, {t:"t"}, {i:"ər", t:"or"}] },
+        { img: "burger.jpg", speak: "burger", parts: [{t:"b"}, {i:"ɜːr", t:"ur"}, {t:"g"}, {i:"ər", t:"er"}] },
+        { img: "sister.jpg", speak: "sister", parts: [{t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}] },
+        { img: "rubber.jpg", speak: "rubber", parts: [{t:"r"}, {i:"ʌ", t:"u"}, {t:"bb"}, {i:"ər", t:"er"}] },
+        { img: "lizard.jpg", speak: "lizard", parts: [{t:"l"}, {i:"ɪ", t:"i"}, {t:"z"}, {i:"ər", t:"ar"}, {t:"d"}] },
+        { img: "under.jpg", speak: "under", parts: [{i:"ʌ", t:"u"}, {t:"n"}, {t:"d"}, {i:"ər", t:"er"}] },
+        { img: "superman.jpg", speak: "superman", parts: [{t:"s"}, {i:"u:", t:"u"}, {t:"p"}, {i:"ər", t:"er"}, {t:"m"}, {i:"æ", t:"a"}, {t:"n"}] },
+        { type: "game", title: "Game /ə/ & /ɜːr/", pairs: ["salad", "teacher", "lemon", "doctor", "panda"], img: "panda.jpg" }
     ],
-    // --- BÀI 16, 17, 18, 19 (Bài cũ 15, 16, 17, 18) ---
     lesson16: [
-        { img: "gear.jpg", speak: "gear", pre: "ear", similar: ["near", "year"], parts: [{i:"ɪr", t:"gear"}] },
-        { img: "deer.jpg", speak: "deer", pre: "ear", similar: ["dear"], parts: [{i:"ɪr", t:"deer"}] },
-        { img: "cheer.jpg", speak: "cheer", pre: "ear", similar: ["chair"], parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
-        { img: "tear.jpg", speak: "tier", pre: "ear", similar: ["tier", "tea"], parts: [{i:"t", t:"t"}, {i:"ɪr", t:"ear"}] },
-        { img: "ear.jpg", speak: "ear", pre: "ear", similar: ["year"], parts: [{i:"ɪr", t:"ear"}] },
-        { img: "bear.jpg", speak: "bear", pre: "air", similar: ["bare"], parts: [{i:"b", t:"b"}, {i:"ɛr", t:"ear"}] },
-        { img: "pear.jpg", speak: "pear", pre: "air", similar: ["pair"], parts: [{i:"p", t:"p"}, {i:"ɛr", t:"ear"}] },
-        { img: "share.jpg", speak: "share", pre: "air", similar: ["chair"], parts: [{i:"ʃ", t:"sh"}, {i:"ɛr", t:"are"}] },
-        { img: "stair.jpg", speak: "stair", pre: "air", similar: ["stare"], parts: [{i:"", t:"st"}, {i:"ɛr", t:"air"}] },
-        { img: "chair.jpg", speak: "chair", pre: "air", similar: ["cheer"], parts: [{i:"tʃ", t:"ch"}, {i:"ɛr", t:"air"}] },
-        { type: "sent", img: "sentence_deer.jpg", speak: "The deer is near the chair", parts: [{i:"ðə", t:"The"}, {t:" "}, {i:"ɪr", t:"deer"}, {t:" "}, {i:"ɪz", t:"is"}, {t:" "}, {i:"ɪr", t:"near"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"tʃ ɛr", t:"chair."}] },
-        { type: "sent", img: "sentence_bear.jpg", speak: "The bear shares the pear", parts: [{i:"ðə", t:"The"}, {t:" "}, {i:"ɛr", t:"bear"}, {t:" "}, {i:"ʃ ɛr z", t:"shares"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"ɛr", t:"pear."}] },
-        { type: "game", title: "GAME 1: Săn âm /ɪr/", pairs: ["gear", "deer", "cheer", "tear", "ear"], img: "ɪr_card.jpg" },
-        { type: "game", title: "GAME 2: Săn âm /ɛr/", pairs: ["bear", "pear", "share", "stair", "chair"], img: "ɛr_card.jpg" }
+        { img: "gear.jpg", speak: "gear", parts: [{t:"g"}, {i:"ɪr", t:"ear"}] },
+        { img: "deer.jpg", speak: "deer", parts: [{t:"d"}, {i:"ɪr", t:"eer"}] },
+        { img: "cheer.jpg", speak: "cheer", parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
+        { img: "tear.jpg", speak: "tear", parts: [{t:"t"}, {i:"ɪr", t:"ear"}] },
+        { img: "ear.jpg", speak: "ear", parts: [{i:"ɪr", t:"ear"}] },
+        { img: "bear.jpg", speak: "bear", parts: [{t:"b"}, {i:"er", t:"ear"}] },
+        { img: "pear.jpg", speak: "pear", parts: [{t:"p"}, {i:"er", t:"ear"}] },
+        { img: "share.jpg", speak: "share", parts: [{i:"ʃ", t:"sh"}, {i:"er", t:"are"}] },
+        { img: "stair.jpg", speak: "stair", parts: [{t:"s"}, {t:"t"}, {i:"er", t:"air"}] },
+        { img: "chair.jpg", speak: "chair", parts: [{i:"tʃ", t:"ch"}, {i:"er", t:"air"}] },
+        { type: "sent", img: "sentence_deer.jpg", speak: "The deer is near the chair", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪr", t:"eer"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"n"}, {i:"ɪr", t:"ear"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"er", t:"air."}] },
+        { type: "sent", img: "sentence_bear.jpg", speak: "The bear shares the pear", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {i:"er", t:"ear"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"er", t:"are"}, {t:"s"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"p"}, {i:"er", t:"ear."}] },
+        { type: "game", title: "Game /ɪr/", pairs: ["gear", "deer", "cheer", "tear", "ear"], img: "gear.jpg" },
+        { type: "game", title: "Game /er/", pairs: ["bear", "pear", "share", "stair", "chair"], img: "bear.jpg" }
     ],
     lesson17: [
-        { img: "shower.jpg", speak: "shower", pre: "ow", similar: ["show"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
-        { img: "shout.jpg", speak: "shout", pre: "ow", similar: ["out"], parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {i:"", t:"t"}] },
-        { img: "cow.jpg", speak: "cow", pre: "ow", similar: ["how"], parts: [{i:"", t:"c"}, {i:"aʊ", t:"ow"}] },
-        { img: "brown.jpg", speak: "brown", pre: "ow", similar: ["down"], parts: [{i:"", t:"br"}, {i:"aʊ", t:"ow"}, {i:"", t:"n"}] },
-        { img: "tower.jpg", speak: "tower", pre: "ow", similar: ["power"], parts: [{i:"", t:"t"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
-        { img: "toe.jpg", speak: "toe", pre: "oh", similar: ["tow"], parts: [{i:"", t:"t"}, {i:"oʊ", t:"oe"}] },
-        { img: "boat.jpg", speak: "boat", pre: "oh", similar: ["boot"], parts: [{i:"", t:"b"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
-        { img: "coat.jpg", speak: "coat", pre: "oh", similar: ["cat"], parts: [{i:"", t:"c"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
-        { img: "phone.jpg", speak: "phone", pre: "oh", similar: ["fun"], parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
-        { img: "goat.jpg", speak: "goat", pre: "oh", similar: ["got"], parts: [{i:"", t:"g"}, {i:"oʊ", t:"oa"}, {i:"", t:"t"}] },
-        { type: "sent", img: "sentence_cow.jpg", speak: "The brown cow shouts at the mouse", parts: [{i:"ðə", t:"The"}, {t:" "}, {i:"aʊ", t:"brown"}, {t:" "}, {i:"aʊ", t:"cow"}, {t:" "}, {i:"aʊ", t:"shouts"}, {t:" "}, {i:"æ", t:"at"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"aʊ _", t:"mouse."}] },
-        { type: "sent", img: "sentence_joe.jpg", speak: "Joe shows the slow goat the soap", parts: [{i:"dʒ oʊ", t:"Joe"}, {t:" "}, {i:"ʃ oʊ z", t:"shows"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"oʊ", t:"slow"}, {t:" "}, {i:"oʊ", t:"goat"}, {t:" "}, {i:"ðə", t:"the"}, {t:" "}, {i:"oʊ", t:"soap."}] },
-        { type: "game", title: "GAME 1: Săn âm /aʊ/", pairs: ["cow", "brown", "shout", "tower", "shower"], img: "aʊ_card.jpg" },
-        { type: "game", title: "GAME 2: Săn âm /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"], img: "oʊ_card.jpg" }
+        { img: "shower.jpg", speak: "shower", parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
+        { img: "shout.jpg", speak: "shout", parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {t:"t"}] },
+        { img: "cow.jpg", speak: "cow", parts: [{i:"k", t:"c"}, {i:"aʊ", t:"ow"}] },
+        { img: "brown.jpg", speak: "brown", parts: [{t:"b"}, {t:"r"}, {i:"aʊ", t:"ow"}, {t:"n"}] },
+        { img: "tower.jpg", speak: "tower", parts: [{t:"t"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
+        { img: "toe.jpg", speak: "toe", parts: [{t:"t"}, {i:"oʊ", t:"oe"}] },
+        { img: "boat.jpg", speak: "boat", parts: [{t:"b"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
+        { img: "coat.jpg", speak: "coat", parts: [{i:"k", t:"c"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
+        { img: "phone.jpg", speak: "phone", parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {t:"n"}, {i:"_", t:"e"}] },
+        { img: "goat.jpg", speak: "goat", parts: [{t:"g"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
+        { type: "sent", img: "sentence_cow.jpg", speak: "The brown cow shouts at the mouse", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {t:"r"}, {i:"aʊ", t:"ow"}, {t:"n"}, {t:" "}, {i:"k", t:"c"}, {i:"aʊ", t:"ow"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"aʊ", t:"ou"}, {t:"s"}, {i:"_", t:"e."}] },
+        { type: "sent", img: "sentence_joe.jpg", speak: "Joe shows the slow goat the soap", parts: [{i:"dʒ", t:"J"}, {i:"oʊ", t:"oe"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"oʊ", t:"ow"}, {t:"s"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"s"}, {t:"l"}, {i:"oʊ", t:"ow"}, {t:" "}, {t:"g"}, {i:"oʊ", t:"oa"}, {t:"t"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"s"}, {i:"oʊ", t:"oa"}, {t:"p."}] },
+        { type: "game", title: "Game /aʊ/", pairs: ["cow", "brown", "shout", "tower", "shower"], img: "cow.jpg" },
+        { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"], img: "goat.jpg" }
     ],
     lesson18: [
-        { img: "face.jpg", speak: "face", pre: "A", similar: [], parts: [{i:"", t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
-        { img: "cake.jpg", speak: "cake", pre: "A", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
-        { img: "cave.jpg", speak: "cave", pre: "A", similar: [], parts: [{i:"", t:"c"}, {i:"eɪ", t:"a"}, {i:"", t:"v"}, {i:"_", t:"e"}] },
-        { img: "baby.jpg", speak: "baby", pre: "A", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"b"}, {i:"i:", t:"y"}] },
-        { img: "baker.jpg", speak: "baker", pre: "A", similar: [], parts: [{i:"", t:"b"}, {i:"eɪ", t:"a"}, {i:"", t:"k"}, {i:"ər", t:"er"}] },
-        { type: "sent", img: "sentence_vase.jpg", speak: "Kate paints a vase", parts: [{i:"", t:"K"}, {i:"eɪ", t:"a"}, {i:"", t:"t"}, {i:"_", t:"e"}, {t:" "}, {i:"", t:"p"}, {i:"eɪ", t:"ai"}, {i:"", t:"nts"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"v"}, {i:"eɪ", t:"a"}, {i:"", t:"s"}, {i:"_", t:"e."}] },
-        { img: "kite.jpg", speak: "kite", pre: "I", similar: [], parts: [{i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}] },
-        { img: "bike.jpg", speak: "bike", pre: "I", similar: [], parts: [{i:"", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"k"}, {i:"_", t:"e"}] },
-        { img: "tie.jpg", speak: "tie", pre: "I", similar: [], parts: [{i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"_", t:"e"}] },
-        { img: "pine.jpg", speak: "pine", pre: "I", similar: [], parts: [{i:"", t:"p"}, {i:"aɪ", t:"i"}, {i:"", t:"n"}, {i:"_", t:"e"}] },
-        { img: "cry.jpg", speak: "cry", pre: "I", similar: [], parts: [{i:"", t:"cr"}, {i:"aɪ", t:"y"}] },
-        { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"", t:"t"}, {i:"aɪ", t:"i"}, {i:"", t:"g"}, {i:"ər", t:"er"}, {t:" "}, {i:"b", t:"b"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e"}, {i:"", t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"", t:"k"}, {i:"aɪ", t:"i"}, {i:"", t:"t"}, {i:"_", t:"e."}] },
-        { type: "game", title: "GAME 1: Săn Chuột /eɪ/", gameType: "mole", phoneme: "eɪ", img: "eɪ_card.jpg" },
-        { type: "game", title: "GAME 2: Săn Chuột /aɪ/", gameType: "mole", phoneme: "aɪ", img: "aɪ_card.jpg" }
+        { img: "face.jpg", speak: "face", parts: [{t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
+        { img: "cake.jpg", speak: "cake", parts: [{i:"k", t:"c"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}] },
+        { img: "cave.jpg", speak: "cave", parts: [{i:"k", t:"c"}, {i:"eɪ", t:"a"}, {t:"v"}, {i:"_", t:"e"}] },
+        { img: "baby.jpg", speak: "baby", parts: [{t:"b"}, {i:"eɪ", t:"a"}, {t:"b"}, {i:"i", t:"y"}] },
+        { img: "baker.jpg", speak: "baker", parts: [{t:"b"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ər", t:"er"}] },
+        { img: "kite.jpg", speak: "kite", parts: [{t:"k"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e"}] },
+        { img: "bike.jpg", speak: "bike", parts: [{t:"b"}, {i:"aɪ", t:"i"}, {t:"k"}, {i:"_", t:"e"}] },
+        { img: "tie.jpg", speak: "tie", parts: [{t:"t"}, {i:"aɪ", t:"ie"}] },
+        { img: "pine.jpg", speak: "pine", parts: [{t:"p"}, {i:"aɪ", t:"i"}, {t:"n"}, {i:"_", t:"e"}] },
+        { img: "cry.jpg", speak: "cry", parts: [{i:"k", t:"c"}, {t:"r"}, {i:"aɪ", t:"y"}] },
+        { type: "sent", img: "sentence_vase.jpg", speak: "Kate paints a vase", parts: [{t:"K"}, {i:"eɪ", t:"a"}, {t:"t"}, {i:"_", t:"e"}, {t:" "}, {t:"p"}, {i:"eɪ", t:"ai"}, {t:"n"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"v"}, {i:"eɪ", t:"a"}, {t:"s"}, {i:"_", t:"e."}] },
+        { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"t"}, {i:"aɪ", t:"i"}, {t:"g"}, {i:"ər", t:"er"}, {t:" "}, {t:"b"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"k"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e."}] },
+        { type: "game", title: "Game /eɪ/", pairs: ["face", "cake", "cave", "baby", "baker"], img: "cake.jpg" },
+        { type: "game", title: "Game /aɪ/", pairs: ["kite", "bike", "tie", "pine", "cry"], img: "kite.jpg" }
     ],
     lesson19: [
-        { img: "coin.jpg", speak: "coin", pre: "oy", similar: [], parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
-        { img: "point.jpg", speak: "point", pre: "oy", similar: [], parts: [{i:"p", t:"p"}, {i:"ɔɪ", t:"oi"}, {i:"n t", t:"nt"}] },
-        { img: "joy.jpg", speak: "joy", pre: "oy", similar: [], parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "boy.jpg", speak: "boy", pre: "oy", similar: [], parts: [{i:"b", t:"b"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "toy.jpg", speak: "toy", pre: "oy", similar: [], parts: [{i:"t", t:"t"}, {i:"ɔɪ", t:"oy"}] },
-        { type: "sent", img: "sentence_boy.jpg", speak: "A boy drops a coin and a toy", parts: [ {i:"ə", t:"A"}, {t:" "}, {i:"b ɔɪ", t:"boy"}, {t:" "}, {i:"d r ɒ p s", t:"drops"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k ɔɪ n", t:"coin"}, {t:" "}, {i:"æ n d", t:"and"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"t ɔɪ", t:"toy."} ]},
-        { img: "otter.jpg", speak: "otter", pre: "", similar: [], parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
-        { img: "butter.jpg", speak: "butter", pre: "", similar: [], parts: [{i:"b", t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
-        { img: "kitty.jpg", speak: "kitty", pre: "", similar: [], parts: [{i:"k", t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i:", t:"y"}] },
-        { img: "party.jpg", speak: "party", pre: "", similar: [], parts: [{i:"p", t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i:", t:"y"}] },
-        { img: "city.jpg", speak: "city", pre: "", similar: [], parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i:", t:"y"}] },
-        { type: "sent", img: "sentence_peter.jpg", speak: "Peter got butter in the party", parts: [ {i:"P i: t ər", t:"Peter"}, {t:" "}, {i:"g ɒ t", t:"got"}, {t:" "}, {i:"b ʌ t ər", t:"butter"}, {t:" "}, {i:"ɪ n", t:"in"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"p ɑːr t i:", t:"party."} ]},
-        { type: "game", title: "GAME 1: Săn âm /ɔɪ/", gameType: "snake", phoneme: "ɔɪ", img: "ɔɪ_card.jpg" },
-        { type: "game", title: "GAME 2: Săn âm /t̬/", gameType: "snake", phoneme: "t̬", img: "t̬_card.jpg" }
+        { img: "coin.jpg", speak: "coin", parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
+        { img: "point.jpg", speak: "point", parts: [{t:"p"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:"t"}] },
+        { img: "joy.jpg", speak: "joy", parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "boy.jpg", speak: "boy", parts: [{t:"b"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "toy.jpg", speak: "toy", parts: [{t:"t"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "otter.jpg", speak: "otter", parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
+        { img: "butter.jpg", speak: "butter", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
+        { img: "kitty.jpg", speak: "kitty", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i", t:"y"}] },
+        { img: "party.jpg", speak: "party", parts: [{t:"p"}, {i:"ɑ:r", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
+        { img: "city.jpg", speak: "city", parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
+        { type: "sent", img: "sentence_boy.jpg", speak: "A boy drops a coin and a toy", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"b"}, {i:"ɔɪ", t:"oy"}, {t:" "}, {t:"d"}, {t:"r"}, {i:"ɑ", t:"o"}, {t:"p"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"t"}, {i:"ɔɪ", t:"oy."}] },
+        { type: "sent", img: "sentence_peter.jpg", speak: "Peter got butter in the party", parts: [{t:"P"}, {i:"i:", t:"e"}, {i:"t̬", t:"t"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}, {t:" "}, {t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"p"}, {i:"ɑ:r", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y."}] },
+        { type: "game", title: "Game /ɔɪ/", pairs: ["coin", "point", "joy", "boy", "toy"], img: "coin.jpg" },
+        { type: "game", title: "Game /t̬/", pairs: ["otter", "butter", "kitty", "party", "city"], img: "butter.jpg" }
     ],
     lesson20: [
-        { img: "mat.jpg", speak: "mat", parts: [{i:"m", t:"m"}, {i:"æ t", t:"at"}] },
-        { img: "game.jpg", speak: "game", parts: [{i:"g", t:"g"}, {i:"eɪ m", t:"ame"}] },
-        { img: "mad.jpg", speak: "mad", parts: [{i:"m", t:"m"}, {i:"æ d", t:"ad"}] },
-        { img: "time.jpg", speak: "time", parts: [{i:"t", t:"t"}, {i:"aɪ m", t:"ime"}] },
-        { img: "mouse.jpg", speak: "mouse", parts: [{i:"m", t:"m"}, {i:"aʊ s", t:"ouse"}] },
-        { img: "net.jpg", speak: "net", parts: [{i:"n", t:"n"}, {i:"e t", t:"et"}] },
-        { img: "sun.jpg", speak: "sun", parts: [{i:"s", t:"s"}, {i:"ʌ n", t:"un"}] },
-        { img: "note.jpg", speak: "note", parts: [{i:"n", t:"n"}, {i:"oʊ t", t:"ote"}] },
-        { img: "nine.jpg", speak: "nine", parts: [{i:"n", t:"n"}, {i:"aɪ n", t:"ine"}] },
-        { img: "fun.jpg", speak: "fun", parts: [{i:"f", t:"f"}, {i:"ʌ n", t:"un"}] },
-        { type: "sent", img: "sentence_mom.jpg", speak: "Mom is sick. Mika makes milk for mom", parts: [{i:"M ɒ m", t:"Mom"}, {t:" "}, {i:"ɪ z", t:"is"}, {t:" "}, {i:"s ɪ k", t:"sick."}, {t:" "}, {i:"M i: k ə", t:"Mika"}, {t:" "}, {i:"m eɪ k s", t:"makes"}, {t:" "}, {i:"m ɪ l k", t:"milk"}, {t:" "}, {i:"f ɔ:r", t:"for"}, {t:" "}, {i:"m ɒ m", t:"mom."}] },
-        { type: "sent", img: "sentence_nina.jpg", speak: "Nina can run fast and she never gives up", parts: [{i:"N i: n ə", t:"Nina"}, {t:" "}, {i:"k æ n", t:"can"}, {t:" "}, {i:"r ʌ n", t:"run"}, {t:" "}, {i:"f æ s t", t:"fast"}, {t:" "}, {i:"æ n d", t:"and"}, {t:" "}, {i:"ʃ i:", t:"she"}, {t:" "}, {i:"n e v ər", t:"never"}, {t:" "}, {i:"g ɪ v z", t:"gives"}, {t:" "}, {i:"ʌ p", t:"up."}] },
+        { img: "mat.jpg", speak: "mat", parts: [{t:"m"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "game.jpg", speak: "game", parts: [{t:"g"}, {i:"eɪ", t:"a"}, {t:"m"}, {i:"_", t:"e"}] },
+        { img: "mad.jpg", speak: "mad", parts: [{t:"m"}, {i:"æ", t:"a"}, {t:"d"}] },
+        { img: "time.jpg", speak: "time", parts: [{t:"t"}, {i:"aɪ", t:"i"}, {t:"m"}, {i:"_", t:"e"}] },
+        { img: "mouse.jpg", speak: "mouse", parts: [{t:"m"}, {i:"aʊ", t:"ou"}, {t:"s"}, {i:"_", t:"e"}] },
+        { img: "net.jpg", speak: "net", parts: [{t:"n"}, {i:"e", t:"e"}, {t:"t"}] },
+        { img: "sun.jpg", speak: "sun", parts: [{t:"s"}, {i:"ʌ", t:"u"}, {t:"n"}] },
+        { img: "note.jpg", speak: "note", parts: [{t:"n"}, {i:"oʊ", t:"o"}, {t:"t"}, {i:"_", t:"e"}] },
+        { img: "nine.jpg", speak: "nine", parts: [{t:"n"}, {i:"aɪ", t:"i"}, {t:"n"}, {i:"_", t:"e"}] },
+        { img: "fun.jpg", speak: "fun", parts: [{t:"f"}, {i:"ʌ", t:"u"}, {t:"n"}] },
+        { type: "sent", img: "sentence_mom.jpg", speak: "Mom is sick. Mika makes milk for mom", parts: [{t:"M"}, {i:"ɑ", t:"o"}, {t:"m"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck."}, {t:" "}, {t:"M"}, {i:"i:", t:"i"}, {t:"k"}, {i:"ə", t:"a"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"ɪ", t:"i"}, {t:"l"}, {t:"k"}, {t:" "}, {t:"f"}, {i:"ɔ:r", t:"or"}, {t:" "}, {t:"m"}, {i:"ɑ", t:"o"}, {t:"m."}] },
+        { type: "sent", img: "sentence_nina.jpg", speak: "Nina can run fast and she never gives up", parts: [{t:"N"}, {i:"i:", t:"i"}, {t:"n"}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"n"}, {t:" "}, {t:"r"}, {i:"ʌ", t:"u"}, {t:"n"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"s"}, {t:"t"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"i:", t:"e"}, {t:" "}, {t:"n"}, {i:"e", t:"e"}, {t:"v"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"v"}, {t:"s"}, {t:" "}, {i:"ʌ", t:"u"}, {t:"p."}] },
         { type: "game", title: "Game /m/ & /n/", pairs: ["mat", "net", "mouse", "sun", "game"], img: "mat.jpg" }
     ],
     lesson21: [
-        { img: "sing.jpg", speak: "sing", parts: [{i:"s", t:"s"}, {i:"ɪ ŋ", t:"ing"}] },
-        { img: "finger.jpg", speak: "finger", parts: [{i:"f ɪ ŋ", t:"fing"}, {i:"g ər", t:"er"}] },
-        { img: "king.jpg", speak: "king", parts: [{i:"k", t:"k"}, {i:"ɪ ŋ", t:"ing"}] },
-        { img: "kingfisher.jpg", speak: "kingfisher", parts: [{i:"k ɪ ŋ", t:"king"}, {i:"f ɪ ʃ ər", t:"fisher"}] },
-        { img: "monkey.jpg", speak: "monkey", parts: [{i:"m ʌ ŋ", t:"mon"}, {i:"k i", t:"key"}] },
-        { img: "hat.jpg", speak: "hat", parts: [{i:"h", t:"h"}, {i:"æ t", t:"at"}] },
-        { img: "hen.jpg", speak: "hen", parts: [{i:"h", t:"h"}, {i:"e n", t:"en"}] },
-        { img: "hippo.jpg", speak: "hippo", parts: [{i:"h", t:"h"}, {i:"ɪ p oʊ", t:"ippo"}] },
-        { img: "heart.jpg", speak: "heart", parts: [{i:"h", t:"h"}, {i:"ɑ:r t", t:"eart"}] },
-        { img: "horse.jpg", speak: "horse", parts: [{i:"h", t:"h"}, {i:"ɔ:r s", t:"orse"}] },
-        { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð ə", t:"The"}, {t:" "}, {i:"m ʌ ŋ k i", t:"monkey"}, {t:" "}, {i:"ɪ z", t:"is"}, {t:" "}, {i:"m eɪ k ɪ ŋ", t:"making"}, {t:" "}, {i:"ən", t:"an"}, {t:" "}, {i:"ə m eɪ z ɪ ŋ", t:"amazing"}, {t:" "}, {i:"g ɪ f t", t:"gift"}, {t:" "}, {i:"f ɔ:r", t:"for"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"f l ə m ɪ ŋ g oʊ", t:"flamingo."}] },
-        { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{i:"H i:", t:"He"}, {t:" "}, {i:"h oʊ p s", t:"hopes"}, {t:" "}, {i:"h ɪ z", t:"his"}, {t:" "}, {i:"s ɪ s t ər", t:"sister"}, {t:" "}, {i:"ɪ z", t:"is"}, {t:" "}, {i:"h æ p i", t:"happy."}] },
+        { img: "sing.jpg", speak: "sing", parts: [{t:"s"}, {i:"ɪ ŋ", t:"ing"}] },
+        { img: "finger.jpg", speak: "finger", parts: [{t:"f"}, {i:"ɪ ŋ", t:"ing"}, {t:"g"}, {i:"ər", t:"er"}] },
+        { img: "king.jpg", speak: "king", parts: [{t:"k"}, {i:"ɪ ŋ", t:"ing"}] },
+        { img: "kingfisher.jpg", speak: "kingfisher", parts: [{t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:"f"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {i:"ər", t:"er"}] },
+        { img: "monkey.jpg", speak: "monkey", parts: [{t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}] },
+        { img: "hat.jpg", speak: "hat", parts: [{t:"h"}, {i:"æ", t:"a"}, {t:"t"}] },
+        { img: "hen.jpg", speak: "hen", parts: [{t:"h"}, {i:"e", t:"e"}, {t:"n"}] },
+        { img: "hippo.jpg", speak: "hippo", parts: [{t:"h"}, {i:"ɪ", t:"i"}, {t:"pp"}, {i:"oʊ", t:"o"}] },
+        { img: "heart.jpg", speak: "heart", parts: [{t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t"}] },
+        { img: "horse.jpg", speak: "horse", parts: [{t:"h"}, {i:"ɔ:r", t:"or"}, {t:"s"}, {i:"_", t:"e"}] },
+        { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {i:"ə", t:"a"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"z"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"f"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔ:r", t:"or"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ə", t:"a"}, {t:"m"}, {i:"ɪ ŋ", t:"ing"}, {t:"g"}, {i:"oʊ", t:"o."}] },
+        { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{t:"H"}, {i:"i:", t:"e"}, {t:" "}, {t:"h"}, {i:"oʊ", t:"o"}, {t:"p"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y."}] },
         { type: "game", title: "Game /ŋ/ & /h/", pairs: ["sing", "hat", "king", "hen", "monkey"], img: "sing.jpg" }
     ],
     lesson22: [
-        { img: "red.jpg", speak: "red", parts: [{i:"r", t:"r"}, {i:"e d", t:"ed"}] },
-        { img: "run.jpg", speak: "run", parts: [{i:"r", t:"r"}, {i:"ʌ n", t:"un"}] },
-        { img: "carrot.jpg", speak: "carrot", parts: [{i:"k æ", t:"car"}, {i:"r ə t", t:"rot"}] },
-        { img: "ring.jpg", speak: "ring", parts: [{i:"r", t:"r"}, {i:"ɪ ŋ", t:"ing"}] },
-        { img: "rabbit.jpg", speak: "rabbit", parts: [{i:"r æ", t:"rab"}, {i:"b ɪ t", t:"bit"}] },
-        { img: "lion.jpg", speak: "lion", parts: [{i:"l", t:"l"}, {i:"aɪ ə n", t:"ion"}] },
-        { img: "ladder.jpg", speak: "ladder", parts: [{i:"l æ", t:"lad"}, {i:"d ər", t:"der"}] },
-        { img: "ball.jpg", speak: "ball", parts: [{i:"b", t:"b"}, {i:"ɔ: l", t:"all"}] },
-        { img: "lips.jpg", speak: "lips", parts: [{i:"l", t:"l"}, {i:"ɪ p s", t:"ips"}] },
-        { img: "lamp.jpg", speak: "lamp", parts: [{i:"l", t:"l"}, {i:"æ m p", t:"amp"}] },
-        { type: "sent", img: "sentence_rick.jpg", speak: "Rick is ready to read a good story for Sarah", parts: [{i:"R ɪ k", t:"Rick"}, {t:" "}, {i:"ɪ z", t:"is"}, {t:" "}, {i:"r e d i", t:"ready"}, {t:" "}, {i:"t u:", t:"to"}, {t:" "}, {i:"r i: d", t:"read"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"g ʊ d", t:"good"}, {t:" "}, {i:"s t ɔ:r i", t:"story"}, {t:" "}, {i:"f ɔ:r", t:"for"}, {t:" "}, {i:"S ɛ r ə", t:"Sarah."}] },
-        { type: "sent", img: "sentence_lily.jpg", speak: "Lily likes to look at her Mom smiling", parts: [{i:"L ɪ l i", t:"Lily"}, {t:" "}, {i:"l aɪ k s", t:"likes"}, {t:" "}, {i:"t u:", t:"to"}, {t:" "}, {i:"l ʊ k", t:"look"}, {t:" "}, {i:"æ t", t:"at"}, {t:" "}, {i:"h ər", t:"her"}, {t:" "}, {i:"M ɒ m", t:"Mom"}, {t:" "}, {i:"s m aɪ l ɪ ŋ", t:"smiling."}] },
+        { img: "red.jpg", speak: "red", parts: [{t:"r"}, {i:"e", t:"e"}, {t:"d"}] },
+        { img: "run.jpg", speak: "run", parts: [{t:"r"}, {i:"ʌ", t:"u"}, {t:"n"}] },
+        { img: "carrot.jpg", speak: "carrot", parts: [{i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"rr"}, {i:"ə", t:"o"}, {t:"t"}] },
+        { img: "ring.jpg", speak: "ring", parts: [{t:"r"}, {i:"ɪ ŋ", t:"ing"}] },
+        { img: "rabbit.jpg", speak: "rabbit", parts: [{t:"r"}, {i:"æ", t:"a"}, {t:"bb"}, {i:"ɪ", t:"i"}, {t:"t"}] },
+        { img: "lion.jpg", speak: "lion", parts: [{t:"l"}, {i:"aɪ", t:"i"}, {i:"ə", t:"o"}, {t:"n"}] },
+        { img: "ladder.jpg", speak: "ladder", parts: [{t:"l"}, {i:"æ", t:"a"}, {t:"dd"}, {i:"ər", t:"er"}] },
+        { img: "ball.jpg", speak: "ball", parts: [{t:"b"}, {i:"ɑː", t:"a"}, {t:"ll"}] },
+        { img: "lips.jpg", speak: "lips", parts: [{t:"l"}, {i:"ɪ", t:"i"}, {t:"p"}, {t:"s"}] },
+        { img: "lamp.jpg", speak: "lamp", parts: [{t:"l"}, {i:"æ", t:"a"}, {t:"m"}, {t:"p"}] },
+        { type: "sent", img: "sentence_rick.jpg", speak: "Rick is ready to read a good story for Sarah", parts: [{t:"R"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"r"}, {i:"e", t:"ea"}, {t:"d"}, {i:"i", t:"y"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"r"}, {i:"i:", t:"ea"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {t:"s"}, {t:"t"}, {i:"ɔ:r", t:"or"}, {i:"i", t:"y"}, {t:" "}, {t:"f"}, {i:"ɔ:r", t:"or"}, {t:" "}, {t:"S"}, {i:"æ", t:"a"}, {t:"r"}, {i:"ə", t:"a"}, {i:"_", t:"h."}] },
+        { type: "sent", img: "sentence_lily.jpg", speak: "Lily likes to look at her Mom smiling", parts: [{t:"L"}, {i:"ɪ", t:"i"}, {t:"l"}, {i:"i", t:"y"}, {t:" "}, {t:"l"}, {i:"aɪ", t:"i"}, {t:"k"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"l"}, {i:"ʊ", t:"oo"}, {t:"k"}, {t:" "}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"h"}, {i:"ər", t:"er"}, {t:" "}, {t:"M"}, {i:"ɑ", t:"o"}, {t:"m"}, {t:" "}, {t:"s"}, {t:"m"}, {i:"aɪ", t:"i"}, {t:"l"}, {i:"ɪ ŋ", t:"ing."}] },
         { type: "game", title: "Game /r/ & /l/", pairs: ["red", "lion", "run", "ladder", "rabbit"], img: "red.jpg" }
     ],
     lesson23: [
-        { img: "yellow.jpg", speak: "yellow", parts: [{i:"j e", t:"yel"}, {i:"l oʊ", t:"low"}] },
-        { img: "yoyo.jpg", speak: "yoyo", parts: [{i:"j oʊ", t:"yo"}, {i:"j oʊ", t:"yo"}] },
-        { img: "yogurt.jpg", speak: "yogurt", parts: [{i:"j oʊ", t:"yo"}, {i:"g ə r t", t:"gurt"}] },
-        { img: "yam.jpg", speak: "yam", parts: [{i:"j", t:"y"}, {i:"æ m", t:"am"}] },
-        { img: "yak.jpg", speak: "yak", parts: [{i:"j", t:"y"}, {i:"æ k", t:"ak"}] },
-        { img: "web.jpg", speak: "web", parts: [{i:"w", t:"w"}, {i:"e b", t:"eb"}] },
-        { img: "wolf.jpg", speak: "wolf", parts: [{i:"w", t:"w"}, {i:"ʊ l f", t:"olf"}] },
-        { img: "walk.jpg", speak: "walk", parts: [{i:"w", t:"w"}, {i:"ɔ: k", t:"alk"}] },
-        { img: "winter.jpg", speak: "winter", parts: [{i:"w ɪ n", t:"win"}, {i:"t ər", t:"ter"}] },
-        { img: "water.jpg", speak: "water", parts: [{i:"w ɔ:", t:"wa"}, {i:"t ər", t:"ter"}] },
-        { type: "sent", img: "sentence_your.jpg", speak: "Your kindness makes you a young hero", parts: [{i:"J ɔ:r", t:"Your"}, {t:" "}, {i:"k aɪ n d n ə s", t:"kindness"}, {t:" "}, {i:"m eɪ k s", t:"makes"}, {t:" "}, {i:"j u:", t:"you"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"j ʌ ŋ", t:"young"}, {t:" "}, {i:"h ɪ r oʊ", t:"hero."}] },
-        { type: "sent", img: "sentence_we.jpg", speak: "We work well to win the race", parts: [{i:"W i:", t:"We"}, {t:" "}, {i:"w 3:r k", t:"work"}, {t:" "}, {i:"w e l", t:"well"}, {t:" "}, {i:"t u:", t:"to"}, {t:" "}, {i:"w ɪ n", t:"win"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"r eɪ s", t:"race."}] },
+        { img: "yellow.jpg", speak: "yellow", parts: [{i:"j", t:"y"}, {i:"e", t:"e"}, {t:"ll"}, {i:"oʊ", t:"ow"}] },
+        { img: "yoyo.jpg", speak: "yoyo", parts: [{i:"j", t:"y"}, {i:"oʊ", t:"o"}, {i:"j", t:"y"}, {i:"oʊ", t:"o"}] },
+        { img: "yogurt.jpg", speak: "yogurt", parts: [{i:"j", t:"y"}, {i:"oʊ", t:"o"}, {t:"g"}, {i:"ər", t:"ur"}, {t:"t"}] },
+        { img: "yam.jpg", speak: "yam", parts: [{i:"j", t:"y"}, {i:"æ", t:"a"}, {t:"m"}] },
+        { img: "yak.jpg", speak: "yak", parts: [{i:"j", t:"y"}, {i:"æ", t:"a"}, {t:"k"}] },
+        { img: "web.jpg", speak: "web", parts: [{t:"w"}, {i:"e", t:"e"}, {t:"b"}] },
+        { img: "wolf.jpg", speak: "wolf", parts: [{t:"w"}, {i:"ʊ", t:"o"}, {t:"l"}, {t:"f"}] },
+        { img: "walk.jpg", speak: "walk", parts: [{t:"w"}, {i:"ɑː", t:"a"}, {i:"_", t:"l"}, {t:"k"}] },
+        { img: "winter.jpg", speak: "winter", parts: [{t:"w"}, {i:"ɪ", t:"i"}, {t:"n"}, {t:"t"}, {i:"ər", t:"er"}] },
+        { img: "water.jpg", speak: "water", parts: [{t:"w"}, {i:"ɑː", t:"a"}, {i:"t̬", t:"t"}, {i:"ər", t:"er"}] },
+        { type: "sent", img: "sentence_your.jpg", speak: "Your kindness makes you a young hero", parts: [{i:"J", t:"Y"}, {i:"ɔ:r", t:"our"}, {t:" "}, {t:"k"}, {i:"aɪ", t:"i"}, {t:"n"}, {t:"d"}, {t:"n"}, {i:"ə", t:"e"}, {t:"ss"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {i:"j", t:"y"}, {i:"u:", t:"ou"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"j", t:"y"}, {i:"ʌ ŋ", t:"oung"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"e"}, {t:"r"}, {i:"oʊ", t:"o."}] },
+        { type: "sent", img: "sentence_we.jpg", speak: "We work well to win the race", parts: [{t:"W"}, {i:"i:", t:"e"}, {t:" "}, {t:"w"}, {i:"ɜːr", t:"or"}, {t:"k"}, {t:" "}, {t:"w"}, {i:"e", t:"e"}, {t:"ll"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"w"}, {i:"ɪ", t:"i"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"r"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e."}] },
         { type: "game", title: "Game /j/ & /w/", pairs: ["yellow", "web", "yoyo", "wolf", "yogurt"], img: "yellow.jpg" }
     ],
     lesson24: [
-        { img: "thin.jpg", speak: "thin", parts: [{i:"θ", t:"th"}, {i:"ɪ n", t:"in"}] },
-        { img: "teeth.jpg", speak: "teeth", parts: [{i:"t i:", t:"tee"}, {i:"θ", t:"th"}] },
-        { img: "thumb.jpg", speak: "thumb", parts: [{i:"θ", t:"th"}, {i:"ʌ m", t:"umb"}] },
-        { img: "earth.jpg", speak: "earth", parts: [{i:"3:r", t:"ear"}, {i:"θ", t:"th"}] },
-        { img: "birthday.jpg", speak: "birthday", parts: [{i:"b 3:r θ", t:"birth"}, {i:"d eɪ", t:"day"}] },
-        { img: "father.jpg", speak: "father", parts: [{i:"f ɑ:", t:"fa"}, {i:"ð ər", t:"ther"}] },
-        { img: "together.jpg", speak: "together", parts: [{i:"t ə", t:"to"}, {i:"g e", t:"ge"}, {i:"ð ər", t:"ther"}] },
-        { img: "clothing.jpg", speak: "clothing", parts: [{i:"k l oʊ", t:"clo"}, {i:"ð ɪ ŋ", t:"thing"}] },
-        { img: "feather.jpg", speak: "feather", parts: [{i:"f e", t:"fea"}, {i:"ð ər", t:"ther"}] },
-        { img: "weather.jpg", speak: "weather", parts: [{i:"w e", t:"wea"}, {i:"ð ər", t:"ther"}] },
-        { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ ɪ ŋ k", t:"Think"}, {t:" "}, {i:"g ʊ d", t:"good"}, {t:" "}, {i:"θ ɪ ŋ z", t:"things"}, {t:" "}, {i:"æ n d", t:"and"}, {t:" "}, {i:"s eɪ", t:"say"}, {t:" "}, {i:"θ æ ŋ k", t:"thank"}, {t:" "}, {i:"j u:", t:"you"}, {t:" "}, {i:"t u:", t:"to"}, {t:" "}, {i:"h æ v", t:"have"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"h æ p i", t:"happy"}, {t:" "}, {i:"h ɑ:r t", t:"heart."}] },
-        { type: "sent", img: "sentence_they.jpg", speak: "They help their mother with the dishes", parts: [{i:"ð eɪ", t:"They"}, {t:" "}, {i:"h e l p", t:"help"}, {t:" "}, {i:"ð e r", t:"their"}, {t:" "}, {i:"m ʌ ð ər", t:"mother"}, {t:" "}, {i:"w ɪ ð", t:"with"}, {t:" "}, {i:"ð ə", t:"the"}, {t:" "}, {i:"d ɪ ʃ ɪ z", t:"dishes."}] },
+        { img: "thin.jpg", speak: "thin", parts: [{i:"θ", t:"th"}, {i:"ɪ", t:"i"}, {t:"n"}] },
+        { img: "teeth.jpg", speak: "teeth", parts: [{t:"t"}, {i:"i:", t:"ee"}, {i:"θ", t:"th"}] },
+        { img: "thumb.jpg", speak: "thumb", parts: [{i:"θ", t:"th"}, {i:"ʌ", t:"u"}, {t:"m"}, {i:"_", t:"b"}] },
+        { img: "earth.jpg", speak: "earth", parts: [{i:"ɜːr", t:"ear"}, {i:"θ", t:"th"}] },
+        { img: "birthday.jpg", speak: "birthday", parts: [{t:"b"}, {i:"ɜːr", t:"ir"}, {i:"θ", t:"th"}, {t:"d"}, {i:"eɪ", t:"ay"}] },
+        { img: "father.jpg", speak: "father", parts: [{t:"f"}, {i:"ɑ:", t:"a"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
+        { img: "together.jpg", speak: "together", parts: [{t:"t"}, {i:"ə", t:"o"}, {t:"g"}, {i:"e", t:"e"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
+        { img: "clothing.jpg", speak: "clothing", parts: [{i:"k", t:"c"}, {t:"l"}, {i:"oʊ", t:"o"}, {i:"ð", t:"th"}, {i:"ɪ ŋ", t:"ing"}] },
+        { img: "feather.jpg", speak: "feather", parts: [{t:"f"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
+        { img: "weather.jpg", speak: "weather", parts: [{t:"w"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
+        { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ", t:"Th"}, {i:"ɪ ŋ", t:"ink"}, {t:"k"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {i:"θ", t:"th"}, {i:"ɪ ŋ", t:"ing"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"s"}, {i:"eɪ", t:"ay"}, {t:" "}, {i:"θ", t:"th"}, {i:"æ", t:"a"}, {i:"ŋ", t:"n"}, {t:"k"}, {t:" "}, {i:"j", t:"y"}, {i:"u:", t:"ou"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"v"}, {i:"_", t:"e"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y"}, {t:" "}, {t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t."}] },
+        { type: "sent", img: "sentence_they.jpg", speak: "They help their mother with the dishes", parts: [{i:"ð", t:"Th"}, {i:"eɪ", t:"ey"}, {t:" "}, {t:"h"}, {i:"e", t:"e"}, {t:"l"}, {t:"p"}, {t:" "}, {i:"ð", t:"th"}, {i:"e", t:"ei"}, {t:"r"}, {t:" "}, {t:"m"}, {i:"ʌ", t:"o"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}, {t:" "}, {t:"w"}, {i:"ɪ", t:"i"}, {i:"ð", t:"th"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {i:"ɪ", t:"es."}] },
         { type: "game", title: "Game /θ/ & /ð/", pairs: ["thin", "father", "thumb", "feather", "teeth"], img: "thin.jpg" }
     ],
 
@@ -624,8 +639,13 @@ const DataEngine = {
         return [];
     }
 };
-/* === [DÁN PHẦN 3 - LOGIC ENGINES VÀO ĐÂY] === */
-/* --- 3.2 XỬ LÝ ÂM THANH (AUDIO ENGINE) --- */
+
+/* ==========================================================================
+   PHẦN 3: LOGIC ENGINES (GAME, SNAKE, AUDIO, LEARNING)
+   * Đã tích hợp đầy đủ *
+   ========================================================================== */
+
+/* --- 3.2 AUDIO ENGINE --- */
 const AudioEngine = {
     isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"), currentUtterance: null,
     unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
@@ -635,7 +655,7 @@ const AudioEngine = {
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- 3.3 LOGIC GAME CHUNG (GAME ENGINE) --- */
+/* --- 3.3 GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
@@ -915,43 +935,21 @@ const App = {
         // Giữ lại tiêu đề
         menuContainer.innerHTML = '<div class="menu-title"> 📚  CHỌN BÀI HỌC</div>';
         
-        // Danh sách tên bài học (Tạm thời hardcode để hiển thị đẹp, sau này có thể lấy động)
-        const lessonTitles = {
-            1: "Bài 1: /t/ & /d/",
-            2: "Bài 2: /p/ & /b/",
-            3: "Bài 3: /æ/ & /ɪ/",
-            4: "Bài 4: /ʌ/ & /ɑ:/",
-            5: "Bài 5: /e/",
-            6: "Bài 6: /k/ & /g/",
-            7: "Bài 7: /f/ & /v/",
-            8: "Bài 8: /s/ & /z/",
-            9: "Bài 9: /ʃ/ & /ʒ/",
-            10: "Bài 10: /tʃ/ & /dʒ/",
-            11: "Bài 11: Ôn tập",
-            12: "Bài 12: /i:/ & /ɪ/",
-            13: "Bài 13: /ʊ/ & /u:/",
-            14: "Bài 14: /ɑ:r/ & /ɔ:r/",
-            15: "Bài 15: /ə/ & /3:r/",
-            16: "Bài 16: /ɪr/ & /ɛr/",
-            17: "Bài 17: /aʊ/ & /oʊ/",
-            18: "Bài 18: /eɪ/ & /aɪ/",
-            19: "Bài 19: /ɔɪ/ & /t̬/",
-            20: "Bài 20: /m/ & /n/",
-            21: "Bài 21: /ŋ/ & /h/",
-            22: "Bài 22: /r/ & /l/",
-            23: "Bài 23: /j/ & /w/",
-            24: "Bài 24: /θ/ & /ð/"
-        };
-
-        for (let i = 1; i <= 24; i++) {
-            if (DataEngine["lesson" + i]) {
+        // Tạo nút từ LevelMap
+        LevelMap.forEach(level => {
+            if (level.type === 'learn') { // Chỉ tạo nút cho bài học, không tạo nút game lẻ
                 const btn = document.createElement('button');
                 btn.className = 'btn-menu';
-                btn.innerText = lessonTitles[i] || `Bài ${i}`;
-                btn.onclick = function() { App.startLesson(i); };
+                btn.innerText = level.label;
+                // Tô màu khác cho bài ôn tập
+                if (level.label.includes("Ôn tập")) {
+                    btn.style.borderColor = "#ff9600";
+                    btn.style.color = "#d35400";
+                }
+                btn.onclick = function() { App.startLesson(level.id); };
                 menuContainer.appendChild(btn);
             }
-        }
+        });
     },
 
     startLesson: function(num) { AudioEngine.unlock(); document.getElementById('menu-screen').style.display = 'none'; document.getElementById('main-container').style.display = 'block'; LearningEngine.initLesson(num); LearningEngine.render(); },
@@ -976,9 +974,6 @@ window.onload = function() {
     App.initMenu(); // Khởi tạo menu tự động
 };
 window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
-</script>
-</body>
-</html>
 </script>
 </body>
 </html>
