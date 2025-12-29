@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh (v1.6)</title>
+<title>Bé Học Tiếng Anh (v1.7)</title>
 <style>
 /* --- CSS CƠ BẢN --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,15 +30,13 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .learn-img-wrapper { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
 #learn-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 15px; }
 
-/* --- KHU VỰC HIỂN THỊ CHỮ (ĐÃ FIX LOGIC) --- */
+/* FIX LỖI XUỐNG DÒNG: Dùng flex-wrap và cấm ngắt dòng trong khối */
 .info-area { 
     min-height: 110px; flex-shrink: 0; 
-    display: flex; flex-direction: row; flex-wrap: wrap; /* Cho phép các TỪ xuống dòng */
-    align-items: flex-end; justify-content: center; 
-    gap: 0px; align-content: center; padding: 0 10px;
+    display: flex; flex-direction: row; flex-wrap: wrap; 
+    align-items: center; justify-content: center; 
+    gap: 2px; align-content: center; padding: 0 5px;
 }
-
-/* Class bao quanh MỘT TỪ (Chứa nhiều âm tiết) */
 .word-group {
     display: inline-flex; 
     flex-direction: row;
@@ -46,10 +44,8 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
     margin-right: 12px; /* Khoảng cách giữa các từ */
     white-space: nowrap; /* QUAN TRỌNG: Cấm ngắt dòng bên trong 1 từ */
 }
-
-/* Từng khối âm tiết (IPA + Text) */
 .char-block { 
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: flex-end; 
     margin: 0 1px; 
 }
 
@@ -93,8 +89,9 @@ box-shadow: 0 4px #d35400; }
 .back { background: white; transform: rotateY(180deg); padding: 2px; }
 .back img { width: 95%; height: 95%; object-fit: contain; }
 
+/* FIX LỖI HIỂN THỊ THẺ BÀI */
 .game-card-text { 
-    display: flex; flex-direction: row; flex-wrap: nowrap; /* Bắt buộc 1 dòng */
+    display: flex; flex-direction: row; flex-wrap: nowrap; 
     align-items: center; justify-content: center; 
     height: 100%; width: 100%; 
     white-space: nowrap; 
@@ -211,9 +208,7 @@ box-shadow: 0 4px #d35400; }
 </head>
 <body>
 <div id="cursor-hammer" class="hammer"></div>
-
 <div id="menu-screen"></div>
-
 <div id="main-container" style="display: none;">
     <div id="learning-screen">
         <div class="top-bar">
@@ -234,7 +229,6 @@ box-shadow: 0 4px #d35400; }
             <button class="btn-nav" onclick="LearningEngine.nav(1)"> ▶ </button>
         </div>
     </div>
-
     <div id="game-screen" style="display: none;">
         <div class="game-header">
             <div style="width:40px;"></div>
@@ -328,7 +322,7 @@ const LevelMap = [
     { id: 13, type: 'learn', label: 'Bài 13: /ʊ/ & /uː/', color: '#58cc02' },
     { id: 13, type: 'game',  label: 'Game /ʊ/', color: '#ff9600', gameIndex: 0 },
     { id: 13, type: 'game',  label: 'Game /uː/', color: '#a322ea', gameIndex: 1 },
-    { id: 14, type: 'learn', label: 'Bài 14: /ɑːr/ & /ɔːr/', color: '#58cc02' },
+    { id: 14, type: 'learn', label: 'Bài 14: /ɑ:r/ & /ɔːr/', color: '#58cc02' },
     { id: 14, type: 'game',  label: 'Game /ɑːr/', color: '#ff9600', gameIndex: 0 },
     { id: 14, type: 'game',  label: 'Game /ɔːr/', color: '#a322ea', gameIndex: 1 },
     { id: 15, type: 'learn', label: 'Bài 15: /ə/ & /ɜːr/', color: '#58cc02' },
@@ -439,7 +433,7 @@ const DataEngine = {
         { img: "dig.jpg", speak: "dig", parts: [{t:"d"}, {i:"ɪ", t:"i"}, {t:"g"}] },
         { img: "dog.jpg", speak: "dog", parts: [{t:"d"}, {i:"ɑ", t:"o"}, {t:"g"}] },
         { img: "get.jpg", speak: "get", parts: [{t:"g"}, {i:"e", t:"e"}, {t:"t"}] },
-        { type: "game", title: "Game /k/", pairs: ["cat", "kid", "cap", "cot", "cup"], img: "k_card.jpg" },
+        { type: "game", title: "Game /k/", pairs: ["cat", "gap", "kid", "got", "cup"], img: "k_card.jpg" },
         { type: "game", title: "Game /g/", pairs: ["gap", "got", "dig", "dog", "get"], img: "g_card.jpg" }
     ],
     lesson7: [
@@ -453,7 +447,7 @@ const DataEngine = {
         { img: "van.jpg", speak: "van", parts: [{t:"v"}, {i:"æ", t:"a"}, {t:"n"}] },
         { type: "sent", img: "sentence_fed.jpg", speak: "Bob fed a fat dog", parts: [{t:"B"}, {i:"ɑ", t:"o"}, {t:"b"}, {t:" "}, {t:"f"}, {i:"e", t:"e"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"d"}, {i:"ɑ", t:"o"}, {t:"g."}] },
         { type: "sent", img: "sentence_cat.jpg", speak: "A cat got a big cap", parts: [{i:"ə", t:"A"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"ɪ", t:"i"}, {t:"g"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"p."}] },
-        { type: "game", title: "Game /f/", pairs: ["fog", "fit", "fig", "fat", "fed"], img: "f_card.jpg" },
+        { type: "game", title: "Game /f/", pairs: ["fog", "vat", "fit", "vet", "fat"], img: "f_card.jpg" },
         { type: "game", title: "Game /v/", pairs: ["vat", "vet", "van"], img: "v_card.jpg" }
     ],
     lesson8: [
@@ -646,7 +640,7 @@ const DataEngine = {
         { img: "nine.jpg", speak: "nine", parts: [{t:"n"}, {i:"aɪ", t:"i"}, {t:"n"}, {i:"_", t:"e"}] },
         { img: "fun.jpg", speak: "fun", parts: [{t:"f"}, {i:"ʌ", t:"u"}, {t:"n"}] },
         { type: "sent", img: "sentence_mom.jpg", speak: "Mom is sick. Mika makes milk for mom", parts: [{t:"M"}, {i:"ɑ", t:"o"}, {t:"m"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck."}, {t:" "}, {t:"M"}, {i:"iː", t:"i"}, {t:"k"}, {i:"ə", t:"a"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"ɪ", t:"i"}, {t:"l"}, {t:"k"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {t:"m"}, {i:"ɑ", t:"o"}, {t:"m."}] },
-        { type: "sent", img: "sentence_nina.jpg", speak: "Nina can run fast and she never gives up", parts: [{t:"N"}, {i:"iː", t:"i"}, {t:"n"}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"n"}, {t:" "}, {t:"r"}, {i:"ʌ", t:"u"}, {t:"n"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"s"}, {t:"t"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"iː", t:"e"}, {t:" "}, {t:"n"}, {i:"e", t:"e"}, {t:"v"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"v"}, {t:"s"}, {t:" "}, {i:"ʌ", t:"u"}, {t:"p."}] },
+        { type: "sent", img: "sentence_nina.jpg", speak: "Nina can run fast and she never gives up", parts: [{t:"N"}, {i:"iː", t:"i"}, {t:"n"}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"n"}, {t:" "}, {t:"r"}, {i:"ʌ", t:"u"}, {t:"n"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"s"}, {t:"t"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"iː", t:"e"}, {t:" "}, {t:"n"}, {i:"e", t:"e"}, {t:"v"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"v"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {i:"ʌ", t:"u"}, {t:"p."}] },
         { type: "game", title: "Game /m/", pairs: ["mat", "game", "mad", "time", "mouse"], img: "m_card.jpg" },
         { type: "game", title: "Game /n/", pairs: ["net", "sun", "note", "nine", "fun"], img: "n_card.jpg" }
     ],
@@ -659,8 +653,8 @@ const DataEngine = {
         { img: "hat.jpg", speak: "hat", parts: [{t:"h"}, {i:"æ", t:"a"}, {t:"t"}] },
         { img: "hen.jpg", speak: "hen", parts: [{t:"h"}, {i:"e", t:"e"}, {t:"n"}] },
         { img: "hippo.jpg", speak: "hippo", parts: [{t:"h"}, {i:"ɪ", t:"i"}, {t:"pp"}, {i:"oʊ", t:"o"}] },
-        { img: "heart.jpg", speak: "heart", parts: [{t:"h"}, {i:"ɑːr", t:"ear"}, {t:"t"}] },
-        { img: "horse.jpg", speak: "horse", parts: [{t:"h"}, {i:"ɔːr", t:"or"}, {t:"s"}, {i:"_", t:"e"}] },
+        { img: "heart.jpg", speak: "heart", parts: [{t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t"}] },
+        { img: "horse.jpg", speak: "horse", parts: [{t:"h"}, {i:"ɔ:r", t:"or"}, {t:"s"}, {i:"_", t:"e"}] },
         { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {i:"ə", t:"a"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"z"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"f"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ə", t:"a"}, {t:"m"}, {i:"ɪ ŋ", t:"in"}, {t:"g"}, {i:"oʊ", t:"o."}] },
         { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{t:"H"}, {i:"iː", t:"e"}, {t:" "}, {t:"h"}, {i:"oʊ", t:"o"}, {t:"p"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y."}] },
         { type: "game", title: "Game /ŋ/", pairs: ["sing", "finger", "king", "kingfisher", "monkey"], img: "ŋ_card.jpg" },
@@ -677,7 +671,7 @@ const DataEngine = {
         { img: "ball.jpg", speak: "ball", parts: [{t:"b"}, {i:"ɑː", t:"a"}, {t:"ll"}] },
         { img: "lips.jpg", speak: "lips", parts: [{t:"l"}, {i:"ɪ", t:"i"}, {t:"p"}, {t:"s"}] },
         { img: "lamp.jpg", speak: "lamp", parts: [{t:"l"}, {i:"æ", t:"a"}, {t:"m"}, {t:"p"}] },
-        { type: "sent", img: "sentence_rick.jpg", speak: "Rick is ready to read a good story for Sarah", parts: [{t:"R"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"r"}, {i:"e", t:"ea"}, {t:"d"}, {i:"i", t:"y"}, {t:" "}, {t:"t"}, {i:"uː", t:"o"}, {t:" "}, {t:"r"}, {i:"iː", t:"ea"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {t:"s"}, {t:"t"}, {i:"ɔːr", t:"or"}, {i:"i", t:"y"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {t:"S"}, {i:"æ", t:"a"}, {t:"r"}, {i:"ə", t:"a"}, {i:"_", t:"h."}] },
+        { type: "sent", img: "sentence_rick.jpg", speak: "Rick is ready to read a good story for Sarah", parts: [{t:"R"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"r"}, {i:"e", t:"ea"}, {t:"d"}, {i:"i", t:"y"}, {t:" "}, {t:"t"}, {i:"uː", t:"o"}, {t:" "}, {t:"r"}, {i:"i:", t:"ea"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {t:"s"}, {t:"t"}, {i:"ɔ:r", t:"or"}, {i:"i", t:"y"}, {t:" "}, {t:"f"}, {i:"ɔ:r", t:"or"}, {t:" "}, {t:"S"}, {i:"æ", t:"a"}, {t:"r"}, {i:"ə", t:"a"}, {i:"_", t:"h."}] },
         { type: "sent", img: "sentence_lily.jpg", speak: "Lily likes to look at her Mom smiling", parts: [{t:"L"}, {i:"ɪ", t:"i"}, {t:"l"}, {i:"i", t:"y"}, {t:" "}, {t:"l"}, {i:"aɪ", t:"i"}, {t:"k"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"t"}, {i:"uː", t:"o"}, {t:" "}, {t:"l"}, {i:"ʊ", t:"oo"}, {t:"k"}, {t:" "}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {t:"h"}, {i:"ər", t:"er"}, {t:" "}, {t:"M"}, {i:"ɑ", t:"o"}, {t:"m"}, {t:" "}, {t:"s"}, {t:"m"}, {i:"aɪ", t:"i"}, {t:"l"}, {i:"ɪ ŋ", t:"ing."}] },
         { type: "game", title: "Game /r/", pairs: ["red", "run", "carrot", "ring", "rabbit"], img: "r_card.jpg" },
         { type: "game", title: "Game /l/", pairs: ["lion", "ladder", "ball", "lips", "lamp"], img: "l_card.jpg" }
@@ -704,12 +698,12 @@ const DataEngine = {
         { img: "thumb.jpg", speak: "thumb", parts: [{i:"θ", t:"th"}, {i:"ʌ", t:"u"}, {t:"m"}, {i:"_", t:"b"}] },
         { img: "earth.jpg", speak: "earth", parts: [{i:"ɜːr", t:"ear"}, {i:"θ", t:"th"}] },
         { img: "birthday.jpg", speak: "birthday", parts: [{t:"b"}, {i:"ɜːr", t:"ir"}, {i:"θ", t:"th"}, {t:"d"}, {i:"eɪ", t:"ay"}] },
-        { img: "father.jpg", speak: "father", parts: [{t:"f"}, {i:"ɑː", t:"a"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
+        { img: "father.jpg", speak: "father", parts: [{t:"f"}, {i:"ɑ:", t:"a"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
         { img: "together.jpg", speak: "together", parts: [{t:"t"}, {i:"ə", t:"o"}, {t:"g"}, {i:"e", t:"e"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
         { img: "clothing.jpg", speak: "clothing", parts: [{i:"k", t:"c"}, {t:"l"}, {i:"oʊ", t:"o"}, {i:"ð", t:"th"}, {i:"ɪ ŋ", t:"ing"}] },
         { img: "feather.jpg", speak: "feather", parts: [{t:"f"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
         { img: "weather.jpg", speak: "weather", parts: [{t:"w"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
-        { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ", t:"Th"}, {i:"ɪ ŋ", t:"ink"}, {t:"k"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {i:"θ", t:"th"}, {i:"ɪ ŋ", t:"ing"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"s"}, {i:"eɪ", t:"ay"}, {t:" "}, {i:"θ", t:"th"}, {i:"æ", t:"a"}, {i:"ŋ", t:"n"}, {t:"k"}, {t:" "}, {i:"j", t:"y"}, {i:"uː", t:"ou"}, {t:" "}, {t:"t"}, {i:"uː", t:"o"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"v"}, {i:"_", t:"e"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y"}, {t:" "}, {t:"h"}, {i:"ɑːr", t:"ear"}, {t:"t."}] },
+        { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ", t:"Th"}, {i:"ɪ ŋ", t:"in"}, {t:"k"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {i:"θ", t:"th"}, {i:"ɪ ŋ", t:"ing"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"s"}, {i:"eɪ", t:"ay"}, {t:" "}, {i:"θ", t:"th"}, {i:"æ", t:"a"}, {i:"ŋ", t:"n"}, {t:"k"}, {t:" "}, {i:"j", t:"y"}, {i:"uː", t:"ou"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"v"}, {i:"_", t:"e"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y"}, {t:" "}, {t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t."}] },
         { type: "sent", img: "sentence_they.jpg", speak: "They help their mother with the dishes", parts: [{i:"ð", t:"Th"}, {i:"eɪ", t:"ey"}, {t:" "}, {t:"h"}, {i:"e", t:"e"}, {t:"l"}, {t:"p"}, {t:" "}, {i:"ð", t:"th"}, {i:"e", t:"ei"}, {t:"r"}, {t:" "}, {t:"m"}, {i:"ʌ", t:"o"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}, {t:" "}, {t:"w"}, {i:"ɪ", t:"i"}, {i:"ð", t:"th"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {i:"ɪ", t:"es."}] },
         { type: "game", title: "Game /θ/", pairs: ["thin", "father", "thumb", "feather", "teeth"], img: "θ_card.jpg" },
         { type: "game", title: "Game /ð/", pairs: ["father", "together", "clothing", "feather", "weather"], img: "ð_card.jpg" }
@@ -720,10 +714,6 @@ const DataEngine = {
         return [];
     }
 };
-
-/* ==========================================================================
-   PHẦN 3: LOGIC ENGINES (GAME, SNAKE, AUDIO, LEARNING)
-   ========================================================================== */
 
 /* --- 3.2 AUDIO ENGINE --- */
 const AudioEngine = {
