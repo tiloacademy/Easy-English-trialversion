@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh (v1.5)</title>
+<title>Bé Học Tiếng Anh (v1.6)</title>
 <style>
 /* --- CSS CƠ BẢN --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,24 +30,34 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .learn-img-wrapper { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
 #learn-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 15px; }
 
-/* FIX LỖI XUỐNG DÒNG: Dùng flex-wrap và cấm ngắt dòng trong khối */
+/* --- KHU VỰC HIỂN THỊ CHỮ (ĐÃ FIX LOGIC) --- */
 .info-area { 
     min-height: 110px; flex-shrink: 0; 
-    display: flex; flex-direction: row; flex-wrap: wrap; 
-    align-items: center; justify-content: center; 
-    gap: 2px; align-content: center;
-}
-.char-block { 
-    display: inline-flex; flex-direction: column; align-items: center; justify-content: flex-end; 
-    margin: 0 1px; 
-    white-space: nowrap; /* Không cho ngắt dòng giữa chừng */
+    display: flex; flex-direction: row; flex-wrap: wrap; /* Cho phép các TỪ xuống dòng */
+    align-items: flex-end; justify-content: center; 
+    gap: 0px; align-content: center; padding: 0 10px;
 }
 
-.cb-ipa { font-size: 24px; color: red; font-weight: bold; font-family: sans-serif; height: 30px; line-height: 30px; }
-.cb-text { font-size: 40px; color: #333; font-weight: bold; height: 50px; line-height: 50px; }
-.sent-ipa { font-size: 16px; color: red; font-weight: bold; height: 20px; }
-.sent-text { font-size: 24px; color: #333; font-weight: bold; height: 30px; }
-.spacer { width: 15px; }
+/* Class bao quanh MỘT TỪ (Chứa nhiều âm tiết) */
+.word-group {
+    display: inline-flex; 
+    flex-direction: row;
+    align-items: flex-end;
+    margin-right: 12px; /* Khoảng cách giữa các từ */
+    white-space: nowrap; /* QUAN TRỌNG: Cấm ngắt dòng bên trong 1 từ */
+}
+
+/* Từng khối âm tiết (IPA + Text) */
+.char-block { 
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
+    margin: 0 1px; 
+}
+
+.cb-ipa { font-size: 20px; color: red; font-weight: bold; font-family: sans-serif; height: 26px; line-height: 26px; }
+.cb-text { font-size: 36px; color: #333; font-weight: bold; height: 45px; line-height: 45px; }
+.sent-ipa { font-size: 14px; color: red; font-weight: bold; height: 18px; margin-bottom: 2px;}
+.sent-text { font-size: 22px; color: #333; font-weight: bold; height: 28px; }
+
 .stars { height: 30px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0; }
 .stars.active { color: #FFD700; text-shadow: 0 0 5px orange; }
 .feedback-text { height: 20px; text-align: center; font-size: 16px; color: #555; font-style: italic; margin-bottom: 5px; }
@@ -71,7 +81,7 @@ box-shadow: 0 4px #d35400; }
 .game-footer { height: 100px; display: flex; justify-content: center; align-items: center; background: white; border-top: 1px solid #ccc; padding-bottom: 30px; flex-shrink: 0; z-index: 200;}
 #win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 300; flex-direction: column; align-items: center; justify-content: center; }
 
-/* CSS Game Cũ (Mole/Flip) */
+/* CSS Game Flip */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
@@ -83,12 +93,11 @@ box-shadow: 0 4px #d35400; }
 .back { background: white; transform: rotateY(180deg); padding: 2px; }
 .back img { width: 95%; height: 95%; object-fit: contain; }
 
-/* FIX LỖI HIỂN THỊ THẺ BÀI: Căn giữa dọc và ngang, KHÔNG NGẮT DÒNG */
 .game-card-text { 
     display: flex; flex-direction: row; flex-wrap: nowrap; /* Bắt buộc 1 dòng */
     align-items: center; justify-content: center; 
     height: 100%; width: 100%; 
-    white-space: nowrap; /* Cấm ngắt dòng */
+    white-space: nowrap; 
 }
 .gc-block { 
     display: flex; flex-direction: column; 
@@ -203,8 +212,7 @@ box-shadow: 0 4px #d35400; }
 <body>
 <div id="cursor-hammer" class="hammer"></div>
 
-<div id="menu-screen">
-    </div>
+<div id="menu-screen"></div>
 
 <div id="main-container" style="display: none;">
     <div id="learning-screen">
@@ -233,7 +241,6 @@ box-shadow: 0 4px #d35400; }
             <div class="timer-badge"> ⏱ ️ <span id="timer">00:00</span></div>
             <button class="btn-close" onclick="App.exitGame()"> ✕ </button>
         </div>
-
         <div id="tower" class="tower-container" style="display:none;"></div>
         <div id="whack-wrapper" style="display:none;">
             <div class="hud-row">
@@ -252,7 +259,6 @@ box-shadow: 0 4px #d35400; }
                 <div class="hole"><div class="mole" onclick="GameEngine.bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
             </div>
         </div>
-
         <div id="snake-game-container">
             <div id="snake-target-bar">
                 <button class="btn-pause" onclick="SnakeEngine.togglePause()">⏸</button>
@@ -272,7 +278,6 @@ box-shadow: 0 4px #d35400; }
                 <button class="btn-menu" style="width:auto;" onclick="SnakeEngine.togglePause()">▶ Tiếp tục chơi</button>
             </div>
         </div>
-
         <div class="game-footer">
             <button class="btn-action btn-nav" style="width: 60%; border-radius: 30px; font-size: 20px; box-shadow: 0 4px #e67e22; background-color: #e67e22;" onclick="GameEngine.restart()"> ↻ Chơi lại</button>
         </div>
@@ -286,11 +291,7 @@ box-shadow: 0 4px #d35400; }
         </div>
     </div>
 </div>
-
 <script>
-/* ==========================================================================
-   PHẦN 1: CẤU HÌNH MENU & DỮ LIỆU BÀI HỌC (LEVEL MAP)
-   ========================================================================== */
 const LevelMap = [
     { id: 1, type: 'learn', label: 'Bài 1: /t/ & /d/', color: '#58cc02' },
     { id: 1, type: 'game',  label: 'Game /t/', color: '#ff9600', gameIndex: 0 },
@@ -322,7 +323,7 @@ const LevelMap = [
     { id: 10, type: 'game',  label: 'Game /tʃ/', color: '#ff9600', gameIndex: 0 },
     { id: 10, type: 'game',  label: 'Game /dʒ/', color: '#a322ea', gameIndex: 1 },
     { id: 11, type: 'learn', label: 'Bài 11: Ôn tập', color: '#ff9600' },
-    { id: 12, type: 'learn', label: 'Bài 12: /iː/', color: '#58cc02' }, /* Đã xóa /ɪ/ */
+    { id: 12, type: 'learn', label: 'Bài 12: Âm /iː/', color: '#58cc02' },
     { id: 12, type: 'game',  label: 'Game /iː/', color: '#ff9600', gameIndex: 0 },
     { id: 13, type: 'learn', label: 'Bài 13: /ʊ/ & /uː/', color: '#58cc02' },
     { id: 13, type: 'game',  label: 'Game /ʊ/', color: '#ff9600', gameIndex: 0 },
@@ -362,7 +363,6 @@ const LevelMap = [
     { id: 24, type: 'game',  label: 'Game /ð/', color: '#a322ea', gameIndex: 1 }
 ];
 
-/* NỘI DUNG CHI TIẾT 24 BÀI */
 const DataEngine = {
     lesson1: [
         { img: "tap.jpg", speak: "tap", parts: [{t:"t"}, {i:"æ", t:"a"}, {t:"p"}] },
@@ -627,7 +627,7 @@ const DataEngine = {
         { img: "otter.jpg", speak: "otter", parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
         { img: "butter.jpg", speak: "butter", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
         { img: "kitty.jpg", speak: "kitty", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i", t:"y"}] },
-        { img: "party.jpg", speak: "party", parts: [{t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
+        { img: "party.jpg", speak: "party", parts: [{t:"p"}, {i:"ɑ:r", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
         { img: "city.jpg", speak: "city", parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
         { type: "sent", img: "sentence_boy.jpg", speak: "A boy drops a coin and a toy", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"b"}, {i:"ɔɪ", t:"oy"}, {t:" "}, {t:"d"}, {t:"r"}, {i:"ɑ", t:"o"}, {t:"p"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"t"}, {i:"ɔɪ", t:"oy."}] },
         { type: "sent", img: "sentence_peter.jpg", speak: "Peter got butter in the party", parts: [{t:"P"}, {i:"iː", t:"e"}, {i:"t̬", t:"t"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}, {t:" "}, {t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y."}] },
@@ -645,8 +645,8 @@ const DataEngine = {
         { img: "note.jpg", speak: "note", parts: [{t:"n"}, {i:"oʊ", t:"o"}, {t:"t"}, {i:"_", t:"e"}] },
         { img: "nine.jpg", speak: "nine", parts: [{t:"n"}, {i:"aɪ", t:"i"}, {t:"n"}, {i:"_", t:"e"}] },
         { img: "fun.jpg", speak: "fun", parts: [{t:"f"}, {i:"ʌ", t:"u"}, {t:"n"}] },
-        { type: "sent", img: "sentence_mom.jpg", speak: "Mom is sick. Mika makes milk for mom", parts: [{t:"M"}, {i:"ɑ", t:"o"}, {t:"m"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck."}, {t:" "}, {t:"M"}, {i:"iː", t:"i"}, {t:"k"}, {i:"ə", t:"a"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"ɪ", t:"i"}, {t:"l"}, {t:"k"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {t:"m"}, {i:"ɑ", t:"o"}, {t:"m."}] },
-        { type: "sent", img: "sentence_nina.jpg", speak: "Nina can run fast and she never gives up", parts: [{t:"N"}, {i:"iː", t:"i"}, {t:"n"}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"n"}, {t:" "}, {t:"r"}, {i:"ʌ", t:"u"}, {t:"n"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"s"}, {t:"t"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"iː", t:"e"}, {t:" "}, {t:"n"}, {i:"e", t:"e"}, {t:"v"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"v"}, {t:"z"}, {t:" "}, {i:"ʌ", t:"u"}, {t:"p."}] },
+        { type: "sent", img: "sentence_mom.jpg", speak: "Mom is sick. Mika makes milk for mom", parts: [{t:"M"}, {i:"ɑ", t:"o"}, {t:"m"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck."}, {t:" "}, {t:"M"}, {i:"iː", t:"i"}, {t:"k"}, {i:"ə", t:"a"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"ɪ", t:"i"}, {t:"l"}, {t:"k"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {t:"m"}, {i:"ɑ", t:"o"}, {t:"m."}] },
+        { type: "sent", img: "sentence_nina.jpg", speak: "Nina can run fast and she never gives up", parts: [{t:"N"}, {i:"iː", t:"i"}, {t:"n"}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"æ", t:"a"}, {t:"n"}, {t:" "}, {t:"r"}, {i:"ʌ", t:"u"}, {t:"n"}, {t:" "}, {t:"f"}, {i:"æ", t:"a"}, {t:"s"}, {t:"t"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"iː", t:"e"}, {t:" "}, {t:"n"}, {i:"e", t:"e"}, {t:"v"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"v"}, {t:"s"}, {t:" "}, {i:"ʌ", t:"u"}, {t:"p."}] },
         { type: "game", title: "Game /m/", pairs: ["mat", "game", "mad", "time", "mouse"], img: "m_card.jpg" },
         { type: "game", title: "Game /n/", pairs: ["net", "sun", "note", "nine", "fun"], img: "n_card.jpg" }
     ],
@@ -661,8 +661,8 @@ const DataEngine = {
         { img: "hippo.jpg", speak: "hippo", parts: [{t:"h"}, {i:"ɪ", t:"i"}, {t:"pp"}, {i:"oʊ", t:"o"}] },
         { img: "heart.jpg", speak: "heart", parts: [{t:"h"}, {i:"ɑːr", t:"ear"}, {t:"t"}] },
         { img: "horse.jpg", speak: "horse", parts: [{t:"h"}, {i:"ɔːr", t:"or"}, {t:"s"}, {i:"_", t:"e"}] },
-        { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {i:"ə", t:"a"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"z"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"f"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ə", t:"a"}, {t:"m"}, {i:"ɪ ŋ", t:"ing"}, {t:"g"}, {i:"oʊ", t:"o."}] },
-        { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{t:"H"}, {i:"iː", t:"e"}, {t:" "}, {t:"h"}, {i:"oʊ", t:"o"}, {t:"p"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y."}] },
+        { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {i:"ə", t:"a"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"z"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"f"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ə", t:"a"}, {t:"m"}, {i:"ɪ ŋ", t:"in"}, {t:"g"}, {i:"oʊ", t:"o."}] },
+        { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{t:"H"}, {i:"iː", t:"e"}, {t:" "}, {t:"h"}, {i:"oʊ", t:"o"}, {t:"p"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y."}] },
         { type: "game", title: "Game /ŋ/", pairs: ["sing", "finger", "king", "kingfisher", "monkey"], img: "ŋ_card.jpg" },
         { type: "game", title: "Game /h/", pairs: ["hat", "hen", "hippo", "heart", "horse"], img: "h_card.jpg" }
     ],
@@ -711,7 +711,7 @@ const DataEngine = {
         { img: "weather.jpg", speak: "weather", parts: [{t:"w"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
         { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ", t:"Th"}, {i:"ɪ ŋ", t:"ink"}, {t:"k"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {i:"θ", t:"th"}, {i:"ɪ ŋ", t:"ing"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"s"}, {i:"eɪ", t:"ay"}, {t:" "}, {i:"θ", t:"th"}, {i:"æ", t:"a"}, {i:"ŋ", t:"n"}, {t:"k"}, {t:" "}, {i:"j", t:"y"}, {i:"uː", t:"ou"}, {t:" "}, {t:"t"}, {i:"uː", t:"o"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"v"}, {i:"_", t:"e"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y"}, {t:" "}, {t:"h"}, {i:"ɑːr", t:"ear"}, {t:"t."}] },
         { type: "sent", img: "sentence_they.jpg", speak: "They help their mother with the dishes", parts: [{i:"ð", t:"Th"}, {i:"eɪ", t:"ey"}, {t:" "}, {t:"h"}, {i:"e", t:"e"}, {t:"l"}, {t:"p"}, {t:" "}, {i:"ð", t:"th"}, {i:"e", t:"ei"}, {t:"r"}, {t:" "}, {t:"m"}, {i:"ʌ", t:"o"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}, {t:" "}, {t:"w"}, {i:"ɪ", t:"i"}, {i:"ð", t:"th"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {i:"ɪ", t:"es."}] },
-        { type: "game", title: "Game /θ/", pairs: ["thin", "teeth", "thumb", "earth", "birthday"], img: "θ_card.jpg" },
+        { type: "game", title: "Game /θ/", pairs: ["thin", "father", "thumb", "feather", "teeth"], img: "θ_card.jpg" },
         { type: "game", title: "Game /ð/", pairs: ["father", "together", "clothing", "feather", "weather"], img: "ð_card.jpg" }
     ],
 
@@ -720,6 +720,10 @@ const DataEngine = {
         return [];
     }
 };
+
+/* ==========================================================================
+   PHẦN 3: LOGIC ENGINES (GAME, SNAKE, AUDIO, LEARNING)
+   ========================================================================== */
 
 /* --- 3.2 AUDIO ENGINE --- */
 const AudioEngine = {
@@ -810,7 +814,7 @@ const GameEngine = {
             if(original) { 
                 cards.push({ id: key, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
                 
-                // TẠO HTML TEXT VỚI CẤU TRÚC MỚI
+                // TẠO HTML TEXT VỚI CẤU TRÚC MỚI (Fix lỗi xuống dòng)
                 let htmlText = `<div class="game-card-text">`; 
                 original.parts.forEach(p => { 
                     htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; 
@@ -956,6 +960,7 @@ const SnakeEngine = {
         
         // --- SỬA ĐỔI VERSION 1.1: Ẩn phiên âm nếu là CÂU ---
         let ipaHtml = "";
+        // Nếu không phải loại 'sent' (câu) VÀ độ dài từ < 2 (tức là từ đơn) thì mới hiện IPA
         if (correctWord.type !== 'sent' && correctWord.speak.split(' ').length < 2) {
              let ipaStr = "";
              if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); }
@@ -1016,7 +1021,42 @@ const LearningEngine = {
             btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="App.enterGame()">  🚀   Chơi Ngay</button>`;
         } else {
             imgEl.src = item.img; btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()">  🎤   Đọc Ngay</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()">  🔊   Nghe Lại</button> `;
-            let html = ''; item.parts.forEach((p) => { if (p.t === " ") html += `<div class="spacer"></div>`; else { const ipaHtml = p.i ? p.i : "&nbsp;"; const textClass = (item.type === 'sent') ? 'sent-text' : 'cb-text'; const ipaClass = (item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'; html += `<div class="char-block"><div class="${ipaClass}">${ipaHtml}</div><div class="${textClass}">${p.t}</div></div>`; } }); infoDisplay.innerHTML = html;
+            
+            // --- LOGIC HIỂN THỊ MỚI: DÙNG WORD-GROUP ---
+            let html = '';
+            // Tách các phần tử theo khoảng trắng để gom nhóm
+            let currentWordBuffer = [];
+            
+            item.parts.forEach((p, index) => {
+                if (p.t === " ") {
+                    // Kết thúc 1 từ -> Render buffer
+                    if (currentWordBuffer.length > 0) {
+                        html += `<div class="word-group">`;
+                        currentWordBuffer.forEach(subP => {
+                            const ipaHtml = subP.i || "&nbsp;";
+                            html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+                        });
+                        html += `</div>`; // Đóng word-group
+                        currentWordBuffer = [];
+                    }
+                    // Thêm khoảng trắng (dùng margin right của word-group nên không cần div spacer nữa, nhưng giữ logic cũ cho an toàn)
+                    // html += `<div class="spacer"></div>`; 
+                } else {
+                    currentWordBuffer.push(p);
+                }
+            });
+            
+            // Render từ cuối cùng nếu còn
+            if (currentWordBuffer.length > 0) {
+                html += `<div class="word-group">`;
+                currentWordBuffer.forEach(subP => {
+                    const ipaHtml = subP.i || "&nbsp;";
+                    html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+                });
+                html += `</div>`;
+            }
+            
+            infoDisplay.innerHTML = html;
         }
     },
     nav: function(d) { if(this.idx + d >= 0 && this.idx + d < this.currentData.length) { this.idx += d; this.render(); } }, nextItem: function() { this.nav(1); },
