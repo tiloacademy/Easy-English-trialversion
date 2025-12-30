@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh (v1.9)</title>
+<title>Bé Học Tiếng Anh (v1.10)</title>
 <style>
 /* --- CSS CƠ BẢN --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,7 +30,7 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .learn-img-wrapper { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
 #learn-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 15px; }
 
-/* HIỂN THỊ CHỮ: Group theo từ để tránh ngắt dòng sai */
+/* HIỂN THỊ CHỮ: Group theo từ */
 .info-area { 
     min-height: 110px; flex-shrink: 0; 
     display: flex; flex-direction: row; flex-wrap: wrap; 
@@ -355,7 +355,7 @@ const LevelMap = [
     { id: 24, type: 'game',  label: 'Game /θ/', color: '#ff9600', gameIndex: 0 },
     { id: 24, type: 'game',  label: 'Game /ð/', color: '#a322ea', gameIndex: 1 },
     { id: 25, type: 'learn', label: 'Bài 25: /ks/ & /kw/', color: '#58cc02' },
-    { id: 25, type: 'game',  label: 'Game /ks/', color: '#ff9600', gameIndex: 1 }, /* ks is usually x */
+    { id: 25, type: 'game',  label: 'Game /ks/', color: '#ff9600', gameIndex: 1 },
     { id: 25, type: 'game',  label: 'Game /kw/', color: '#a322ea', gameIndex: 0 }
 ];
 
@@ -567,59 +567,59 @@ const DataEngine = {
         { type: "game", title: "Game /ɜːr/", pairs: ["teacher", "doctor", "burger", "sister", "rubber"], img: "ɜːr_card.jpg" }
     ],
     lesson16: [
-        { img: "gear.jpg", speak: "gear", parts: [{t:"g"}, {i:"ɪr", t:"ear"}] },
-        { img: "deer.jpg", speak: "deer", parts: [{t:"d"}, {i:"ɪr", t:"eer"}] },
-        { img: "cheer.jpg", speak: "cheer", parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
-        { img: "tear.jpg", speak: "tear", parts: [{t:"t"}, {i:"ɪr", t:"ear"}] },
-        { img: "ear.jpg", speak: "ear", parts: [{i:"ɪr", t:"ear"}] },
-        { img: "bear.jpg", speak: "bear", parts: [{t:"b"}, {i:"er", t:"ear"}] },
-        { img: "pear.jpg", speak: "pear", parts: [{t:"p"}, {i:"er", t:"ear"}] },
-        { img: "share.jpg", speak: "share", parts: [{i:"ʃ", t:"sh"}, {i:"er", t:"are"}] },
-        { img: "stair.jpg", speak: "stair", parts: [{t:"s"}, {t:"t"}, {i:"er", t:"air"}] },
-        { img: "chair.jpg", speak: "chair", parts: [{i:"tʃ", t:"ch"}, {i:"er", t:"air"}] },
+        { img: "gear.jpg", speak: "gear", pre: "ear", parts: [{t:"g"}, {i:"ɪr", t:"ear"}] },
+        { img: "deer.jpg", speak: "deer", pre: "ear", parts: [{t:"d"}, {i:"ɪr", t:"eer"}] },
+        { img: "cheer.jpg", speak: "cheer", pre: "ear", parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
+        { img: "tear.jpg", speak: "tear", pre: "ear", parts: [{t:"t"}, {i:"ɪr", t:"ear"}] },
+        { img: "ear.jpg", speak: "ear", pre: "ear", parts: [{i:"ɪr", t:"ear"}] },
+        { img: "bear.jpg", speak: "bear", pre: "air", parts: [{t:"b"}, {i:"er", t:"ear"}] },
+        { img: "pear.jpg", speak: "pear", pre: "air", parts: [{t:"p"}, {i:"er", t:"ear"}] },
+        { img: "share.jpg", speak: "share", pre: "air", parts: [{i:"ʃ", t:"sh"}, {i:"er", t:"are"}] },
+        { img: "stair.jpg", speak: "stair", pre: "air", parts: [{t:"s"}, {t:"t"}, {i:"er", t:"air"}] },
+        { img: "chair.jpg", speak: "chair", pre: "air", parts: [{i:"tʃ", t:"ch"}, {i:"er", t:"air"}] },
         { type: "sent", img: "sentence_deer.jpg", speak: "The deer is near the chair", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪr", t:"eer"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"n"}, {i:"ɪr", t:"ear"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"er", t:"air."}] },
         { type: "sent", img: "sentence_bear.jpg", speak: "The bear shares the pear", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {i:"er", t:"ear"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"er", t:"are"}, {t:"s"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"p"}, {i:"er", t:"ear."}] },
         { type: "game", title: "Game /ɪr/", pairs: ["gear", "deer", "cheer", "tear", "ear"], img: "ɪr_card.jpg" },
         { type: "game", title: "Game /er/", pairs: ["bear", "pear", "share", "stair", "chair"], img: "er_card.jpg" }
     ],
     lesson17: [
-        { img: "shower.jpg", speak: "shower", parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
-        { img: "shout.jpg", speak: "shout", parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {t:"t"}] },
-        { img: "cow.jpg", speak: "cow", parts: [{i:"k", t:"c"}, {i:"aʊ", t:"ow"}] },
-        { img: "brown.jpg", speak: "brown", parts: [{t:"b"}, {t:"r"}, {i:"aʊ", t:"ow"}, {t:"n"}] },
-        { img: "tower.jpg", speak: "tower", parts: [{t:"t"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
-        { img: "toe.jpg", speak: "toe", parts: [{t:"t"}, {i:"oʊ", t:"oe"}] },
-        { img: "boat.jpg", speak: "boat", parts: [{t:"b"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
-        { img: "coat.jpg", speak: "coat", parts: [{i:"k", t:"c"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
-        { img: "phone.jpg", speak: "phone", parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {t:"n"}, {i:"_", t:"e"}] },
-        { img: "goat.jpg", speak: "goat", parts: [{t:"g"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
+        { img: "shower.jpg", speak: "shower", pre: "ow", parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
+        { img: "shout.jpg", speak: "shout", pre: "ow", parts: [{i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {t:"t"}] },
+        { img: "cow.jpg", speak: "cow", pre: "ow", parts: [{i:"k", t:"c"}, {i:"aʊ", t:"ow"}] },
+        { img: "brown.jpg", speak: "brown", pre: "ow", parts: [{t:"b"}, {t:"r"}, {i:"aʊ", t:"ow"}, {t:"n"}] },
+        { img: "tower.jpg", speak: "tower", pre: "ow", parts: [{t:"t"}, {i:"aʊ", t:"ow"}, {i:"ər", t:"er"}] },
+        { img: "toe.jpg", speak: "toe", pre: "oh", parts: [{t:"t"}, {i:"oʊ", t:"oe"}] },
+        { img: "boat.jpg", speak: "boat", pre: "oh", parts: [{t:"b"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
+        { img: "coat.jpg", speak: "coat", pre: "oh", parts: [{i:"k", t:"c"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
+        { img: "phone.jpg", speak: "phone", pre: "oh", parts: [{i:"f", t:"ph"}, {i:"oʊ", t:"o"}, {t:"n"}, {i:"_", t:"e"}] },
+        { img: "goat.jpg", speak: "goat", pre: "oh", parts: [{t:"g"}, {i:"oʊ", t:"oa"}, {t:"t"}] },
         { type: "sent", img: "sentence_cow.jpg", speak: "The brown cow shouts at the mouse", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {t:"r"}, {i:"aʊ", t:"ow"}, {t:"n"}, {t:" "}, {i:"k", t:"c"}, {i:"aʊ", t:"ow"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"aʊ", t:"ou"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"t"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"aʊ", t:"ou"}, {t:"s"}, {i:"_", t:"e."}] },
         { type: "sent", img: "sentence_joe.jpg", speak: "Joe shows the slow goat the soap", parts: [{i:"dʒ", t:"J"}, {i:"oʊ", t:"oe"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"oʊ", t:"ow"}, {i:"z", t:"s"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"s"}, {t:"l"}, {i:"oʊ", t:"ow"}, {t:" "}, {t:"g"}, {i:"oʊ", t:"oa"}, {t:"t"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"s"}, {i:"oʊ", t:"oa"}, {t:"p."}] },
         { type: "game", title: "Game /aʊ/", pairs: ["cow", "brown", "shout", "tower", "shower"], img: "aʊ_card.jpg" },
         { type: "game", title: "Game /oʊ/", pairs: ["toe", "boat", "coat", "phone", "goat"], img: "oʊ_card.jpg" }
     ],
     lesson18: [
-        { img: "face.jpg", speak: "face", parts: [{t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
-        { img: "cake.jpg", speak: "cake", parts: [{i:"k", t:"c"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}] },
-        { img: "cave.jpg", speak: "cave", parts: [{i:"k", t:"c"}, {i:"eɪ", t:"a"}, {t:"v"}, {i:"_", t:"e"}] },
-        { img: "baby.jpg", speak: "baby", parts: [{t:"b"}, {i:"eɪ", t:"a"}, {t:"b"}, {i:"i", t:"y"}] },
-        { img: "baker.jpg", speak: "baker", parts: [{t:"b"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ər", t:"er"}] },
-        { img: "kite.jpg", speak: "kite", parts: [{t:"k"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e"}] },
-        { img: "bike.jpg", speak: "bike", parts: [{t:"b"}, {i:"aɪ", t:"i"}, {t:"k"}, {i:"_", t:"e"}] },
-        { img: "tie.jpg", speak: "tie", parts: [{t:"t"}, {i:"aɪ", t:"ie"}] },
-        { img: "pine.jpg", speak: "pine", parts: [{t:"p"}, {i:"aɪ", t:"i"}, {t:"n"}, {i:"_", t:"e"}] },
-        { img: "cry.jpg", speak: "cry", parts: [{i:"k", t:"c"}, {t:"r"}, {i:"aɪ", t:"y"}] },
+        { img: "face.jpg", speak: "face", pre: "ay", parts: [{t:"f"}, {i:"eɪ", t:"a"}, {i:"s", t:"c"}, {i:"_", t:"e"}] },
+        { img: "cake.jpg", speak: "cake", pre: "ay", parts: [{i:"k", t:"c"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"_", t:"e"}] },
+        { img: "cave.jpg", speak: "cave", pre: "ay", parts: [{i:"k", t:"c"}, {i:"eɪ", t:"a"}, {t:"v"}, {i:"_", t:"e"}] },
+        { img: "baby.jpg", speak: "baby", pre: "ay", parts: [{t:"b"}, {i:"eɪ", t:"a"}, {t:"b"}, {i:"i", t:"y"}] },
+        { img: "baker.jpg", speak: "baker", pre: "ay", parts: [{t:"b"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ər", t:"er"}] },
+        { img: "kite.jpg", speak: "kite", pre: "eye", parts: [{t:"k"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e"}] },
+        { img: "bike.jpg", speak: "bike", pre: "eye", parts: [{t:"b"}, {i:"aɪ", t:"i"}, {t:"k"}, {i:"_", t:"e"}] },
+        { img: "tie.jpg", speak: "tie", pre: "eye", parts: [{t:"t"}, {i:"aɪ", t:"ie"}] },
+        { img: "pine.jpg", speak: "pine", pre: "eye", parts: [{t:"p"}, {i:"aɪ", t:"i"}, {t:"n"}, {i:"_", t:"e"}] },
+        { img: "cry.jpg", speak: "cry", pre: "eye", parts: [{i:"k", t:"c"}, {t:"r"}, {i:"aɪ", t:"y"}] },
         { type: "sent", img: "sentence_vase.jpg", speak: "Kate paints a vase", parts: [{t:"K"}, {i:"eɪ", t:"a"}, {t:"t"}, {i:"_", t:"e"}, {t:" "}, {t:"p"}, {i:"eɪ", t:"ai"}, {t:"n"}, {t:"t"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"v"}, {i:"eɪ", t:"a"}, {t:"s"}, {i:"_", t:"e."}] },
         { type: "sent", img: "sentence_tiger.jpg", speak: "A tiger bites a kite", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"t"}, {i:"aɪ", t:"i"}, {t:"g"}, {i:"ər", t:"er"}, {t:" "}, {t:"b"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"k"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e."}] },
         { type: "game", title: "Game /eɪ/ (Mole)", gameType: 'mole', phoneme: "eɪ", img: "eɪ_card.jpg" },
         { type: "game", title: "Game /aɪ/ (Mole)", gameType: 'mole', phoneme: "aɪ", img: "aɪ_card.jpg" }
     ],
     lesson19: [
-        { img: "coin.jpg", speak: "coin", parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
-        { img: "point.jpg", speak: "point", parts: [{t:"p"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:"t"}] },
-        { img: "joy.jpg", speak: "joy", parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "boy.jpg", speak: "boy", parts: [{t:"b"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "toy.jpg", speak: "toy", parts: [{t:"t"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "coin.jpg", speak: "coin", pre: "oy", parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
+        { img: "point.jpg", speak: "point", pre: "oy", parts: [{t:"p"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:"t"}] },
+        { img: "joy.jpg", speak: "joy", pre: "oy", parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "boy.jpg", speak: "boy", pre: "oy", parts: [{t:"b"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "toy.jpg", speak: "toy", pre: "oy", parts: [{t:"t"}, {i:"ɔɪ", t:"oy"}] },
         { img: "otter.jpg", speak: "otter", parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
         { img: "butter.jpg", speak: "butter", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
         { img: "kitty.jpg", speak: "kitty", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i", t:"y"}] },
@@ -657,8 +657,8 @@ const DataEngine = {
         { img: "hippo.jpg", speak: "hippo", parts: [{t:"h"}, {i:"ɪ", t:"i"}, {t:"pp"}, {i:"oʊ", t:"o"}] },
         { img: "heart.jpg", speak: "heart", parts: [{t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t"}] },
         { img: "horse.jpg", speak: "horse", parts: [{t:"h"}, {i:"ɔ:r", t:"or"}, {t:"s"}, {i:"_", t:"e"}] },
-        { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}, {t:" "}, {i:"ɪ", t:"i"}, {i:"z", t:"s"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {i:"ə", t:"a"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"z"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"f"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ə", t:"a"}, {t:"m"}, {i:"ɪ ŋ", t:"in"}, {t:"g"}, {i:"oʊ", t:"o."}] },
-        { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{t:"H"}, {i:"iː", t:"e"}, {t:" "}, {t:"h"}, {i:"oʊ", t:"o"}, {t:"p"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {i:"z", t:"s"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y."}] },
+        { type: "sent", img: "sentence_monkey.jpg", speak: "The monkey is making an amazing gift for the flamingo", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"m"}, {i:"ʌ ŋ", t:"on"}, {t:"k"}, {i:"i", t:"ey"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"k"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {i:"ə", t:"a"}, {t:"n"}, {t:" "}, {i:"ə", t:"a"}, {t:"m"}, {i:"eɪ", t:"a"}, {t:"z"}, {i:"ɪ ŋ", t:"ing"}, {t:" "}, {t:"g"}, {i:"ɪ", t:"i"}, {t:"f"}, {t:"t"}, {t:" "}, {t:"f"}, {i:"ɔːr", t:"or"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"f"}, {t:"l"}, {i:"ə", t:"a"}, {t:"m"}, {i:"ɪ ŋ", t:"in"}, {t:"g"}, {i:"oʊ", t:"o."}] },
+        { type: "sent", img: "sentence_he.jpg", speak: "He hopes his sister is happy", parts: [{t:"H"}, {i:"iː", t:"e"}, {t:" "}, {t:"h"}, {i:"oʊ", t:"o"}, {t:"p"}, {i:"_", t:"e"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"s"}, {i:"ɪ", t:"i"}, {t:"s"}, {t:"t"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"s"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y."}] },
         { type: "game", title: "Game /ŋ/", pairs: ["sing", "finger", "king", "kingfisher", "monkey"], img: "ŋ_card.jpg" },
         { type: "game", title: "Game /h/", pairs: ["hat", "hen", "hippo", "heart", "horse"], img: "h_card.jpg" }
     ],
@@ -705,54 +705,24 @@ const DataEngine = {
         { img: "clothing.jpg", speak: "clothing", parts: [{i:"k", t:"c"}, {t:"l"}, {i:"oʊ", t:"o"}, {i:"ð", t:"th"}, {i:"ɪ ŋ", t:"ing"}] },
         { img: "feather.jpg", speak: "feather", parts: [{t:"f"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
         { img: "weather.jpg", speak: "weather", parts: [{t:"w"}, {i:"e", t:"ea"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}] },
-        { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ", t:"Th"}, {i:"ɪ ŋ", t:"in"}, {t:"k"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {i:"θ", t:"th"}, {i:"ɪ ŋ", t:"ing"}, {i:"z", t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"s"}, {i:"eɪ", t:"ay"}, {t:" "}, {i:"θ", t:"th"}, {i:"æ", t:"a"}, {i:"ŋ", t:"n"}, {t:"k"}, {t:" "}, {i:"j", t:"y"}, {i:"uː", t:"ou"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"v"}, {i:"_", t:"e"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y"}, {t:" "}, {t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t."}] },
+        { type: "sent", img: "sentence_think.jpg", speak: "Think good things and say thank you to have a happy heart", parts: [{i:"θ", t:"Th"}, {i:"ɪ ŋ", t:"in"}, {t:"k"}, {t:" "}, {t:"g"}, {i:"ʊ", t:"oo"}, {t:"d"}, {t:" "}, {i:"θ", t:"th"}, {i:"ɪ ŋ", t:"ing"}, {i:"z", t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {t:"s"}, {i:"eɪ", t:"ay"}, {t:" "}, {i:"θ", t:"th"}, {i:"æ", t:"a"}, {i:"ŋ", t:"n"}, {t:"k"}, {t:" "}, {i:"j", t:"y"}, {i:"uː", t:"ou"}, {t:" "}, {t:"t"}, {i:"uː", t:"o"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"v"}, {i:"_", t:"e"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"h"}, {i:"æ", t:"a"}, {t:"pp"}, {i:"i", t:"y"}, {t:" "}, {t:"h"}, {i:"ɑ:r", t:"ear"}, {t:"t."}] },
         { type: "sent", img: "sentence_they.jpg", speak: "They help their mother with the dishes", parts: [{i:"ð", t:"Th"}, {i:"eɪ", t:"ey"}, {t:" "}, {t:"h"}, {i:"e", t:"e"}, {t:"l"}, {t:"p"}, {t:" "}, {i:"ð", t:"th"}, {i:"e", t:"ei"}, {t:"r"}, {t:" "}, {t:"m"}, {i:"ʌ", t:"o"}, {i:"ð", t:"th"}, {i:"ər", t:"er"}, {t:" "}, {t:"w"}, {i:"ɪ", t:"i"}, {i:"ð", t:"th"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪ", t:"i"}, {i:"ʃ", t:"sh"}, {i:"ɪ", t:"e"}, {i:"z", t:"s."}] },
         { type: "game", title: "Game /θ/", pairs: ["thin", "father", "thumb", "feather", "teeth"], img: "θ_card.jpg" },
         { type: "game", title: "Game /ð/", pairs: ["father", "together", "clothing", "feather", "weather"], img: "ð_card.jpg" }
     ],
     lesson25: [
-        // Âm /kw/ (queen, question, quiet, quail, quill)
         { img: "queen.jpg", speak: "queen", parts: [{i:"k w", t:"qu"}, {i:"iː", t:"een"}] },
         { img: "question.jpg", speak: "question", parts: [{i:"k w", t:"qu"}, {i:"e", t:"es"}, {i:"tʃ ə", t:"tio"}, {t:"n"}] },
         { img: "quiet.jpg", speak: "quiet", parts: [{i:"k w", t:"qu"}, {i:"aɪ", t:"i"}, {i:"ə", t:"e"}, {t:"t"}] },
         { img: "quail.jpg", speak: "quail", parts: [{i:"k w", t:"qu"}, {i:"eɪ", t:"ail"}] },
         { img: "quill.jpg", speak: "quill", parts: [{i:"k w", t:"qu"}, {i:"ɪ", t:"i"}, {t:"ll"}] },
-
-        // Âm /ks/ (axe, taxi, six, box, fox)
         { img: "axe.jpg", speak: "axe", parts: [{i:"æ", t:"a"}, {i:"k s", t:"x"}, {i:"_", t:"e"}] },
         { img: "taxi.jpg", speak: "taxi", parts: [{t:"t"}, {i:"æ", t:"a"}, {i:"k s", t:"x"}, {i:"i", t:"i"}] },
         { img: "six.jpg", speak: "six", parts: [{t:"s"}, {i:"ɪ", t:"i"}, {i:"k s", t:"x"}] },
         { img: "box.jpg", speak: "box", parts: [{t:"b"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}] },
         { img: "fox.jpg", speak: "fox", parts: [{t:"f"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}] },
-
-        // Câu 1: Be quiet and ask a quick question to learn.
-        { type: "sent", img: "sentence_quiet.jpg", speak: "Be quiet and ask a quick question to learn", parts: [
-            {t:"B"}, {i:"i:", t:"e"}, {t:" "}, 
-            {i:"k w", t:"qu"}, {i:"aɪ", t:"i"}, {i:"ə", t:"e"}, {t:"t"}, {t:" "}, 
-            {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, 
-            {i:"æ", t:"a"}, {t:"s"}, {t:"k"}, {t:" "}, 
-            {i:"ə", t:"a"}, {t:" "}, 
-            {i:"k w", t:"qu"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, 
-            {i:"k w", t:"qu"}, {i:"e", t:"es"}, {i:"tʃ ə", t:"tio"}, {t:"n"}, {t:" "}, 
-            {t:"t"}, {i:"u:", t:"o"}, {t:" "}, 
-            {t:"l"}, {i:"ɜːr", t:"ear"}, {t:"n."}
-        ]},
-
-        // Câu 2: Six kids and one fox relax around a box of toys.
-        { type: "sent", img: "sentence_six.jpg", speak: "Six kids and one fox relax around a box of toys", parts: [
-            {t:"S"}, {i:"ɪ", t:"i"}, {i:"k s", t:"x"}, {t:" "}, 
-            {t:"k"}, {i:"ɪ", t:"i"}, {t:"d"}, {i:"z", t:"s"}, {t:" "}, 
-            {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, 
-            {i:"w ʌ n", t:"one"}, {t:" "}, 
-            {t:"f"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}, {t:" "}, 
-            {t:"r"}, {i:"ɪ", t:"e"}, {t:"l"}, {i:"æ", t:"a"}, {i:"k s", t:"x"}, {t:" "}, 
-            {i:"ə", t:"a"}, {t:"r"}, {i:"aʊ", t:"ou"}, {t:"n"}, {t:"d"}, {t:" "}, 
-            {i:"ə", t:"a"}, {t:" "}, 
-            {t:"b"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}, {t:" "}, 
-            {i:"ʌ", t:"o"}, {t:"f"}, {t:" "}, 
-            {t:"t"}, {i:"ɔɪ", t:"oy"}, {i:"z", t:"s."}
-        ]},
-
+        { type: "sent", img: "sentence_quiet.jpg", speak: "Be quiet and ask a quick question to learn", parts: [{t:"B"}, {i:"i:", t:"e"}, {t:" "}, {i:"k w", t:"qu"}, {i:"aɪ", t:"i"}, {i:"ə", t:"e"}, {t:"t"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"æ", t:"a"}, {t:"s"}, {t:"k"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k w", t:"qu"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, {i:"k w", t:"qu"}, {i:"e", t:"es"}, {i:"tʃ ə", t:"tio"}, {t:"n"}, {t:" "}, {t:"t"}, {i:"u:", t:"o"}, {t:" "}, {t:"l"}, {i:"ɜːr", t:"ear"}, {t:"n."}] },
+        { type: "sent", img: "sentence_six.jpg", speak: "Six kids and one fox relax around a box of toys", parts: [{t:"S"}, {i:"ɪ", t:"i"}, {i:"k s", t:"x"}, {t:" "}, {t:"k"}, {i:"ɪ", t:"i"}, {t:"d"}, {i:"z", t:"s"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"w ʌ n", t:"one"}, {t:" "}, {t:"f"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}, {t:" "}, {t:"r"}, {i:"ɪ", t:"e"}, {t:"l"}, {i:"æ", t:"a"}, {i:"k s", t:"x"}, {t:" "}, {i:"ə", t:"a"}, {t:"r"}, {i:"aʊ", t:"ou"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"b"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}, {t:" "}, {i:"ʌ", t:"o"}, {t:"f"}, {t:" "}, {t:"t"}, {i:"ɔɪ", t:"oy"}, {i:"z", t:"s."}] },
         { type: "game", title: "Game /kw/", pairs: ["queen", "question", "quiet", "quail", "quill"], img: "kw_card.jpg" },
         { type: "game", title: "Game /ks/", pairs: ["axe", "taxi", "six", "box", "fox"], img: "ks_card.jpg" }
     ],
@@ -1102,10 +1072,56 @@ const LearningEngine = {
         }
     },
     nav: function(d) { if(this.idx + d >= 0 && this.idx + d < this.currentData.length) { this.idx += d; this.render(); } }, nextItem: function() { this.nav(1); },
-    onUserClickSpeak: function() { const item = this.currentData[this.idx]; if(item && item.type !== 'game') { let text = item.speak || item.parts.map(p => p.t).join(""); if(item.pre) text = item.pre + ". " + text; AudioEngine.playTTS(text); } },
+    onUserClickSpeak: function() { 
+        const item = this.currentData[this.idx]; 
+        if(item && item.type !== 'game') { 
+            let text = item.speak || item.parts.map(p => p.t).join(""); 
+            // Nếu có âm đệm (pre) và đây không phải là câu (sent), thì đọc âm đệm trước
+            if(item.pre && item.type !== 'sent') {
+                 text = item.pre + ". " + text;
+            }
+            AudioEngine.playTTS(text); 
+        } 
+    },
     startListening: function() { const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); const btn = document.getElementById('mic-btn'); btn.disabled = true; btn.innerText = "  👂   Đang nghe..."; btn.style.backgroundColor = "#e74c3c"; const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start(); recognition.onresult = (e) => { let heard = []; for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); this.checkResult(heard); }; recognition.onerror = () => { this.resetMic(); }; recognition.onend = () => { if(btn.disabled) this.resetMic(); }; },
     resetMic: function() { const btn = document.getElementById('mic-btn'); if(btn) { btn.disabled = false; btn.innerText = "  🎤   Đọc Ngay"; btn.style.backgroundColor = "#27ae60"; } },
-    checkResult: function(heardArray) { const item = this.currentData[this.idx]; const targetRaw = item.speak.toLowerCase().replace(/[.,!?]/g, "").trim(); let validAnswers = [targetRaw]; if (item.pre) validAnswers.push((item.pre + " " + targetRaw).toLowerCase()); let maxScore = 0; for (let text of heardArray) { let userText = text.trim(); for (let target of validAnswers) { if (userText.includes(target) || target.includes(userText)) maxScore = 100; } } let finalStars = 2; let msg = "Try again!"; if (maxScore >= 90) { finalStars = 5; msg = "Excellent!  🎉 "; AudioEngine.playEffect('win'); } else { AudioEngine.playEffect('wrong'); } let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars === 5) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); }
+    checkResult: function(heardArray) { 
+        const item = this.currentData[this.idx]; 
+        const targetRaw = item.speak.toLowerCase().replace(/[.,!?]/g, "").trim(); 
+        
+        // Tạo danh sách đáp án chấp nhận được
+        let validAnswers = [targetRaw]; 
+        
+        // Nếu có âm đệm, chấp nhận thêm đáp án có đọc âm đệm
+        if (item.pre) { 
+            validAnswers.push((item.pre + " " + targetRaw).toLowerCase()); 
+        } 
+        
+        let maxScore = 0; 
+        for (let text of heardArray) { 
+            let userText = text.trim(); 
+            for (let target of validAnswers) { 
+                if (userText.includes(target) || target.includes(userText)) maxScore = 100; 
+            } 
+        } 
+        
+        let finalStars = 2; 
+        let msg = "Try again!"; 
+        if (maxScore >= 90) { 
+            finalStars = 5; 
+            msg = "Excellent!  🎉 "; 
+            AudioEngine.playEffect('win'); 
+        } else { 
+            AudioEngine.playEffect('wrong'); 
+        } 
+        
+        let s = ""; 
+        for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; 
+        document.getElementById('stars').innerText = s; 
+        document.getElementById('stars').className = (finalStars === 5) ? "stars active" : "stars"; 
+        document.getElementById('feedback').innerText = msg; 
+        this.resetMic(); 
+    }
 };
 
 const App = {
@@ -1136,7 +1152,7 @@ const App = {
     enterGame: function() { document.getElementById('learning-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; const item = LearningEngine.currentData[LearningEngine.idx]; 
     let vocabList = [];
     // Quét tìm bài học chứa item hiện tại
-    for(let i=1; i<=24; i++) { 
+    for(let i=1; i<=25; i++) { 
         if(!DataEngine["lesson"+i]) continue;
         const lesson = DataEngine.getLesson(i); 
         if (lesson.includes(item)) { 
