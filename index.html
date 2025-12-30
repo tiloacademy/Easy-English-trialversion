@@ -354,7 +354,10 @@ const LevelMap = [
     { id: 23, type: 'game',  label: 'Game /w/', color: '#a322ea', gameIndex: 1 },
     { id: 24, type: 'learn', label: 'Bài 24: /θ/ & /ð/', color: '#58cc02' },
     { id: 24, type: 'game',  label: 'Game /θ/', color: '#ff9600', gameIndex: 0 },
-    { id: 24, type: 'game',  label: 'Game /ð/', color: '#a322ea', gameIndex: 1 }
+    { id: 24, type: 'game',  label: 'Game /ð/', color: '#a322ea', gameIndex: 1 },
+    { id: 25, type: 'learn', label: 'Bài 25: /ks/ & /kw/', color: '#58cc02' },
+    { id: 25, type: 'game',  label: 'Game /kw/', color: '#ff9600', gameIndex: 0 },
+    { id: 25, type: 'game',  label: 'Game /ks/', color: '#a322ea', gameIndex: 1 }
 ];
 
 const DataEngine = {
@@ -708,7 +711,52 @@ const DataEngine = {
         { type: "game", title: "Game /θ/", pairs: ["thin", "father", "thumb", "feather", "teeth"], img: "θ_card.jpg" },
         { type: "game", title: "Game /ð/", pairs: ["father", "together", "clothing", "feather", "weather"], img: "ð_card.jpg" }
     ],
+lesson25: [
+        // Âm /kw/ (queen, question, quiet, quail, quill)
+        { img: "queen.jpg", speak: "queen", parts: [{i:"k w", t:"qu"}, {i:"iː", t:"een"}] },
+        { img: "question.jpg", speak: "question", parts: [{i:"k w", t:"qu"}, {i:"e", t:"es"}, {i:"tʃ ə n", t:"tion"}] },
+        { img: "quiet.jpg", speak: "quiet", parts: [{i:"k w", t:"qu"}, {i:"aɪ", t:"i"}, {i:"ə", t:"e"}, {t:"t"}] },
+        { img: "quail.jpg", speak: "quail", parts: [{i:"k w", t:"qu"}, {i:"eɪ", t:"ail"}] },
+        { img: "quill.jpg", speak: "quill", parts: [{i:"k w", t:"qu"}, {i:"ɪ", t:"i"}, {t:"ll"}] },
 
+        // Âm /ks/ (axe, taxi, six, box, fox)
+        { img: "axe.jpg", speak: "axe", parts: [{i:"æ", t:"a"}, {i:"k s", t:"x"}, {i:"_", t:"e"}] },
+        { img: "taxi.jpg", speak: "taxi", parts: [{t:"t"}, {i:"æ", t:"a"}, {i:"k s", t:"x"}, {i:"i", t:"i"}] },
+        { img: "six.jpg", speak: "six", parts: [{t:"s"}, {i:"ɪ", t:"i"}, {i:"k s", t:"x"}] },
+        { img: "box.jpg", speak: "box", parts: [{t:"b"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}] },
+        { img: "fox.jpg", speak: "fox", parts: [{t:"f"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}] },
+
+        // Câu 1: Be quiet and ask a quick question to learn.
+        { type: "sent", img: "sentence_quiet.jpg", speak: "Be quiet and ask a quick question to learn", parts: [
+            {t:"B"}, {i:"i:", t:"e"}, {t:" "}, 
+            {i:"k w", t:"qu"}, {i:"aɪ", t:"i"}, {i:"ə", t:"e"}, {t:"t"}, {t:" "}, 
+            {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, 
+            {i:"æ", t:"a"}, {t:"s"}, {t:"k"}, {t:" "}, 
+            {i:"ə", t:"a"}, {t:" "}, 
+            {i:"k w", t:"qu"}, {i:"ɪ", t:"i"}, {i:"k", t:"ck"}, {t:" "}, 
+            {i:"k w", t:"qu"}, {i:"e", t:"es"}, {i:"tʃ ə n", t:"tion"}, {t:" "}, 
+            {t:"t"}, {i:"u:", t:"o"}, {t:" "}, 
+            {t:"l"}, {i:"ɜːr", t:"ear"}, {t:"n."}
+        ]},
+
+        // Câu 2: Six kids and one fox relax around a box of toys.
+        { type: "sent", img: "sentence_six.jpg", speak: "Six kids and one fox relax around a box of toys", parts: [
+            {t:"S"}, {i:"ɪ", t:"i"}, {i:"k s", t:"x"}, {t:" "}, 
+            {t:"k"}, {i:"ɪ", t:"i"}, {t:"d"}, {t:"s"}, {t:" "}, 
+            {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, 
+            {t:"w"}, {i:"ʌ", t:"o"}, {t:"n"}, {i:"_", t:"e"}, {t:" "}, 
+            {t:"f"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}, {t:" "}, 
+            {t:"r"}, {i:"ɪ", t:"e"}, {t:"l"}, {i:"æ", t:"a"}, {i:"k s", t:"x"}, {t:" "}, 
+            {i:"ə", t:"a"}, {t:"r"}, {i:"aʊ", t:"ou"}, {t:"n"}, {t:"d"}, {t:" "}, 
+            {i:"ə", t:"a"}, {t:" "}, 
+            {t:"b"}, {i:"ɑ", t:"o"}, {i:"k s", t:"x"}, {t:" "}, 
+            {i:"ʌ", t:"o"}, {t:"f"}, {t:" "}, 
+            {t:"t"}, {i:"ɔɪ", t:"oy"}, {t:"s."}
+        ]},
+
+        { type: "game", title: "Game /kw/", pairs: ["queen", "question", "quiet", "quail", "quill"], img: "kw_card.jpg" },
+        { type: "game", title: "Game /ks/", pairs: ["axe", "taxi", "six", "box", "fox"], img: "ks_card.jpg" }
+    ],
     getLesson: function(num) {
         if(this["lesson" + num]) return this["lesson" + num];
         return [];
@@ -1105,3 +1153,4 @@ window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if 
 </script>
 </body>
 </html>
+
