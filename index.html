@@ -504,29 +504,30 @@ const DataEngine = {
         { type: "game", title: "Game /ə/", pairs: ["salad", "lemon", "chicken", "kitchen", "panda"], img: "ə_card.jpg" },
         { type: "game", title: "Game /ɜːr/", pairs: ["teacher", "doctor", "burger", "sister", "rubber"], img: "ɜːr_card.jpg" }
     ],
-    lesson16: [
-        // Âm /ɪr/ -> Mã pre: "ir" (Hệ thống sẽ tìm file sound_ir.wav)
+   lesson16: [
         { img: "gear.jpg", speak: "gear", pre: "ir", parts: [{t:"g"}, {i:"ɪr", t:"ear"}] },
         { img: "deer.jpg", speak: "deer", pre: "ir", parts: [{t:"d"}, {i:"ɪr", t:"eer"}] },
         { img: "cheer.jpg", speak: "cheer", pre: "ir", parts: [{i:"tʃ", t:"ch"}, {i:"ɪr", t:"eer"}] },
         
-        // ĐÃ SỬA: tear -> phiên âm /ɪr/ (không phải /er/)
-        { img: "tear.jpg", speak: "tear", pre: "ir", parts: [{t:"t"}, {i:"ɪr", t:"ear"}] },
+        // --- SỬA LỖI ĐỌC TỪ "TEAR" ---
+        // Hiển thị (parts): Vẫn là chữ "t" + "ear"
+        // Đọc (speak): Đổi thành "tier" để máy luôn đọc âm /tɪr/
+        { img: "tear.jpg", speak: "tier", pre: "ir", parts: [{t:"t"}, {i:"ɪr", t:"ear"}] },
         
         { img: "ear.jpg", speak: "ear", pre: "ir", parts: [{i:"ɪr", t:"ear"}] },
         
-        // Âm /er/ -> Mã pre: "er" (Hệ thống sẽ tìm file sound_er.wav)
+        // Các từ âm /er/
         { img: "bear.jpg", speak: "bear", pre: "er", parts: [{t:"b"}, {i:"er", t:"ear"}] },
         { img: "pear.jpg", speak: "pear", pre: "er", parts: [{t:"p"}, {i:"er", t:"ear"}] },
         { img: "share.jpg", speak: "share", pre: "er", parts: [{i:"ʃ", t:"sh"}, {i:"er", t:"are"}] },
         { img: "stair.jpg", speak: "stair", pre: "er", parts: [{t:"s"}, {t:"t"}, {i:"er", t:"air"}] },
         { img: "chair.jpg", speak: "chair", pre: "er", parts: [{i:"tʃ", t:"ch"}, {i:"er", t:"air"}] },
         
-        // Câu (Giữ nguyên)
+        // Câu
         { type: "sent", img: "sentence_deer.jpg", speak: "The deer is near the chair", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"d"}, {i:"ɪr", t:"eer"}, {t:" "}, {i:"ɪ", t:"i"}, {i:"z", t:"s"}, {t:" "}, {t:"n"}, {i:"ɪr", t:"ear"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {i:"tʃ", t:"ch"}, {i:"er", t:"air."}] },
         { type: "sent", img: "sentence_bear.jpg", speak: "The bear shares the pear", parts: [{i:"ð", t:"Th"}, {i:"ə", t:"e"}, {t:" "}, {t:"b"}, {i:"er", t:"ear"}, {t:" "}, {i:"ʃ", t:"sh"}, {i:"er", t:"are"}, {i:"z", t:"s"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"p"}, {i:"er", t:"ear."}] },
         
-        // Game (Giữ nguyên)
+        // Game
         { type: "game", title: "Game /ɪr/", pairs: ["gear", "deer", "cheer", "tear", "ear"], img: "ɪr_card.jpg" },
         { type: "game", title: "Game /er/", pairs: ["bear", "pear", "share", "stair", "chair"], img: "er_card.jpg" }
     ],
@@ -1134,4 +1135,5 @@ window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if 
 </script>
 </body>
 </html>
+
 
