@@ -564,18 +564,25 @@ const DataEngine = {
         { type: "game", title: "Game /aɪ/ (Mole)", gameType: 'mole', phoneme: "aɪ", img: "aɪ_card.jpg" }
     ],
     lesson19: [
-        { img: "coin.jpg", speak: "coin", pre: "oi", parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
-        { img: "point.jpg", speak: "point", pre: "oi", parts: [{t:"p"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:"t"}] },
-        { img: "joy.jpg", speak: "joy", pre: "oi", parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "boy.jpg", speak: "boy", pre: "oi", parts: [{t:"b"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "toy.jpg", speak: "toy", pre: "oi", parts: [{t:"t"}, {i:"ɔɪ", t:"oy"}] },
-        { img: "otter.jpg", speak: "otter", parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
-        { img: "butter.jpg", speak: "butter", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
-        { img: "kitty.jpg", speak: "kitty", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i", t:"y"}] },
-        { img: "party.jpg", speak: "party", parts: [{t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
-        { img: "city.jpg", speak: "city", parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
+        // Âm /ɔɪ/ (Giữ nguyên pre="oy" -> sound_oy.wav)
+        { img: "coin.jpg", speak: "coin", pre: "oy", parts: [{i:"k", t:"c"}, {i:"ɔɪ", t:"oin"}] },
+        { img: "point.jpg", speak: "point", pre: "oy", parts: [{t:"p"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:"t"}] },
+        { img: "joy.jpg", speak: "joy", pre: "oy", parts: [{i:"dʒ", t:"j"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "boy.jpg", speak: "boy", pre: "oy", parts: [{t:"b"}, {i:"ɔɪ", t:"oy"}] },
+        { img: "toy.jpg", speak: "toy", pre: "oy", parts: [{t:"t"}, {i:"ɔɪ", t:"oy"}] },
+
+        // Âm /t̬/ -> CẬP NHẬT: Thêm pre="flapt" để gọi file sound_flapt.wav
+        { img: "otter.jpg", speak: "otter", pre: "flapt", parts: [{i:"ɑ", t:"o"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
+        { img: "butter.jpg", speak: "butter", pre: "flapt", parts: [{t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}] },
+        { img: "kitty.jpg", speak: "kitty", pre: "flapt", parts: [{t:"k"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"tt"}, {i:"i", t:"y"}] },
+        { img: "party.jpg", speak: "party", pre: "flapt", parts: [{t:"p"}, {i:"ɑ:r", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
+        { img: "city.jpg", speak: "city", pre: "flapt", parts: [{i:"s", t:"c"}, {i:"ɪ", t:"i"}, {i:"t̬", t:"t"}, {i:"i", t:"y"}] },
+
+        // Câu (Giữ nguyên)
         { type: "sent", img: "sentence_boy.jpg", speak: "A boy drops a coin and a toy", parts: [{i:"ə", t:"A"}, {t:" "}, {t:"b"}, {i:"ɔɪ", t:"oy"}, {t:" "}, {t:"d"}, {t:"r"}, {i:"ɑ", t:"o"}, {t:"p"}, {t:"s"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {i:"k", t:"c"}, {i:"ɔɪ", t:"oi"}, {t:"n"}, {t:" "}, {i:"æ", t:"a"}, {t:"n"}, {t:"d"}, {t:" "}, {i:"ə", t:"a"}, {t:" "}, {t:"t"}, {i:"ɔɪ", t:"oy."}] },
         { type: "sent", img: "sentence_peter.jpg", speak: "Peter got butter in the party", parts: [{t:"P"}, {i:"iː", t:"e"}, {i:"t̬", t:"t"}, {i:"ər", t:"er"}, {t:" "}, {t:"g"}, {i:"ɑ", t:"o"}, {t:"t"}, {t:" "}, {t:"b"}, {i:"ʌ", t:"u"}, {i:"t̬", t:"tt"}, {i:"ər", t:"er"}, {t:" "}, {i:"ɪ", t:"i"}, {t:"n"}, {t:" "}, {i:"ð", t:"th"}, {i:"ə", t:"e"}, {t:" "}, {t:"p"}, {i:"ɑːr", t:"ar"}, {i:"t̬", t:"t"}, {i:"i", t:"y."}] },
+        
+        // Game (Giữ nguyên)
         { type: "game", title: "Game /ɔɪ/ (Snake)", gameType: 'snake', phoneme: "ɔɪ", img: "ɔɪ_card.jpg" },
         { type: "game", title: "Game /t̬/ (Snake)", gameType: 'snake', phoneme: "t̬", img: "t̬_card.jpg" }
     ],
@@ -1135,5 +1142,6 @@ window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if 
 </script>
 </body>
 </html>
+
 
 
