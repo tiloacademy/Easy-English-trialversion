@@ -1,0 +1,481 @@
+/* --- AUDIO ENGINE --- */
+const AudioEngine = {
+    isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"), currentUtterance: null,
+    unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
+    stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
+    stopCurrentSound: function() { window.speechSynthesis.cancel(); },
+    playTTS: function(text) { if (!this.isAudioAllowed) return; this.stopCurrentSound(); if ('speechSynthesis' in window) { window.currentUtterance = new SpeechSynthesisUtterance(text); window.currentUtterance.lang = 'en-US'; window.currentUtterance.rate = 0.9; window.speechSynthesis.speak(window.currentUtterance); } },
+    playSequence: function(soundFile, textToRead) {
+        if (!this.isAudioAllowed) return; this.stopCurrentSound(); const audio = new Audio(soundFile);
+        audio.onended = () => { if (textToRead) setTimeout(() => { this.playTTS(textToRead); }, 300); };
+        audio.onerror = () => { if (textToRead) this.playTTS(textToRead); };
+        audio.play().catch(e => { if (textToRead) this.playTTS(textToRead); });
+    },
+    playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
+};
+
+/* --- GAME ENGINES (WHACK-A-MOLE & FLIP) --- */
+const GameEngine = {
+    active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
+    score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
+    currentConfig: null, currentDataPool: [],
+    
+    WINNING_SCORE: 1000, 
+
+    start: function(config, dataPool) {
+        this.currentConfig = config; this.currentDataPool = dataPool;
+        if (config.gameType === 'snake') { SnakeEngine.start(config, dataPool); return; }
+        if (config.gameType === 'mole') { this.startMoleGame(); return; } 
+        this.startFlipGame();
+    },
+    restart: function() { if(this.currentConfig) this.start(this.currentConfig, this.currentDataPool); },
+    stop: function() {
+        this.active = false; clearInterval(this.moleAudioLoop); clearTimeout(this.moleLoop); clearInterval(this.timerInt); clearTimeout(this.hammerTimeout);
+        const allMoles = document.querySelectorAll('.mole'); allMoles.forEach(m => m.classList.remove('up', 'bonked'));
+        const hammer = document.getElementById('cursor-hammer'); if(hammer) hammer.classList.remove('active');
+        SnakeEngine.stop();
+    },
+    // MOLE Logic
+    startMoleGame: function() {
+        this.stop(); this.active = true; this.score = 0; this.sec = 0; this.updateScore(0);
+        this.moles = document.querySelectorAll('.mole');
+        document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
+        this.refillMoleWords();
+        if(this.moleRemainingWords.length === 0) return alert("Không có dữ liệu từ vựng!");
+        this.startTimer(); this.nextMoleRound();
+    },
+    refillMoleWords: function() { const targetPhoneme = this.currentConfig.phoneme; this.moleRemainingWords = this.currentDataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(targetPhoneme))).sort(() => 0.5 - Math.random()); },
+    nextMoleRound: function() {
+        if (!this.active) return;
+        if (this.score >= this.WINNING_SCORE) { this.win(); return; }
+        if (this.moleRemainingWords.length === 0) { this.refillMoleWords(); }
+        this.moleTarget = this.moleRemainingWords.pop();
+        let html = ''; this.moleTarget.parts.forEach(p => { const ipaHtml = p.i ? p.i : "&nbsp;"; html += `<div class="target-char"><div class="target-ipa">${ipaHtml}</div><div class="target-txt">${p.t}</div></div>`; });
+        document.getElementById('target-word-container').innerHTML = html;
+        AudioEngine.playTTS(this.moleTarget.speak); clearInterval(this.moleAudioLoop);
+        this.moleAudioLoop = setInterval(() => { if(this.active) AudioEngine.playTTS(this.moleTarget.speak); }, 2000);
+        this.peep();
+    },
+    peep: function() {
+        if (!this.active) return;
+        let speed = Math.max(600, 1500 - (this.score * 0.8)); const time = speed + Math.random() * 400; 
+        const hole = this.moles[Math.floor(Math.random() * this.moles.length)];
+        let isTarget = Math.random() < 0.4; let moleImgData = isTarget ? this.moleTarget : this.currentDataPool[Math.floor(Math.random() * this.currentDataPool.length)];
+        const imgEl = hole.querySelector('img'); imgEl.src = moleImgData.img; hole.dataset.speak = moleImgData.speak;
+        hole.classList.add('up');
+        this.moleLoop = setTimeout(() => { hole.classList.remove('up'); if (this.active) this.peep(); }, time);
+    },
+    bonk: function(moleEl, event) {
+        if(!moleEl.classList.contains('up') || !this.active) return;
+        let touchX = event.clientX || event.pageX; let touchY = event.clientY || event.pageY; this.spawnHammer(touchX, touchY);
+        const clickedWord = moleEl.dataset.speak;
+        if (clickedWord === this.moleTarget.speak) { AudioEngine.playEffect('correct'); moleEl.classList.add('bonked'); this.updateScore(100); this.showFloatingText(touchX, touchY, "+100", "yellow"); setTimeout(() => { moleEl.classList.remove('up', 'bonked'); clearTimeout(this.moleLoop); this.nextMoleRound(); }, 300); }
+        else { AudioEngine.playEffect('wrong'); moleEl.classList.remove('up'); this.updateScore(-50); this.showFloatingText(touchX, touchY, "-50", "red"); }
+    },
+    spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
+    // FLIP Logic
+    startFlipGame: function() {
+        this.stop(); this.active = true; this.sec = 0; this.matches = 0;
+        document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
+        const tower = document.getElementById('tower'); tower.innerHTML = '';
+        let cards = [];
+        
+        const validWords = this.currentConfig.pairs;
+        validWords.forEach(key => {
+            let original = this.currentDataPool.find(d => { 
+                if(d.type === 'game' || d.type === 'sent') return false; 
+                let fullWord = d.parts.map(p => p.t).join(""); 
+                return fullWord === key; 
+            });
+            if(original) { 
+                cards.push({ id: key, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
+                let htmlText = `<div class="game-card-text">`; 
+                original.parts.forEach(p => { 
+                    htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; 
+                }); 
+                htmlText += `</div>`; 
+                cards.push({ id: key, type: 'text', content: htmlText, speak: original.speak }); 
+            }
+        });
+        
+        cards.sort(() => 0.5 - Math.random());
+        let cCount = 0; let num = 1; const rows = [3, 2, 3, 2];
+        rows.forEach(cnt => {
+            const rowDiv = document.createElement('div'); rowDiv.className = 'tower-row';
+            for(let k=0; k<cnt; k++) {
+                if(cCount >= cards.length) break; 
+                const c = cards[cCount]; const el = document.createElement('div'); el.className = 'card-flip'; el.dataset.speak = c.speak; el.dataset.id = c.id;
+                el.innerHTML = `<div class="card-inner"><div class="face front">${num}</div><div class="face back">${c.content}</div></div>`;
+                el.onclick = function() { GameEngine.cardClick(this); }; rowDiv.appendChild(el); cCount++; num++;
+            }
+            tower.appendChild(rowDiv);
+        });
+        this.startTimer();
+    },
+    cardClick: function(el) {
+        if(el.classList.contains('flipped') || el.classList.contains('matched')) return;
+        el.classList.add('flipped'); AudioEngine.playTTS(el.dataset.speak);
+        if(!this.c1) { this.c1 = el; } else { this.c2 = el;
+            if(this.c1.dataset.id === this.c2.dataset.id) { setTimeout(() => { this.c1.classList.add('matched'); this.c2.classList.add('matched'); this.c1 = null; this.c2 = null; this.matches++; AudioEngine.playEffect('correct'); if(this.matches === 5) this.win(); }, 600); }
+            else { setTimeout(() => { this.c1.classList.remove('flipped'); this.c2.classList.remove('flipped'); this.c1 = null; this.c2 = null; AudioEngine.playEffect('wrong'); }, 1000); }
+        }
+    },
+    startTimer: function() { clearInterval(this.timerInt); document.getElementById('timer').innerText = "00:00"; this.timerInt = setInterval(() => { this.sec++; let m=Math.floor(this.sec/60).toString().padStart(2,'0'); let s=(this.sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `${m}:${s}`; }, 1000); },
+    updateScore: function(val) { this.score += val; if(this.score < 0) this.score = 0; document.getElementById('score-display').innerText = this.score; },
+    showFloatingText: function(x, y, text, color) { const el = document.createElement('div'); el.className = 'floating-text'; el.innerText = text; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.color = color; document.body.appendChild(el); setTimeout(() => el.remove(), 800); },
+    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("Excellent job!"); document.getElementById('win-msg').innerText = "Thời gian: " + document.getElementById('timer').innerText; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
+};
+
+/* --- SNAKE ENGINE --- */
+const SnakeEngine = {
+    active: false, paused: false, gameLoopId: null, audioLoopId: null, boardSize: 15, snake: [], direction: {x: 0, y: 0}, nextDirection: {x: 0, y: 0}, 
+    foods: [], score: 0, speed: 300, targetPhoneme: "", currentTargetWord: null, poolCorrect: [], poolWrong: [],
+    lives: 3,
+
+    start: function(config, dataPool) {
+        this.stop(); this.active = true; this.paused = false; this.score = 0; this.speed = 550; this.lives = 3; this.targetPhoneme = config.phoneme;
+        this.poolCorrect = dataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
+        this.poolWrong = dataPool.filter(w => !w.parts || !w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
+        if (this.poolCorrect.length === 0) return alert("Thiếu dữ liệu âm /" + this.targetPhoneme + "/");
+
+        document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('pause-modal').style.display = 'none'; document.getElementById('snake-score').innerText = this.score;
+        this.updateLivesUI();
+        
+        const center = Math.floor(this.boardSize / 2);
+        this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}];
+        this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
+        this.createBoard(); this.spawnFoods(); this.gameLoop(); this.startAudioLoop();
+    },
+    stop: function() { this.active = false; clearTimeout(this.gameLoopId); clearInterval(this.audioLoopId); },
+    togglePause: function() { if (!this.active) return; this.paused = !this.paused; const modal = document.getElementById('pause-modal'); if (this.paused) { modal.style.display = 'flex'; clearInterval(this.audioLoopId); } else { modal.style.display = 'none'; this.gameLoop(); this.startAudioLoop(); } },
+    startAudioLoop: function() { clearInterval(this.audioLoopId); if(this.currentTargetWord) AudioEngine.playTTS(this.currentTargetWord.speak); this.audioLoopId = setInterval(() => { if (this.active && !this.paused && this.currentTargetWord) { AudioEngine.playTTS(this.currentTargetWord.speak); } }, 4000); },
+    createBoard: function() { const board = document.getElementById('snake-board'); board.innerHTML = ''; board.style.gridTemplateColumns = `repeat(${this.boardSize}, 1fr)`; board.style.gridTemplateRows = `repeat(${this.boardSize}, 1fr)`; for(let i=0; i < this.boardSize * this.boardSize; i++) { const cell = document.createElement('div'); cell.className = 'grid-cell'; board.appendChild(cell); } },
+    updateLivesUI: function() {
+        let hearts = "";
+        for(let i=0; i<this.lives; i++) hearts += "❤️";
+        for(let i=this.lives; i<3; i++) hearts += "🖤";
+        document.getElementById('snake-lives').innerText = hearts;
+    },
+    handleDeath: function(msg) {
+        this.lives--;
+        this.updateLivesUI();
+        AudioEngine.playEffect('wrong');
+        if (this.lives <= 0) { this.showGameOver(msg + " Hết mạng rồi!"); } 
+        else {
+            const center = Math.floor(this.boardSize / 2);
+            this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}];
+            this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
+        }
+    },
+    gameLoop: function() {
+        if (!this.active || this.paused) return;
+        this.direction = this.nextDirection;
+        const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
+        if (this.isCollision(head)) { 
+            this.handleDeath("Rắn đụng tường!"); 
+            if(this.lives > 0) { this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; }
+            else return;
+        }
+        this.snake.unshift(head);
+        let ate = false;
+        const foodIndex = this.foods.findIndex(f => f.x === head.x && f.y === head.y);
+        if (foodIndex !== -1) {
+            const food = this.foods[foodIndex];
+            if (food.isCorrect) {
+                ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score;
+                AudioEngine.playEffect('correct'); 
+                if (this.speed > 150) this.speed -= 20; 
+                this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop();
+                if (this.score >= 100) { this.win(); return; }
+            } else { 
+                this.handleDeath(`Sai rồi! "${food.word}" không phải từ cần tìm!`);
+                if(this.lives > 0) {
+                     this.foods.splice(foodIndex, 1);
+                     this.snake.pop(); this.draw();
+                     this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); 
+                     return;
+                } else return;
+            }
+        }
+        if (!ate) this.snake.pop();
+        this.draw();
+        this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed);
+    },
+    isCollision: function(pos) { if (pos.x < 0 || pos.x >= this.boardSize || pos.y < 0 || pos.y >= this.boardSize) return true; for (let i = 1; i < this.snake.length; i++) if (pos.x === this.snake[i].x && pos.y === this.snake[i].y) return true; return false; },
+    spawnFoods: function() {
+        this.foods = [];
+        const correctWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)];
+        this.currentTargetWord = correctWord; 
+        const validWrongPool = this.poolWrong.filter(w => !w.img.includes("card.jpg"));
+        const wrongWords = validWrongPool.sort(() => 0.5 - Math.random()).slice(0, 2); 
+        const itemsToSpawn = [{ ...correctWord, isCorrect: true, icon: '🍎' }, { ...wrongWords[0], isCorrect: false, icon: '🍄' }];
+        if (wrongWords[1]) itemsToSpawn.push({ ...wrongWords[1], isCorrect: false, icon: '💣' });
+        itemsToSpawn.forEach(item => {
+            let pos; do { 
+                pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; 
+                let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10);
+                if (isSafeZone) continue; 
+                let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1);
+                if (isTooClose) continue; 
+            } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1));
+            this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon });
+        });
+        let ipaHtml = "";
+        if (correctWord.type !== 'sent' && correctWord.speak.split(' ').length < 2) {
+             let ipaStr = "";
+             if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); }
+             ipaHtml = `<div style="color:red; font-size:14px;">/${ipaStr}/</div>`;
+        }
+        let fontSize = (correctWord.type === 'sent') ? '18px' : '24px';
+        document.getElementById('snake-target-content').innerHTML = 
+            `${ipaHtml}<div style="color:#d35400; font-size:${fontSize}; font-weight:900;">${correctWord.speak}</div>`;
+    },
+    isOccupied: function(pos) { if (this.snake.some(s => s.x === pos.x && s.y === pos.y)) return true; if (this.foods.some(f => f.x === pos.x && f.y === pos.y)) return true; const head = this.snake[0]; if (Math.abs(pos.x - head.x) < 3 && Math.abs(pos.y - head.y) < 3) return true; return false; },
+    draw: function() {
+        const cells = document.querySelectorAll('.grid-cell'); cells.forEach(c => { c.className = 'grid-cell'; c.innerHTML = ''; });
+        this.foods.forEach(f => {
+            const idx = f.y * this.boardSize + f.x;
+            if (cells[idx]) { 
+                const zIndex = 10; 
+                cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; 
+            }
+        });
+        this.snake.forEach((part, index) => {
+            const idx = part.y * this.boardSize + part.x;
+            if (cells[idx]) {
+                const div = document.createElement('div'); div.classList.add('snake-part');
+                if (index === 0) {
+                    div.classList.add('snake-head');
+                    if (this.direction.y === -1) div.classList.add('head-down'); else if (this.direction.y === 1) div.classList.add('head-up'); else if (this.direction.x === -1) div.classList.add('head-left'); else if (this.direction.x === 1) div.classList.add('head-right');
+                }
+                cells[idx].appendChild(div);
+            }
+        });
+    },
+    changeDirection: function(newDirName) {
+        if (this.paused) return; 
+        let newDir = {x:0, y:0};
+        if (newDirName === 'up') newDir = {x: 0, y: -1}; if (newDirName === 'down') newDir = {x: 0, y: 1};
+        if (newDirName === 'left') newDir = {x: -1, y: 0}; if (newDirName === 'right') newDir = {x: 1, y: 0};
+        if (this.direction.x + newDir.x === 0 && this.direction.y + newDir.y === 0) return;
+        this.nextDirection = newDir;
+    },
+    showGameOver: function(msg) { this.stop(); AudioEngine.playTTS("Game Over!"); document.getElementById('win-msg').innerText = msg; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; },
+    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Tuyệt vời!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
+};
+
+/* --- LEARNING ENGINE --- */
+const LearningEngine = {
+    currentData: [], idx: 0, currentLessonId: 0, 
+    initLesson: function(lessonNum) { 
+        this.currentLessonId = lessonNum;
+        this.currentData = DataEngine.getLesson(lessonNum); 
+        this.idx = 0; this.preload(); 
+    },
+    preload: function() { this.currentData.forEach(item => { if(item.img) new Image().src = item.img; }); },
+    
+    render: function() {
+        const item = this.currentData[this.idx]; if(!item) return; AudioEngine.stopCurrentSound();
+        document.getElementById('game-screen').style.display = 'none'; document.getElementById('learning-screen').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; 
+        
+        document.getElementById('stars').style.display = (this.currentLessonId === 26) ? 'none' : 'block'; 
+        document.getElementById('feedback').innerText = (this.currentLessonId === 26) ? `Câu ${this.idx + 1} / 40` : "...";
+        const imgEl = document.getElementById('learn-img'); const btnContainer = document.getElementById('action-container'); const infoDisplay = document.getElementById('info-display');
+        
+        if(item.type === 'game') {
+            imgEl.src = item.img || 'https://img.icons8.com/color/500/controller.png';
+            let titleColor = item.title.includes("GAME 1") ? "#e67e22" : (item.title.includes("GAME 2") ? "#9b59b6" : "#333");
+            infoDisplay.innerHTML = `<h2 class="word-display" style="font-size:28px; color:${titleColor}; font-weight:900;">${item.title}</h2>`;
+            btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="App.enterGame()">  🚀   Chơi Ngay</button>`;
+        } 
+        else if (item.type === 'exam-ipa') {
+            imgEl.src = item.img;
+            infoDisplay.innerHTML = ""; 
+            this.renderExamButtons(btnContainer);
+        }
+        else {
+            imgEl.src = item.img;
+            let html = '';
+            let currentWordBuffer = [];
+            if(item.parts) {
+                item.parts.forEach((p, index) => {
+                    if (p.t === " ") {
+                        if (currentWordBuffer.length > 0) {
+                            html += `<div class="word-group">`;
+                            currentWordBuffer.forEach(subP => {
+                                const ipaHtml = subP.i || "&nbsp;";
+                                html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+                            });
+                            html += `</div>`;
+                            currentWordBuffer = [];
+                        }
+                    } else { currentWordBuffer.push(p); }
+                });
+                if (currentWordBuffer.length > 0) {
+                    html += `<div class="word-group">`;
+                    currentWordBuffer.forEach(subP => {
+                        const ipaHtml = subP.i || "&nbsp;";
+                        html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+                    });
+                    html += `</div>`;
+                }
+            }
+            infoDisplay.innerHTML = html;
+
+            if (this.currentLessonId === 26) {
+                this.renderExamButtons(btnContainer);
+            } else {
+                btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()"> 🎤 Đọc Ngay</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()"> 🔊 Nghe Lại</button> `;
+            }
+        }
+        
+        if(this.currentLessonId === 26) {
+             document.querySelector('.nav-row').style.display = 'none'; 
+        } else {
+             document.querySelector('.nav-row').style.display = 'flex';
+        }
+    },
+
+    renderExamButtons: function(container) {
+        container.innerHTML = `
+            <button class="btn-action btn-check" onclick="LearningEngine.checkExamAnswer()"> ✅ Kiểm tra</button>
+            <button class="btn-action btn-next" onclick="LearningEngine.nextExamQuestion()"> ➡ Câu Tiếp</button>
+        `;
+    },
+
+    checkExamAnswer: function() {
+        const item = this.currentData[this.idx];
+        if (item.type === 'exam-ipa') {
+            const audio = new Audio(item.speak);
+            audio.play();
+        } else {
+            this.onUserClickSpeak();
+        }
+    },
+
+    nextExamQuestion: function() {
+        if (this.idx < this.currentData.length - 1) {
+            this.idx++;
+            this.render();
+        } else {
+            alert("Chúc mừng con đã hoàn thành bài thi! 🎉");
+            App.goHome();
+        }
+    },
+
+    nav: function(d) { if(this.idx + d >= 0 && this.idx + d < this.currentData.length) { this.idx += d; this.render(); } }, nextItem: function() { this.nav(1); },
+    onUserClickSpeak: function() { 
+        const item = this.currentData[this.idx]; 
+        if(item) { 
+            let soundFile = null;
+            let textToRead = item.speak; 
+            if(item.pre && item.type !== 'sent') { soundFile = "sound_" + item.pre + ".wav"; }
+            if(item.type === 'exam-ipa') { soundFile = item.speak; textToRead = null; }
+
+            if (soundFile) { AudioEngine.playSequence(soundFile, textToRead); } 
+            else { AudioEngine.playTTS(textToRead); }
+        } 
+    },
+    startListening: function() { const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); const btn = document.getElementById('mic-btn'); btn.disabled = true; btn.innerText = "  👂   Đang nghe..."; btn.style.backgroundColor = "#e74c3c"; const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start(); recognition.onresult = (e) => { let heard = []; for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); this.checkResult(heard); }; recognition.onerror = () => { this.resetMic(); }; recognition.onend = () => { if(btn.disabled) this.resetMic(); }; },
+    resetMic: function() { const btn = document.getElementById('mic-btn'); if(btn) { btn.disabled = false; btn.innerText = "  🎤   Đọc Ngay"; btn.style.backgroundColor = "#27ae60"; } },
+    checkResult: function(heardArray) { const item = this.currentData[this.idx]; const targetRaw = item.speak.toLowerCase().replace(/[.,!?]/g, "").trim(); let validAnswers = [targetRaw]; if (item.pre) validAnswers.push((item.pre + " " + targetRaw).toLowerCase()); let maxScore = 0; for (let text of heardArray) { let userText = text.trim(); for (let target of validAnswers) { if (userText.includes(target) || target.includes(userText)) maxScore = 100; } } let finalStars = 2; let msg = "Try again!"; if (maxScore >= 90) { finalStars = 5; msg = "Excellent!  🎉 "; AudioEngine.playEffect('win'); } else { AudioEngine.playEffect('wrong'); } let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars === 5) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); }
+};
+
+/* --- APP CONTROLLER --- */
+const App = {
+    initMenu: function() {
+        const menuContainer = document.getElementById('menu-screen');
+        menuContainer.innerHTML = '<div class="menu-title"> 📚  CHỌN BÀI HỌC</div>';
+        
+        const btnIPA = document.createElement('button');
+        btnIPA.className = 'btn-menu';
+        btnIPA.innerText = "🔠  Bảng Phiên Âm (IPA)";
+        btnIPA.style.borderColor = "#9C27B0";
+        btnIPA.style.color = "#9C27B0";
+        btnIPA.onclick = function() { App.openIPA(); };
+        menuContainer.appendChild(btnIPA);
+
+        LevelMap.forEach(level => {
+            if (level.type === 'learn') {
+                const btn = document.createElement('button');
+                btn.className = 'btn-menu';
+                btn.innerText = level.label;
+                if (level.label.includes("Ôn tập")) {
+                    btn.style.borderColor = "#ff9600";
+                    btn.style.color = "#d35400";
+                }
+                if (level.label.includes("THI THỬ")) { 
+                    btn.style.borderColor = "#e74c3c"; 
+                    btn.style.color = "#c0392b"; 
+                    btn.style.borderWidth = "4px"; 
+                }
+                btn.onclick = function() { App.startLesson(level.id); };
+                menuContainer.appendChild(btn);
+            }
+        });
+    },
+
+    openIPA: function() {
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('ipa-screen').style.display = 'flex';
+        
+        const content = document.getElementById('ipa-content');
+        content.innerHTML = ''; 
+
+        for (const [sectionName, soundFiles] of Object.entries(IPA_DATA)) {
+            const secTitle = document.createElement('div');
+            secTitle.className = 'ipa-sec-title';
+            secTitle.innerText = sectionName;
+            
+            if (sectionName.includes("Vowels")) secTitle.classList.add("bg-blue");
+            else secTitle.classList.add("bg-green");
+            
+            content.appendChild(secTitle);
+
+            const grid = document.createElement('div');
+            grid.className = 'ipa-grid';
+
+            soundFiles.forEach(fileName => {
+                const item = document.createElement('div');
+                item.className = 'ipa-item';
+                item.innerHTML = `<img src="${fileName}.jpg" onerror="this.style.display='none'">`;
+                item.onclick = function() {
+                    const audio = new Audio(fileName + ".wav");
+                    audio.play();
+                    this.style.transform = "scale(0.9)";
+                    setTimeout(() => this.style.transform = "scale(1)", 150);
+                };
+                grid.appendChild(item);
+            });
+
+            content.appendChild(grid);
+            content.appendChild(document.createElement('br'));
+        }
+    },
+
+    closeIPA: function() {
+        document.getElementById('ipa-screen').style.display = 'none';
+        document.getElementById('menu-screen').style.display = 'flex';
+    },
+
+    startLesson: function(num) { AudioEngine.unlock(); document.getElementById('menu-screen').style.display = 'none'; document.getElementById('main-container').style.display = 'block'; LearningEngine.initLesson(num); LearningEngine.render(); },
+    enterGame: function() { document.getElementById('learning-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; const item = LearningEngine.currentData[LearningEngine.idx]; 
+    let vocabList = [];
+    for(let i=1; i<=25; i++) { 
+        if(!DataEngine["lesson"+i]) continue;
+        const lesson = DataEngine.getLesson(i); 
+        if (lesson.includes(item)) { 
+            vocabList = lesson.filter(l => l.img && l.type !== 'game'); 
+            break; 
+        } 
+    }
+    GameEngine.start(item, vocabList); },
+    exitGame: function() { GameEngine.stop(); LearningEngine.render(); },
+    goHome: function() { AudioEngine.stopAllAndBlock(); GameEngine.stop(); document.getElementById('main-container').style.display = 'none'; document.getElementById('menu-screen').style.display = 'flex'; }
+};
+
+window.onload = function() { 
+    AudioEngine.stopAllAndBlock(); 
+    App.initMenu(); 
+};
+window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
