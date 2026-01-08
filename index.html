@@ -1253,8 +1253,8 @@ const App = {
             soundFiles.forEach(fileName => {
                 const item = document.createElement('div');
                 item.className = 'ipa-item';
-                // Hình ảnh: fileName + .png
-                item.innerHTML = `<img src="${fileName}.png" onerror="this.style.display='none'">`;
+                // Hình ảnh: fileName + .jpg
+                item.innerHTML = `<img src="${fileName}.jpg" onerror="this.style.display='none'">`;
                 // Click -> Phát âm thanh .wav
                 item.onclick = function() {
                     const audio = new Audio(fileName + ".wav");
@@ -1301,3 +1301,4 @@ window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if 
 </script>
 </body>
 </html>
+
