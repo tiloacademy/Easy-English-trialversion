@@ -1,9 +1,10 @@
+Version 1.15
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bé Học Tiếng Anh (v1.14)</title>
+<title>Bé Học Tiếng Anh (v1.15)</title>
 <style>
 /* --- CSS CƠ BẢN --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -18,45 +19,22 @@ align-items: center; justify-content: flex-start; gap: 10px; overflow-y: auto; p
 box-shadow: 0 5px #ccebfd; cursor: pointer; width: 90%; max-width: 400px; transition: transform 0.1s; margin-bottom: 5px; flex-shrink: 0; }
 .btn-menu:active { transform: scale(0.95); background: #f0f8ff; }
 
-/* --- IPA SCREEN (MỚI) --- */
+/* --- IPA SCREEN --- */
 #ipa-screen { 
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
     background: #f0f8ff; z-index: 50; display: none; flex-direction: column;
-    overflow-y: auto; padding: 10px; padding-bottom: 80px; /* Chừa chỗ cho nút Back */
+    overflow-y: auto; padding: 10px; padding-bottom: 80px; 
 }
 .ipa-header { text-align: center; margin-bottom: 15px; }
 .ipa-h1 { font-size: 28px; color: #333; font-weight: 900; margin: 0; }
-
-.ipa-section { margin-bottom: 20px; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; }
-.ipa-sec-title { 
-    padding: 8px; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 10px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.bg-blue { background-color: #008CBA; } /* Màu cho Nguyên âm */
-.bg-green { background-color: #4CAF50; } /* Màu cho Phụ âm */
-
-/* GRID 3 CỘT CHO ĐIỆN THOẠI */
-.ipa-grid { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); /* 3 cột đều nhau */
-    gap: 10px; 
-}
-.ipa-item { 
-    background: white; border-radius: 10px; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
-    overflow: hidden; cursor: pointer; border: 2px solid transparent;
-    transition: transform 0.1s;
-    aspect-ratio: 1/1; /* Hình vuông */
-    display: flex; align-items: center; justify-content: center;
-}
+.ipa-sec-title { padding: 8px; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 10px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.bg-blue { background-color: #008CBA; } 
+.bg-green { background-color: #4CAF50; }
+.ipa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ipa-item { background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; }
 .ipa-item:active { transform: scale(0.95); border-color: #ff9600; }
 .ipa-item img { width: 100%; height: 100%; object-fit: contain; }
-
-.btn-back-ipa {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: #ff6f00; color: white; border: none; padding: 10px 40px;
-    border-radius: 30px; font-size: 20px; font-weight: bold; 
-    box-shadow: 0 4px #d35400; cursor: pointer; z-index: 100;
-}
+.btn-back-ipa { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ff6f00; color: white; border: none; padding: 10px 40px; border-radius: 30px; font-size: 20px; font-weight: bold; box-shadow: 0 4px #d35400; cursor: pointer; z-index: 100; }
 
 /* --- MAIN CONTAINER --- */
 #main-container { width: 100%; height: 100%; position: relative; }
@@ -70,7 +48,7 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .learn-img-wrapper { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
 #learn-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 15px; }
 
-/* HIỂN THỊ CHỮ: Word Grouping */
+/* INFO AREA */
 .info-area { min-height: 110px; flex-shrink: 0; display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px; align-content: center; padding: 0 5px; }
 .word-group { display: inline-flex; flex-direction: row; align-items: flex-end; margin-right: 12px; white-space: nowrap; }
 .char-block { display: inline-flex; flex-direction: column; align-items: center; justify-content: flex-end; margin: 0 1px; }
@@ -78,20 +56,25 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .cb-text { font-size: 36px; color: #333; font-weight: bold; height: 45px; line-height: 45px; }
 .sent-ipa { font-size: 14px; color: red; font-weight: bold; height: 18px; margin-bottom: 2px;}
 .sent-text { font-size: 22px; color: #333; font-weight: bold; height: 28px; }
+
 .stars { height: 30px; text-align: center; font-size: 32px; color: #e0e0e0; flex-shrink: 0; }
 .stars.active { color: #FFD700; text-shadow: 0 0 5px orange; }
 .feedback-text { height: 20px; text-align: center; font-size: 16px; color: #555; font-style: italic; margin-bottom: 5px; }
+
+/* ACTION BUTTONS */
 .action-row { height: 60px; flex-shrink: 0; display: flex; justify-content: center; gap: 15px; align-items: center; margin-bottom: 10px; }
 .btn-action { flex: 1; height: 55px; border-radius: 30px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px rgba(0,0,0,0.2); max-width: 45%; }
 .btn-mic { background: #27ae60; }
 .btn-listen { background: #2980b9; }
+.btn-check { background: #e67e22; } /* Nút Kiểm tra cho bài thi */
+.btn-next { background: #8e44ad; } /* Nút Next cho bài thi */
 .btn-game-entry { background: #9b59b6; width: 80%; max-width: none; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
 .nav-row { height: 60px; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; margin-bottom: 15px; }
 .btn-nav { width: 60px; height: 60px; border-radius: 50%; background: #f39c12; color: white; border: none; font-size: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #d35400; }
 .btn-nav:active { transform: translateY(2px); box-shadow: none; }
 
-/* UI Game Chung */
+/* UI Game Chung (Giữ nguyên) */
 #game-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff3e0; z-index: 20; flex-direction: column; }
 .game-header { height: 60px; display: flex; justify-content: center; align-items: center; position: relative; background: rgba(255,255,255,0.9); border-bottom: 1px solid #ddd; flex-shrink: 0; z-index: 200; }
 .timer-badge { background: white; border: 3px solid #d35400; color: #d35400; padding: 5px 25px; border-radius: 25px; font-size: 24px; font-weight: bold; }
@@ -99,7 +82,7 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .game-footer { height: 100px; display: flex; justify-content: center; align-items: center; background: white; border-top: 1px solid #ccc; padding-bottom: 30px; flex-shrink: 0; z-index: 200;}
 #win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 300; flex-direction: column; align-items: center; justify-content: center; }
 
-/* CSS Game Flip */
+/* CSS Game Components (Flip, Mole, Snake...) giữ nguyên */
 .tower-container { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
 .tower-row { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
 .card-flip { height: 95%; aspect-ratio: 0.75; position: relative; perspective: 1000px; }
@@ -114,7 +97,6 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .gc-block { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 1px; }
 .gc-ipa { color: red; font-weight: bold; font-size: 2.2vh; height: 3vh; margin-bottom: 2px; }
 .gc-word { color: #333; font-weight: bold; font-size: 3vh; }
-
 #whack-wrapper { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #8bc34a 40%, #8bc34a 100%); position: relative; padding-bottom: 20px; }
 #whack-wrapper::before { content: ' ☁ ️'; font-size: 60px; position: absolute; top: 30px; left: 20px; opacity: 0.8; }
 #whack-wrapper::after { content: ' ☁ ️'; font-size: 50px; position: absolute; top: 60px; right: 40px; opacity: 0.8; }
@@ -139,8 +121,6 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 .floating-text { position: fixed; font-weight: 900; font-size: 28px; pointer-events: none; z-index: 1000; animation: floatUp 0.8s ease-out forwards; text-shadow: 2px 2px 0px black, -2px -2px 0px white; }
 @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
 .mole.bonked { filter: brightness(1.3) sepia(0.5) hue-rotate(-30deg) saturate(2); transition: none; transform: scale(0.95); }
-
-/* --- CSS GAME RẮN SĂN MỒI --- */
 #snake-game-container { flex: 1; width: 100%; display: none; flex-direction: column; align-items: center; justify-content: flex-start; background-color: #dcedc8; background-image: radial-gradient(#8bc34a 2px, transparent 2.5px); background-size: 30px 30px; position: relative; overflow: hidden; }
 #snake-target-bar { width: 95%; background: rgba(255,255,255,0.95); padding: 5px 15px; border-radius: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 200; height: 60px; flex-shrink: 0; }
 .target-label { font-weight: bold; color: #555; font-size: 16px; margin-right: 5px; }
@@ -167,19 +147,12 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
 </head>
 <body>
 <div id="cursor-hammer" class="hammer"></div>
-
 <div id="menu-screen"></div>
-
 <div id="ipa-screen">
-    <div class="ipa-header">
-        <h1 class="ipa-h1">Bảng Phiên Âm (IPA)</h1>
-    </div>
-    
+    <div class="ipa-header"><h1 class="ipa-h1">Bảng Phiên Âm (IPA)</h1></div>
     <div id="ipa-content"></div>
-
     <button class="btn-back-ipa" onclick="App.closeIPA()"> ◀  Quay lại</button>
 </div>
-
 <div id="main-container" style="display: none;">
     <div id="learning-screen">
         <div class="top-bar">
@@ -191,13 +164,13 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
         <div class="info-area" id="info-display"></div>
         <div class="stars" id="stars">☆☆☆☆☆</div>
         <div class="feedback-text" id="feedback">...</div>
+        
         <div class="action-row" id="action-container">
-            <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()"> 🎤 Đọc Ngay</button>
-            <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()"> 🔊 Nghe Lại</button>
-        </div>
+            </div>
+        
         <div class="nav-row">
-            <button class="btn-nav" onclick="LearningEngine.nav(-1)"> ◀ </button>
-            <button class="btn-nav" onclick="LearningEngine.nav(1)"> ▶ </button>
+            <button class="btn-nav" id="btn-prev" onclick="LearningEngine.nav(-1)"> ◀ </button>
+            <button class="btn-nav" id="btn-next" onclick="LearningEngine.nav(1)"> ▶ </button>
         </div>
     </div>
     <div id="game-screen" style="display: none;">
@@ -225,7 +198,7 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
             </div>
         </div>
         <div id="snake-game-container">
-             <div id="snake-target-bar">
+            <div id="snake-target-bar">
                 <button class="btn-pause" onclick="SnakeEngine.togglePause()">⏸</button>
                 <div class="target-label">Săn từ:</div>
                 <div id="snake-target-content"></div>
@@ -256,12 +229,9 @@ padding: 5px 10px 90px 10px; background: #fff; z-index: 10; }
         </div>
     </div>
 </div>
-
 <script>
-/* ==========================================================================
-   PHẦN 1: CẤU HÌNH & MENU
-   ========================================================================== */
 const LevelMap = [
+    // ... Copy từ 1-25 giữ nguyên ...
     { id: 1, type: 'learn', label: 'Bài 1: /t/ & /d/', color: '#58cc02' },
     { id: 1, type: 'game',  label: 'Game /t/', color: '#ff9600', gameIndex: 0 },
     { id: 1, type: 'game',  label: 'Game /d/', color: '#a322ea', gameIndex: 1 },
@@ -332,12 +302,13 @@ const LevelMap = [
     { id: 24, type: 'game',  label: 'Game /ð/', color: '#a322ea', gameIndex: 1 },
     { id: 25, type: 'learn', label: 'Bài 25: /ks/ & /kw/', color: '#58cc02' },
     { id: 25, type: 'game',  label: 'Game /ks/', color: '#ff9600', gameIndex: 1 },
-    { id: 25, type: 'game',  label: 'Game /kw/', color: '#a322ea', gameIndex: 0 }
+    { id: 25, type: 'game',  label: 'Game /kw/', color: '#a322ea', gameIndex: 0 },
+
+    { id: 26, type: 'learn', label: '🎓 THI THỬ CUỐI KHÓA', color: '#e74c3c' }
 ];
 /* ==========================================================================
    PHẦN 2: DỮ LIỆU (DATA ENGINE & IPA DATA)
    ========================================================================== */
-
 const DataEngine = {
     lesson1: [
         { img: "tap.jpg", speak: "tap", pre: "t", parts: [{t:"t"}, {i:"æ", t:"a"}, {t:"p"}] },
@@ -756,62 +727,88 @@ const IPA_DATA = {
         "sound_kw", "sound_flapt"
     ]
 };
-/* ==========================================================================
-   PHẦN 3: LOGIC ENGINES (GAME, SNAKE, AUDIO, LEARNING)
-   ========================================================================== */
 
-/* --- 3.2 AUDIO ENGINE --- */
+    // --- HÀM TẠO ĐỀ THI NGẪU NHIÊN (40 CÂU) ---
+    getMockTest: function() {
+        let testSet = [];
+        
+        // 1. Lấy 10 hình IPA ngẫu nhiên
+        let allIPAs = [];
+        for (const key in IPA_DATA) {
+            IPA_DATA[key].forEach(sound => {
+                // Tạo object câu hỏi IPA: Chỉ có hình (img) và âm thanh (speak=wav file)
+                allIPAs.push({ 
+                    type: 'exam-ipa', 
+                    img: sound + ".jpg", 
+                    speak: sound + ".wav", // Khi check sẽ phát file này
+                    text: "" // Không hiện chữ
+                });
+            });
+        }
+        allIPAs.sort(() => 0.5 - Math.random());
+        testSet = testSet.concat(allIPAs.slice(0, 10));
+
+        // 2. Lấy 25 từ ngẫu nhiên (có hình + chữ + ipa đỏ)
+        let allWords = [];
+        for (let i=1; i<=25; i++) {
+            let lesson = this["lesson"+i];
+            if(lesson) {
+                // Lọc ra các item là từ (có img, không phải game, không phải sent)
+                let words = lesson.filter(item => item.img && item.type !== 'game' && item.type !== 'sent');
+                allWords = allWords.concat(words);
+            }
+        }
+        allWords.sort(() => 0.5 - Math.random());
+        testSet = testSet.concat(allWords.slice(0, 25));
+
+        // 3. Lấy 5 câu ngẫu nhiên
+        let allSents = [];
+        for (let i=1; i<=25; i++) {
+            let lesson = this["lesson"+i];
+            if(lesson) {
+                let sents = lesson.filter(item => item.type === 'sent');
+                allSents = allSents.concat(sents);
+            }
+        }
+        allSents.sort(() => 0.5 - Math.random());
+        testSet = testSet.concat(allSents.slice(0, 5));
+
+        return testSet;
+    },
+
+    getLesson: function(num) {
+        if (num === 26) return this.getMockTest(); // Nếu là bài 26 -> Tạo đề thi
+        if(this["lesson" + num]) return this["lesson" + num];
+        return [];
+    }
+};
+
+const IPA_DATA = {
+    "Single Vowels": ["sound_i", "sound_ii", "sound_u", "sound_uu", "sound_e", "sound_schwa", "sound_ae", "sound_uh", "sound_aa"],
+    "Double Vowels": ["sound_ei", "sound_oi", "sound_ai", "sound_ou", "sound_au"],
+    "R-controlled Vowels": ["sound_ur", "sound_or", "sound_ar", "sound_ir", "sound_er"],
+    "Unvoiced Consonants": ["sound_p", "sound_f", "sound_th", "sound_t", "sound_s", "sound_sh", "sound_ch", "sound_k", "sound_h", "sound_ks"],
+    "Voiced Consonants": ["sound_b", "sound_v", "sound_dh", "sound_d", "sound_z", "sound_zh", "sound_j", "sound_g", "sound_m", "sound_n", "sound_ng", "sound_w", "sound_l", "sound_r", "sound_y", "sound_kw", "sound_flapt"]
+};
+/* ==========================================================================
+   PHẦN 3: LOGIC ENGINES
+   ========================================================================== */
 const AudioEngine = {
     isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"), currentUtterance: null,
     unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
-    
-    // --- CẬP NHẬT: Hỗ trợ file âm thanh .WAV ---
-    playTTS: function(text) { 
-        // Chỉ dùng TTS cho từ/câu, không dùng cho âm đơn lẻ nữa
-        if (!this.isAudioAllowed) return; 
-        this.stopCurrentSound(); 
-        if ('speechSynthesis' in window) { 
-            window.currentUtterance = new SpeechSynthesisUtterance(text); 
-            window.currentUtterance.lang = 'en-US'; 
-            window.currentUtterance.rate = 0.9; 
-            window.speechSynthesis.speak(window.currentUtterance); 
-        } 
-    },
-
-    // Hàm mới: Phát file âm thanh -> Rồi mới đọc từ
+    playTTS: function(text) { if (!this.isAudioAllowed) return; this.stopCurrentSound(); if ('speechSynthesis' in window) { window.currentUtterance = new SpeechSynthesisUtterance(text); window.currentUtterance.lang = 'en-US'; window.currentUtterance.rate = 0.9; window.speechSynthesis.speak(window.currentUtterance); } },
     playSequence: function(soundFile, textToRead) {
-        if (!this.isAudioAllowed) return;
-        this.stopCurrentSound();
-
-        const audio = new Audio(soundFile);
-        
-        // Xử lý khi phát xong file âm thanh -> Đọc tiếp từ vựng
-        audio.onended = () => {
-            if (textToRead) {
-                // Delay 1 chút cho tự nhiên
-                setTimeout(() => {
-                    this.playTTS(textToRead);
-                }, 300); 
-            }
-        };
-
-        // Xử lý lỗi: Nếu không tìm thấy file .wav -> Vẫn đọc từ vựng (Fallback)
-        audio.onerror = () => {
-            console.warn("Audio file not found: " + soundFile);
-            if (textToRead) this.playTTS(textToRead);
-        };
-
-        audio.play().catch(e => {
-            console.error("Audio play failed", e);
-            if (textToRead) this.playTTS(textToRead);
-        });
+        if (!this.isAudioAllowed) return; this.stopCurrentSound(); const audio = new Audio(soundFile);
+        audio.onended = () => { if (textToRead) setTimeout(() => { this.playTTS(textToRead); }, 300); };
+        audio.onerror = () => { if (textToRead) this.playTTS(textToRead); };
+        audio.play().catch(e => { if (textToRead) this.playTTS(textToRead); });
     },
-
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
+// ... (Giữ nguyên GameEngine và SnakeEngine cũ) ...
 /* --- 3.3 GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
@@ -1082,81 +1079,129 @@ const SnakeEngine = {
     showGameOver: function(msg) { this.stop(); AudioEngine.playTTS("Game Over!"); document.getElementById('win-msg').innerText = msg; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; },
     win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Tuyệt vời!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
-
-/* --- 3.5 LEARNING ENGINE (CẬP NHẬT AUDIO & CHẤM ĐIỂM) --- */
 const LearningEngine = {
-    currentData: [], idx: 0,
-    initLesson: function(lessonNum) { this.currentData = DataEngine.getLesson(lessonNum); this.idx = 0; this.preload(); },
+    currentData: [], idx: 0, currentLessonId: 0, // Thêm biến theo dõi ID bài học
+    initLesson: function(lessonNum) { 
+        this.currentLessonId = lessonNum;
+        this.currentData = DataEngine.getLesson(lessonNum); 
+        this.idx = 0; this.preload(); 
+    },
     preload: function() { this.currentData.forEach(item => { if(item.img) new Image().src = item.img; }); },
+    
     render: function() {
         const item = this.currentData[this.idx]; if(!item) return; AudioEngine.stopCurrentSound();
-        document.getElementById('game-screen').style.display = 'none'; document.getElementById('learning-screen').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('stars').innerText = "☆☆☆☆☆"; document.getElementById('stars').classList.remove('active'); document.getElementById('feedback').innerText = "...";
+        document.getElementById('game-screen').style.display = 'none'; document.getElementById('learning-screen').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; 
+        
+        // Reset UI
+        document.getElementById('stars').style.display = (this.currentLessonId === 26) ? 'none' : 'block'; // Ẩn sao khi thi
+        document.getElementById('feedback').innerText = (this.currentLessonId === 26) ? `Câu ${this.idx + 1} / 40` : "...";
         const imgEl = document.getElementById('learn-img'); const btnContainer = document.getElementById('action-container'); const infoDisplay = document.getElementById('info-display');
+        
+        // --- XỬ LÝ HIỂN THỊ (LEARN vs EXAM) ---
         if(item.type === 'game') {
-            imgEl.src = item.img || 'https://img.icons8.com/color/500/controller.png';
-            let titleColor = item.title.includes("GAME 1") ? "#e67e22" : (item.title.includes("GAME 2") ? "#9b59b6" : "#333");
-            infoDisplay.innerHTML = `<h2 class="word-display" style="font-size:28px; color:${titleColor}; font-weight:900;">${item.title}</h2>`;
-            btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="App.enterGame()">  🚀   Chơi Ngay</button>`;
-        } else {
-            imgEl.src = item.img; btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()">  🎤   Đọc Ngay</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()">  🔊   Nghe Lại</button> `;
+            // ... (Logic game cũ) ...
+        } 
+        else if (item.type === 'exam-ipa') {
+            // Hiển thị cho câu hỏi IPA (chỉ có hình to)
+            imgEl.src = item.img;
+            infoDisplay.innerHTML = ""; // Không có chữ dưới
+            this.renderExamButtons(btnContainer);
+        }
+        else {
+            // Hiển thị từ/câu (Word/Sentence)
+            imgEl.src = item.img;
             
-            // --- LOGIC HIỂN THỊ MỚI: DÙNG WORD-GROUP ---
+            // Render chữ (Word Grouping Logic)
             let html = '';
             let currentWordBuffer = [];
-            
-            item.parts.forEach((p, index) => {
-                if (p.t === " ") {
-                    if (currentWordBuffer.length > 0) {
-                        html += `<div class="word-group">`;
-                        currentWordBuffer.forEach(subP => {
-                            const ipaHtml = subP.i || "&nbsp;";
-                            html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
-                        });
-                        html += `</div>`; 
-                        currentWordBuffer = [];
-                    }
-                } else {
-                    currentWordBuffer.push(p);
-                }
-            });
-            
-            if (currentWordBuffer.length > 0) {
-                html += `<div class="word-group">`;
-                currentWordBuffer.forEach(subP => {
-                    const ipaHtml = subP.i || "&nbsp;";
-                    html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+            if(item.parts) {
+                item.parts.forEach((p, index) => {
+                    if (p.t === " ") {
+                        if (currentWordBuffer.length > 0) {
+                            html += `<div class="word-group">`;
+                            currentWordBuffer.forEach(subP => {
+                                const ipaHtml = subP.i || "&nbsp;";
+                                html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+                            });
+                            html += `</div>`;
+                            currentWordBuffer = [];
+                        }
+                    } else { currentWordBuffer.push(p); }
                 });
-                html += `</div>`;
+                if (currentWordBuffer.length > 0) {
+                    html += `<div class="word-group">`;
+                    currentWordBuffer.forEach(subP => {
+                        const ipaHtml = subP.i || "&nbsp;";
+                        html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
+                    });
+                    html += `</div>`;
+                }
             }
-            
             infoDisplay.innerHTML = html;
+
+            // Render Buttons
+            if (this.currentLessonId === 26) {
+                this.renderExamButtons(btnContainer);
+            } else {
+                btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()"> 🎤 Đọc Ngay</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()"> 🔊 Nghe Lại</button> `;
+            }
+        }
+        
+        // Ẩn hiện nút Nav hai bên
+        if(this.currentLessonId === 26) {
+             document.querySelector('.nav-row').style.display = 'none'; // Ẩn nav cũ khi thi
+        } else {
+             document.querySelector('.nav-row').style.display = 'flex';
         }
     },
+
+    renderExamButtons: function(container) {
+        // Nút Kiểm Tra & Câu Tiếp
+        container.innerHTML = `
+            <button class="btn-action btn-check" onclick="LearningEngine.checkExamAnswer()"> ✅ Kiểm tra</button>
+            <button class="btn-action btn-next" onclick="LearningEngine.nextExamQuestion()"> ➡ Câu Tiếp</button>
+        `;
+    },
+
+    checkExamAnswer: function() {
+        // Phát âm thanh đúng
+        const item = this.currentData[this.idx];
+        if (item.type === 'exam-ipa') {
+            // Chỉ phát file wav
+            const audio = new Audio(item.speak);
+            audio.play();
+        } else {
+            // Dùng logic phát âm chuẩn (pre + speak)
+            this.onUserClickSpeak();
+        }
+    },
+
+    nextExamQuestion: function() {
+        if (this.idx < this.currentData.length - 1) {
+            this.idx++;
+            this.render();
+        } else {
+            alert("Chúc mừng con đã hoàn thành bài thi! 🎉");
+            App.goHome();
+        }
+    },
+
     nav: function(d) { if(this.idx + d >= 0 && this.idx + d < this.currentData.length) { this.idx += d; this.render(); } }, nextItem: function() { this.nav(1); },
-    
-    // --- KHÔI PHỤC: Đọc Âm đệm (FILE .WAV) trước khi đọc từ ---
     onUserClickSpeak: function() { 
         const item = this.currentData[this.idx]; 
-        if(item && item.type !== 'game') { 
+        if(item) { 
             let soundFile = null;
-            let textToRead = item.speak; // Mặc định chỉ đọc từ
-
-            // Nếu có cấu hình âm đệm (pre) và không phải là câu (sent)
-            if(item.pre && item.type !== 'sent') {
-                soundFile = "sound_" + item.pre + ".wav";
-            }
+            let textToRead = item.speak; 
+            if(item.pre && item.type !== 'sent') { soundFile = "sound_" + item.pre + ".wav"; }
             
-            if (soundFile) {
-                // Phát file wav xong mới đọc từ
-                AudioEngine.playSequence(soundFile, textToRead);
-            } else {
-                // Chỉ đọc từ (dành cho câu hoặc từ không có pre)
-                AudioEngine.playTTS(textToRead); 
-            }
+            // Xử lý riêng cho Bài thi IPA
+            if(item.type === 'exam-ipa') { soundFile = item.speak; textToRead = null; }
+
+            if (soundFile) { AudioEngine.playSequence(soundFile, textToRead); } 
+            else { AudioEngine.playTTS(textToRead); }
         } 
     },
-    
-    startListening: function() { const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); const btn = document.getElementById('mic-btn'); btn.disabled = true; btn.innerText = "  👂   Đang nghe..."; btn.style.backgroundColor = "#e74c3c"; const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start(); recognition.onresult = (e) => { let heard = []; for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); this.checkResult(heard); }; recognition.onerror = () => { this.resetMic(); }; recognition.onend = () => { if(btn.disabled) this.resetMic(); }; },
+startListening: function() { const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); const btn = document.getElementById('mic-btn'); btn.disabled = true; btn.innerText = "  👂   Đang nghe..."; btn.style.backgroundColor = "#e74c3c"; const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start(); recognition.onresult = (e) => { let heard = []; for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); this.checkResult(heard); }; recognition.onerror = () => { this.resetMic(); }; recognition.onend = () => { if(btn.disabled) this.resetMic(); }; },
     resetMic: function() { const btn = document.getElementById('mic-btn'); if(btn) { btn.disabled = false; btn.innerText = "  🎤   Đọc Ngay"; btn.style.backgroundColor = "#27ae60"; } },
     
     checkResult: function(heardArray) { 
@@ -1194,39 +1239,29 @@ const LearningEngine = {
         this.resetMic(); 
     }
 };
-
-/* --- APP CONTROLLER (CHỨA MENU & IPA) --- */
 const App = {
-    initMenu: function() {
+    // ... (Giữ nguyên initMenu, openIPA, closeIPA) ...
+    initMenu: function() { /* ... code cũ (nhớ thêm nút Bài 26 nếu chưa có trong loop) ... */ 
+        /* LevelMap loop tự động render bài 26 rồi */
         const menuContainer = document.getElementById('menu-screen');
         menuContainer.innerHTML = '<div class="menu-title"> 📚  CHỌN BÀI HỌC</div>';
-        
-        // Nút Bảng IPA
         const btnIPA = document.createElement('button');
-        btnIPA.className = 'btn-menu';
-        btnIPA.innerText = "🔠  Bảng Phiên Âm (IPA)";
-        btnIPA.style.borderColor = "#9C27B0";
-        btnIPA.style.color = "#9C27B0";
+        btnIPA.className = 'btn-menu'; btnIPA.innerText = "🔠  Bảng Phiên Âm (IPA)";
+        btnIPA.style.borderColor = "#9C27B0"; btnIPA.style.color = "#9C27B0";
         btnIPA.onclick = function() { App.openIPA(); };
         menuContainer.appendChild(btnIPA);
-
-        // Các nút bài học
         LevelMap.forEach(level => {
             if (level.type === 'learn') {
                 const btn = document.createElement('button');
-                btn.className = 'btn-menu';
-                btn.innerText = level.label;
-                if (level.label.includes("Ôn tập")) {
-                    btn.style.borderColor = "#ff9600";
-                    btn.style.color = "#d35400";
-                }
+                btn.className = 'btn-menu'; btn.innerText = level.label;
+                if (level.label.includes("Ôn tập")) { btn.style.borderColor = "#ff9600"; btn.style.color = "#d35400"; }
+                if (level.label.includes("THI THỬ")) { btn.style.borderColor = "#e74c3c"; btn.style.color = "#c0392b"; btn.style.borderWidth = "4px"; }
                 btn.onclick = function() { App.startLesson(level.id); };
                 menuContainer.appendChild(btn);
             }
         });
     },
-
-    // --- LOGIC BẢNG IPA ---
+// --- LOGIC BẢNG IPA ---
     openIPA: function() {
         document.getElementById('menu-screen').style.display = 'none';
         document.getElementById('ipa-screen').style.display = 'flex';
@@ -1275,9 +1310,8 @@ const App = {
         document.getElementById('ipa-screen').style.display = 'none';
         document.getElementById('menu-screen').style.display = 'flex';
     },
-
     startLesson: function(num) { AudioEngine.unlock(); document.getElementById('menu-screen').style.display = 'none'; document.getElementById('main-container').style.display = 'block'; LearningEngine.initLesson(num); LearningEngine.render(); },
-    enterGame: function() { document.getElementById('learning-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; const item = LearningEngine.currentData[LearningEngine.idx]; 
+enterGame: function() { document.getElementById('learning-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; const item = LearningEngine.currentData[LearningEngine.idx]; 
     let vocabList = [];
     // Quét tìm bài học chứa item hiện tại
     for(let i=1; i<=25; i++) { 
@@ -1293,12 +1327,8 @@ const App = {
     goHome: function() { AudioEngine.stopAllAndBlock(); GameEngine.stop(); document.getElementById('main-container').style.display = 'none'; document.getElementById('menu-screen').style.display = 'flex'; }
 };
 
-window.onload = function() { 
-    AudioEngine.stopAllAndBlock(); 
-    App.initMenu(); 
-};
+window.onload = function() { AudioEngine.stopAllAndBlock(); App.initMenu(); };
 window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
 </script>
 </body>
 </html>
-
