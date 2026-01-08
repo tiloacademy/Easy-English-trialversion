@@ -695,65 +695,30 @@ const DataEngine = {
         { type: "game", title: "Game /ks/", pairs: ["axe", "taxi", "six", "box", "fox"], img: "ks_card.jpg" }
     ],
 
-    getLesson: function(num) {
-        if(this["lesson" + num]) return this["lesson" + num];
-        return [];
-    }
-};
-/* --- DỮ LIỆU BẢNG IPA (MỚI) --- */
-const IPA_DATA = {
-    "Single Vowels": [
-        "sound_i", "sound_ii", "sound_u", 
-        "sound_uu", "sound_e", "sound_schwa", 
-        "sound_ae", "sound_uh", "sound_aa"
-    ],
-    "Double Vowels": [
-        "sound_ei", "sound_oi", "sound_ai", "sound_ou", "sound_au"
-    ],
-    "R-controlled Vowels": [
-        "sound_ur", "sound_or", "sound_ar", "sound_ir", "sound_er"
-    ],
-    "Unvoiced Consonants": [
-        "sound_p", "sound_f", "sound_th", 
-        "sound_t", "sound_s", "sound_sh", 
-        "sound_ch", "sound_k", "sound_h", "sound_ks"
-    ],
-    "Voiced Consonants": [
-        "sound_b", "sound_v", "sound_dh", 
-        "sound_d", "sound_z", "sound_zh", 
-        "sound_j", "sound_g", "sound_m", 
-        "sound_n", "sound_ng", "sound_w", 
-        "sound_l", "sound_r", "sound_y", 
-        "sound_kw", "sound_flapt"
-    ]
-};
-
-    // --- HÀM TẠO ĐỀ THI NGẪU NHIÊN (40 CÂU) ---
+    /* --- HÀM TẠO ĐỀ THI NGẪU NHIÊN (40 CÂU) --- */
     getMockTest: function() {
         let testSet = [];
         
-        // 1. Lấy 10 hình IPA ngẫu nhiên
+        // 1. Lấy 10 hình IPA ngẫu nhiên từ biến IPA_DATA
         let allIPAs = [];
         for (const key in IPA_DATA) {
             IPA_DATA[key].forEach(sound => {
-                // Tạo object câu hỏi IPA: Chỉ có hình (img) và âm thanh (speak=wav file)
                 allIPAs.push({ 
                     type: 'exam-ipa', 
                     img: sound + ".jpg", 
-                    speak: sound + ".wav", // Khi check sẽ phát file này
-                    text: "" // Không hiện chữ
+                    speak: sound + ".wav", 
+                    text: "" 
                 });
             });
         }
         allIPAs.sort(() => 0.5 - Math.random());
         testSet = testSet.concat(allIPAs.slice(0, 10));
 
-        // 2. Lấy 25 từ ngẫu nhiên (có hình + chữ + ipa đỏ)
+        // 2. Lấy 25 từ ngẫu nhiên
         let allWords = [];
         for (let i=1; i<=25; i++) {
             let lesson = this["lesson"+i];
             if(lesson) {
-                // Lọc ra các item là từ (có img, không phải game, không phải sent)
                 let words = lesson.filter(item => item.img && item.type !== 'game' && item.type !== 'sent');
                 allWords = allWords.concat(words);
             }
@@ -777,12 +742,13 @@ const IPA_DATA = {
     },
 
     getLesson: function(num) {
-        if (num === 26) return this.getMockTest(); // Nếu là bài 26 -> Tạo đề thi
+        if (num === 26) return this.getMockTest(); 
         if(this["lesson" + num]) return this["lesson" + num];
         return [];
     }
 };
 
+/* --- DỮ LIỆU BẢNG IPA --- */
 const IPA_DATA = {
     "Single Vowels": ["sound_i", "sound_ii", "sound_u", "sound_uu", "sound_e", "sound_schwa", "sound_ae", "sound_uh", "sound_aa"],
     "Double Vowels": ["sound_ei", "sound_oi", "sound_ai", "sound_ou", "sound_au"],
