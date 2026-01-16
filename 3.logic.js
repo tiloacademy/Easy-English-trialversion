@@ -1,20 +1,47 @@
+/* ==========================================================================
+   FILE: 3.logic.js (CẬP NHẬT: THỜI GIAN ĐỌC & FIX GAME LẬT HÌNH)
+   ========================================================================== */
+
 /* --- AUDIO ENGINE --- */
 const AudioEngine = {
     isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"), currentUtterance: null,
     unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
-    playTTS: function(text) { if (!this.isAudioAllowed) return; this.stopCurrentSound(); if ('speechSynthesis' in window) { window.currentUtterance = new SpeechSynthesisUtterance(text); window.currentUtterance.lang = 'en-US'; window.currentUtterance.rate = 0.9; window.speechSynthesis.speak(window.currentUtterance); } },
-    playSequence: function(soundFile, textToRead) {
-        if (!this.isAudioAllowed) return; this.stopCurrentSound(); const audio = new Audio(soundFile);
-        audio.onended = () => { if (textToRead) setTimeout(() => { this.playTTS(textToRead); }, 300); };
-        audio.onerror = () => { if (textToRead) this.playTTS(textToRead); };
-        audio.play().catch(e => { if (textToRead) this.playTTS(textToRead); });
+    
+    // HÀM TTS CHUẨN (Đọc bằng trình duyệt)
+    playTTS: function(text) { 
+        if (!this.isAudioAllowed) return; 
+        this.stopCurrentSound(); 
+        if ('speechSynthesis' in window) { 
+            window.currentUtterance = new SpeechSynthesisUtterance(text); 
+            window.currentUtterance.lang = 'en-US'; 
+            window.currentUtterance.rate = 0.9; 
+            window.speechSynthesis.speak(window.currentUtterance); 
+        } 
     },
+    
+    // HÀM PHÁT FILE WAV RỒI MỚI ĐỌC TTS (Cho phần học âm đệm)
+    playSequence: function(soundFile, textToRead) {
+        if (!this.isAudioAllowed) return; 
+        this.stopCurrentSound(); 
+        const audio = new Audio(soundFile);
+        audio.onended = () => { 
+            if (textToRead) setTimeout(() => { this.playTTS(textToRead); }, 300); 
+        };
+        audio.onerror = () => { 
+            // Nếu lỗi file wav -> Vẫn đọc TTS
+            if (textToRead) this.playTTS(textToRead); 
+        };
+        audio.play().catch(e => { 
+            if (textToRead) this.playTTS(textToRead); 
+        });
+    },
+    
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- GAME ENGINES (WHACK-A-MOLE & FLIP) --- */
+/* --- GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
@@ -73,32 +100,47 @@ const GameEngine = {
         else { AudioEngine.playEffect('wrong'); moleEl.classList.remove('up'); this.updateScore(-50); this.showFloatingText(touchX, touchY, "-50", "red"); }
     },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
-    // FLIP Logic
+    
+    // --- FLIP LOGIC ĐÃ SỬA LỖI ---
+    // Fix: Chỉ chọn tối đa 5 cặp từ để đảm bảo không bị dư hình/chữ khi tạo bảng 10 ô
     startFlipGame: function() {
         this.stop(); this.active = true; this.sec = 0; this.matches = 0;
         document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
         const tower = document.getElementById('tower'); tower.innerHTML = '';
         let cards = [];
         
-        const validWords = this.currentConfig.pairs;
-        validWords.forEach(key => {
+        // 1. Lọc ra danh sách các từ hợp lệ
+        let validItems = [];
+        this.currentConfig.pairs.forEach(key => {
             let original = this.currentDataPool.find(d => { 
                 if(d.type === 'game' || d.type === 'sent') return false; 
                 let fullWord = d.parts.map(p => p.t).join(""); 
                 return fullWord === key; 
             });
-            if(original) { 
-                cards.push({ id: key, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
-                let htmlText = `<div class="game-card-text">`; 
-                original.parts.forEach(p => { 
-                    htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; 
-                }); 
-                htmlText += `</div>`; 
-                cards.push({ id: key, type: 'text', content: htmlText, speak: original.speak }); 
-            }
+            if(original) validItems.push(original);
+        });
+
+        // 2. Trộn và chỉ lấy tối đa 5 cặp (để khớp với lưới 10 ô)
+        validItems.sort(() => 0.5 - Math.random());
+        validItems = validItems.slice(0, 5); // CẮT CHUỖI ĐỂ ĐẢM BẢO CHỈ CÓ 5 CẶP
+
+        // 3. Tạo thẻ bài từ 5 cặp đã chọn
+        validItems.forEach(original => {
+            // Thẻ Hình
+            cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak });
+            // Thẻ Chữ
+            let htmlText = `<div class="game-card-text">`; 
+            original.parts.forEach(p => { 
+                htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; 
+            }); 
+            htmlText += `</div>`; 
+            cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak });
         });
         
+        // 4. Trộn bài
         cards.sort(() => 0.5 - Math.random());
+        
+        // 5. Hiển thị lên lưới
         let cCount = 0; let num = 1; const rows = [3, 2, 3, 2];
         rows.forEach(cnt => {
             const rowDiv = document.createElement('div'); rowDiv.className = 'tower-row';
@@ -264,9 +306,11 @@ const SnakeEngine = {
     win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Tuyệt vời!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
-/* --- LEARNING ENGINE --- */
+/* --- LEARNING ENGINE (CẬP NHẬT THỜI GIAN ĐỌC) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, 
+    listenTimeout: null, // Thêm biến để quản lý timeout
+
     initLesson: function(lessonNum) { 
         this.currentLessonId = lessonNum;
         this.currentData = DataEngine.getLesson(lessonNum); 
@@ -376,8 +420,53 @@ const LearningEngine = {
             else { AudioEngine.playTTS(textToRead); }
         } 
     },
-    startListening: function() { const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); const btn = document.getElementById('mic-btn'); btn.disabled = true; btn.innerText = "  👂   Đang nghe..."; btn.style.backgroundColor = "#e74c3c"; const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start(); recognition.onresult = (e) => { let heard = []; for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); this.checkResult(heard); }; recognition.onerror = () => { this.resetMic(); }; recognition.onend = () => { if(btn.disabled) this.resetMic(); }; },
-    resetMic: function() { const btn = document.getElementById('mic-btn'); if(btn) { btn.disabled = false; btn.innerText = "  🎤   Đọc Ngay"; btn.style.backgroundColor = "#27ae60"; } },
+    
+    // --- START LISTENING ĐÃ CẬP NHẬT ---
+    startListening: function() { 
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
+        if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); 
+        
+        const btn = document.getElementById('mic-btn'); 
+        btn.disabled = true; 
+        btn.innerText = "  👂   Đang nghe..."; 
+        btn.style.backgroundColor = "#e74c3c"; 
+        
+        // 1. Xác định thời gian chờ
+        const currentItem = this.currentData[this.idx];
+        const waitTime = (currentItem.type === 'sent') ? 10000 : 5000; // 10s cho câu, 5s cho từ
+
+        const recognition = new SpeechRecognition(); 
+        recognition.lang = 'en-US'; 
+        
+        // Bắt đầu thu âm
+        recognition.start(); 
+        
+        // 2. Cài đặt bộ đếm giờ tự động tắt
+        if(this.listenTimeout) clearTimeout(this.listenTimeout);
+        this.listenTimeout = setTimeout(() => {
+            // Sau 5s hoặc 10s tự động dừng nếu chưa có kết quả
+            if(btn.disabled) recognition.stop();
+        }, waitTime);
+
+        recognition.onresult = (e) => { 
+            let heard = []; 
+            for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); 
+            this.checkResult(heard); 
+        }; 
+        recognition.onerror = () => { this.resetMic(); }; 
+        recognition.onend = () => { if(btn.disabled) this.resetMic(); }; 
+    },
+    
+    resetMic: function() { 
+        if(this.listenTimeout) clearTimeout(this.listenTimeout); // Xóa timeout
+        const btn = document.getElementById('mic-btn'); 
+        if(btn) { 
+            btn.disabled = false; 
+            btn.innerText = "  🎤   Đọc Ngay"; 
+            btn.style.backgroundColor = "#27ae60"; 
+        } 
+    },
+    
     checkResult: function(heardArray) { const item = this.currentData[this.idx]; const targetRaw = item.speak.toLowerCase().replace(/[.,!?]/g, "").trim(); let validAnswers = [targetRaw]; if (item.pre) validAnswers.push((item.pre + " " + targetRaw).toLowerCase()); let maxScore = 0; for (let text of heardArray) { let userText = text.trim(); for (let target of validAnswers) { if (userText.includes(target) || target.includes(userText)) maxScore = 100; } } let finalStars = 2; let msg = "Try again!"; if (maxScore >= 90) { finalStars = 5; msg = "Excellent!  🎉 "; AudioEngine.playEffect('win'); } else { AudioEngine.playEffect('wrong'); } let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars === 5) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); }
 };
 
