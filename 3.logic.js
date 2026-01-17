@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE: 3.logic.js (FIXED: SMART SCORING & TIMER)
+   FILE: 3.logic.js (FIXED: AUTO-DETECT SENTENCE & SMART SCORING)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
@@ -9,6 +9,7 @@ const AudioEngine = {
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
     
+    // HÀM TTS CHUẨN
     playTTS: function(text) { 
         if (!this.isAudioAllowed) return; 
         this.stopCurrentSound(); 
@@ -20,6 +21,7 @@ const AudioEngine = {
         } 
     },
     
+    // HÀM PHÁT FILE WAV RỒI MỚI ĐỌC TTS
     playSequence: function(soundFile, textToRead) {
         if (!this.isAudioAllowed) return; 
         this.stopCurrentSound(); 
@@ -32,11 +34,12 @@ const AudioEngine = {
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- GAME ENGINE --- */
+/* --- GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
     currentConfig: null, currentDataPool: [],
+    
     WINNING_SCORE: 1000, 
 
     start: function(config, dataPool) {
@@ -91,7 +94,7 @@ const GameEngine = {
     },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
     
-    // FLIP GAME
+    // FLIP GAME (FIXED)
     startFlipGame: function() {
         this.stop(); this.active = true; this.sec = 0; this.matches = 0;
         document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
@@ -106,8 +109,11 @@ const GameEngine = {
             });
             if(original) validItems.push(original);
         });
+        
+        // CHỈ LẤY 5 CẶP (10 THẺ) ĐỂ TRÁNH LỖI LẺ CẶP
         validItems.sort(() => 0.5 - Math.random());
         validItems = validItems.slice(0, 5); 
+        
         validItems.forEach(original => {
             cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
             let htmlText = `<div class="game-card-text">`; 
@@ -283,7 +289,7 @@ const SnakeEngine = {
     win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Tuyệt vời!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
-/* --- LEARNING ENGINE (CẬP NHẬT: 15S & CHẤM ĐIỂM THÔNG MINH) --- */
+/* --- LEARNING ENGINE (CẬP NHẬT: AUTO-DETECT SENTENCE) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, 
     listenTimeout: null, 
@@ -348,7 +354,7 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED: 15 giây cho câu ---
+    // --- UPDATED START LISTENING: Tự động phát hiện câu dài ---
     startListening: function() { 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
         if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); 
@@ -359,12 +365,15 @@ const LearningEngine = {
         btn.style.backgroundColor = "#e74c3c"; 
         
         const currentItem = this.currentData[this.idx];
-        // Nếu là câu (type='sent') -> chờ 15s, ngược lại 5s
-        const waitTime = (currentItem.type === 'sent') ? 15000 : 5000; 
+        
+        // LOGIC MỚI: Nếu có type='sent' HOẶC số từ >= 2 thì coi là câu -> 15 giây
+        const wordCount = currentItem.speak.trim().split(/\s+/).length;
+        const isSentence = (currentItem.type === 'sent') || (wordCount >= 2);
+        
+        const waitTime = isSentence ? 15000 : 5000; 
 
         const recognition = new SpeechRecognition(); 
         recognition.lang = 'en-US'; 
-        // QUAN TRỌNG: Cố gắng giữ mic mở lâu hơn
         recognition.continuous = false; 
         recognition.interimResults = false;
         
@@ -394,7 +403,7 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED: CHẤM ĐIỂM THÔNG MINH ---
+    // --- UPDATED CHECK RESULT: Chấm điểm thông minh cho cả câu ---
     checkResult: function(heardArray) { 
         const item = this.currentData[this.idx]; 
         const normalize = (str) => str.toLowerCase().replace(/[.,!?;:]/g, "").trim();
@@ -403,37 +412,44 @@ const LearningEngine = {
         let validTargets = [targetRaw];
         if (item.pre) validTargets.push(normalize(item.pre + " " + item.speak));
 
+        // Xác định loại bài để chọn cách chấm
+        const wordCount = targetRaw.split(/\s+/).length;
+        const isSentence = (item.type === 'sent') || (wordCount >= 2);
+
         let bestAccuracy = 0;
 
         for (let text of heardArray) {
             let userText = normalize(text);
             for (let target of validTargets) {
-                if (item.type === 'sent') {
-                    // LOGIC CHO CÂU: Tính % số từ trùng khớp
+                if (isSentence) {
+                    // LOGIC CHẤM CÂU: Đếm số từ trùng khớp
                     const targetWords = target.split(/\s+/);
                     const userWords = userText.split(/\s+/);
+                    
                     let matchCount = 0;
+                    // Kiểm tra từng từ trong câu mẫu xem có xuất hiện trong câu bé đọc không
                     targetWords.forEach(w => {
                         if (userWords.includes(w)) matchCount++;
                     });
+                    
                     let accuracy = (matchCount / targetWords.length) * 100;
                     if (accuracy > bestAccuracy) bestAccuracy = accuracy;
                 } else {
-                    // LOGIC CHO TỪ ĐƠN: Bé nói CHỨA từ mẫu là được
+                    // LOGIC CHẤM TỪ ĐƠN: Chỉ cần chứa từ đó là đúng
                     if (userText.includes(target)) bestAccuracy = 100;
                 }
             }
         }
 
-        // Đánh giá sao dựa trên độ chính xác
+        // Đánh giá sao
         let finalStars = 1;
         let msg = "Try again!";
         
         if (bestAccuracy >= 100) { 
             finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win');
-        } else if (bestAccuracy >= 80) { 
-            finalStars = 5; msg = "Great job! 🎉"; AudioEngine.playEffect('win');
-        } else if (bestAccuracy >= 50) {
+        } else if (bestAccuracy >= 75) { 
+            finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win');
+        } else if (bestAccuracy >= 50) { 
             finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct');
         } else {
             finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong');
