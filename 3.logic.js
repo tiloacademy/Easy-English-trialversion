@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE: 3.logic.js (CẬP NHẬT: THỜI GIAN ĐỌC & FIX GAME LẬT HÌNH)
+   FILE: 3.logic.js (CẬP NHẬT: FIX LỖI GAME FLIP + THỜI GIAN ĐỌC)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
@@ -101,15 +101,14 @@ const GameEngine = {
     },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
     
-    // --- FLIP LOGIC ĐÃ SỬA LỖI ---
-    // Fix: Chỉ chọn tối đa 5 cặp từ để đảm bảo không bị dư hình/chữ khi tạo bảng 10 ô
+    // --- FLIP GAME (SỬA LỖI) ---
     startFlipGame: function() {
         this.stop(); this.active = true; this.sec = 0; this.matches = 0;
         document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
         const tower = document.getElementById('tower'); tower.innerHTML = '';
         let cards = [];
         
-        // 1. Lọc ra danh sách các từ hợp lệ
+        // 1. Lọc ra danh sách từ hợp lệ
         let validItems = [];
         this.currentConfig.pairs.forEach(key => {
             let original = this.currentDataPool.find(d => { 
@@ -120,27 +119,25 @@ const GameEngine = {
             if(original) validItems.push(original);
         });
 
-        // 2. Trộn và chỉ lấy tối đa 5 cặp (để khớp với lưới 10 ô)
+        // 2. CHỈ LẤY ĐÚNG 5 TỪ (để tạo 5 cặp = 10 thẻ)
         validItems.sort(() => 0.5 - Math.random());
-        validItems = validItems.slice(0, 5); // CẮT CHUỖI ĐỂ ĐẢM BẢO CHỈ CÓ 5 CẶP
+        validItems = validItems.slice(0, 5); 
 
-        // 3. Tạo thẻ bài từ 5 cặp đã chọn
+        // 3. Tạo thẻ cho 5 từ này (1 Hình + 1 Chữ)
         validItems.forEach(original => {
-            // Thẻ Hình
-            cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak });
-            // Thẻ Chữ
+            cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
             let htmlText = `<div class="game-card-text">`; 
             original.parts.forEach(p => { 
                 htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; 
             }); 
             htmlText += `</div>`; 
-            cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak });
+            cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); 
         });
         
-        // 4. Trộn bài
+        // 4. Trộn thẻ
         cards.sort(() => 0.5 - Math.random());
         
-        // 5. Hiển thị lên lưới
+        // 5. Hiển thị
         let cCount = 0; let num = 1; const rows = [3, 2, 3, 2];
         rows.forEach(cnt => {
             const rowDiv = document.createElement('div'); rowDiv.className = 'tower-row';
@@ -309,7 +306,7 @@ const SnakeEngine = {
 /* --- LEARNING ENGINE (CẬP NHẬT THỜI GIAN ĐỌC) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, 
-    listenTimeout: null, // Thêm biến để quản lý timeout
+    listenTimeout: null, 
 
     initLesson: function(lessonNum) { 
         this.currentLessonId = lessonNum;
