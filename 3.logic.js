@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE: 3.logic.js (FIXED: AUTO-DETECT SENTENCE & SMART SCORING)
+   FILE: 3.logic.js (FINAL FIXED: AUTO-DETECT SENTENCE BY WORD COUNT)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
@@ -9,7 +9,6 @@ const AudioEngine = {
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
     
-    // HÀM TTS CHUẨN
     playTTS: function(text) { 
         if (!this.isAudioAllowed) return; 
         this.stopCurrentSound(); 
@@ -21,7 +20,6 @@ const AudioEngine = {
         } 
     },
     
-    // HÀM PHÁT FILE WAV RỒI MỚI ĐỌC TTS
     playSequence: function(soundFile, textToRead) {
         if (!this.isAudioAllowed) return; 
         this.stopCurrentSound(); 
@@ -34,12 +32,11 @@ const AudioEngine = {
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
+/* --- GAME ENGINE (FIXED FLIP GAME) --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
     currentConfig: null, currentDataPool: [],
-    
     WINNING_SCORE: 1000, 
 
     start: function(config, dataPool) {
@@ -94,7 +91,7 @@ const GameEngine = {
     },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
     
-    // FLIP GAME (FIXED)
+    // --- FLIP GAME (ĐÃ SỬA LỖI LẺ CẶP) ---
     startFlipGame: function() {
         this.stop(); this.active = true; this.sec = 0; this.matches = 0;
         document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
@@ -110,7 +107,7 @@ const GameEngine = {
             if(original) validItems.push(original);
         });
         
-        // CHỈ LẤY 5 CẶP (10 THẺ) ĐỂ TRÁNH LỖI LẺ CẶP
+        // CHỈ LẤY ĐÚNG 5 CẶP (10 THẺ)
         validItems.sort(() => 0.5 - Math.random());
         validItems = validItems.slice(0, 5); 
         
@@ -123,6 +120,7 @@ const GameEngine = {
             htmlText += `</div>`; 
             cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); 
         });
+        
         cards.sort(() => 0.5 - Math.random());
         let cCount = 0; let num = 1; const rows = [3, 2, 3, 2];
         rows.forEach(cnt => {
@@ -289,7 +287,7 @@ const SnakeEngine = {
     win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Tuyệt vời!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
-/* --- LEARNING ENGINE (CẬP NHẬT: AUTO-DETECT SENTENCE) --- */
+/* --- LEARNING ENGINE (UPDATED: SMART TIMER & SCORING) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, 
     listenTimeout: null, 
@@ -354,7 +352,7 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED START LISTENING: Tự động phát hiện câu dài ---
+    // --- UPDATED: TỰ ĐỘNG ĐẾM TỪ (KHÔNG PHỤ THUỘC 'type: sent' NỮA) ---
     startListening: function() { 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
         if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); 
@@ -366,11 +364,10 @@ const LearningEngine = {
         
         const currentItem = this.currentData[this.idx];
         
-        // LOGIC MỚI: Nếu có type='sent' HOẶC số từ >= 2 thì coi là câu -> 15 giây
+        // 🔹 LOGIC MỚI: Đếm số từ thực tế
         const wordCount = currentItem.speak.trim().split(/\s+/).length;
-        const isSentence = (currentItem.type === 'sent') || (wordCount >= 2);
-        
-        const waitTime = isSentence ? 15000 : 5000; 
+        // Nếu có >= 2 từ -> Chờ 15s. Nếu 1 từ -> Chờ 5s
+        const waitTime = (wordCount >= 2) ? 15000 : 5000; 
 
         const recognition = new SpeechRecognition(); 
         recognition.lang = 'en-US'; 
@@ -382,7 +379,7 @@ const LearningEngine = {
         if(this.listenTimeout) clearTimeout(this.listenTimeout);
         this.listenTimeout = setTimeout(() => {
             if(btn.disabled) recognition.stop();
-        }, waitTime);
+        }, waitTime); // <-- Dùng waitTime đã tính toán ở trên
 
         recognition.onresult = (e) => { 
             let heard = []; 
@@ -403,7 +400,7 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED CHECK RESULT: Chấm điểm thông minh cho cả câu ---
+    // --- UPDATED: CHẤM ĐIỂM THÔNG MINH (Dựa trên số từ đếm được) ---
     checkResult: function(heardArray) { 
         const item = this.currentData[this.idx]; 
         const normalize = (str) => str.toLowerCase().replace(/[.,!?;:]/g, "").trim();
@@ -412,9 +409,9 @@ const LearningEngine = {
         let validTargets = [targetRaw];
         if (item.pre) validTargets.push(normalize(item.pre + " " + item.speak));
 
-        // Xác định loại bài để chọn cách chấm
+        // 🔹 Xác định loại bài bằng cách đếm từ (giống startListening)
         const wordCount = targetRaw.split(/\s+/).length;
-        const isSentence = (item.type === 'sent') || (wordCount >= 2);
+        const isSentence = (wordCount >= 2);
 
         let bestAccuracy = 0;
 
@@ -427,7 +424,6 @@ const LearningEngine = {
                     const userWords = userText.split(/\s+/);
                     
                     let matchCount = 0;
-                    // Kiểm tra từng từ trong câu mẫu xem có xuất hiện trong câu bé đọc không
                     targetWords.forEach(w => {
                         if (userWords.includes(w)) matchCount++;
                     });
@@ -441,7 +437,6 @@ const LearningEngine = {
             }
         }
 
-        // Đánh giá sao
         let finalStars = 1;
         let msg = "Try again!";
         
