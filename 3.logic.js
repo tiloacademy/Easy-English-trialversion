@@ -1,10 +1,10 @@
 /* ==========================================================================
-   FILE: 3.logic.js (FINAL FIXED: AUTO-DETECT SENTENCE BY WORD COUNT)
+   FILE: 3.logic.js (FINAL v2.0: 3 PARTS SYSTEM + ENGLISH UI)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
 const AudioEngine = {
-    isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"), currentUtterance: null,
+    isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"),
     unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
@@ -32,7 +32,7 @@ const AudioEngine = {
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- GAME ENGINE (FIXED FLIP GAME) --- */
+/* --- GAME ENGINE --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
@@ -52,13 +52,14 @@ const GameEngine = {
         const hammer = document.getElementById('cursor-hammer'); if(hammer) hammer.classList.remove('active');
         SnakeEngine.stop();
     },
+    
     // MOLE Logic
     startMoleGame: function() {
         this.stop(); this.active = true; this.score = 0; this.sec = 0; this.updateScore(0);
         this.moles = document.querySelectorAll('.mole');
         document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
         this.refillMoleWords();
-        if(this.moleRemainingWords.length === 0) return alert("Không có dữ liệu từ vựng!");
+        if(this.moleRemainingWords.length === 0) return alert("No vocabulary data available!");
         this.startTimer(); this.nextMoleRound();
     },
     refillMoleWords: function() { const targetPhoneme = this.currentConfig.phoneme; this.moleRemainingWords = this.currentDataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(targetPhoneme))).sort(() => 0.5 - Math.random()); },
@@ -91,7 +92,7 @@ const GameEngine = {
     },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
     
-    // --- FLIP GAME (ĐÃ SỬA LỖI LẺ CẶP) ---
+    // FLIP GAME
     startFlipGame: function() {
         this.stop(); this.active = true; this.sec = 0; this.matches = 0;
         document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
@@ -106,11 +107,8 @@ const GameEngine = {
             });
             if(original) validItems.push(original);
         });
-        
-        // CHỈ LẤY ĐÚNG 5 CẶP (10 THẺ)
         validItems.sort(() => 0.5 - Math.random());
         validItems = validItems.slice(0, 5); 
-        
         validItems.forEach(original => {
             cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
             let htmlText = `<div class="game-card-text">`; 
@@ -120,7 +118,6 @@ const GameEngine = {
             htmlText += `</div>`; 
             cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); 
         });
-        
         cards.sort(() => 0.5 - Math.random());
         let cCount = 0; let num = 1; const rows = [3, 2, 3, 2];
         rows.forEach(cnt => {
@@ -146,7 +143,7 @@ const GameEngine = {
     startTimer: function() { clearInterval(this.timerInt); document.getElementById('timer').innerText = "00:00"; this.timerInt = setInterval(() => { this.sec++; let m=Math.floor(this.sec/60).toString().padStart(2,'0'); let s=(this.sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `${m}:${s}`; }, 1000); },
     updateScore: function(val) { this.score += val; if(this.score < 0) this.score = 0; document.getElementById('score-display').innerText = this.score; },
     showFloatingText: function(x, y, text, color) { const el = document.createElement('div'); el.className = 'floating-text'; el.innerText = text; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.color = color; document.body.appendChild(el); setTimeout(() => el.remove(), 800); },
-    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("Excellent job!"); document.getElementById('win-msg').innerText = "Thời gian: " + document.getElementById('timer').innerText; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
+    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("Excellent job!"); document.getElementById('win-msg').innerText = "Time: " + document.getElementById('timer').innerText; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
 /* --- SNAKE ENGINE --- */
@@ -159,7 +156,7 @@ const SnakeEngine = {
         this.stop(); this.active = true; this.paused = false; this.score = 0; this.speed = 550; this.lives = 3; this.targetPhoneme = config.phoneme;
         this.poolCorrect = dataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         this.poolWrong = dataPool.filter(w => !w.parts || !w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
-        if (this.poolCorrect.length === 0) return alert("Thiếu dữ liệu âm /" + this.targetPhoneme + "/");
+        if (this.poolCorrect.length === 0) return alert("Missing data for /" + this.targetPhoneme + "/");
 
         document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('pause-modal').style.display = 'none'; document.getElementById('snake-score').innerText = this.score;
         this.updateLivesUI();
@@ -183,7 +180,7 @@ const SnakeEngine = {
         this.lives--;
         this.updateLivesUI();
         AudioEngine.playEffect('wrong');
-        if (this.lives <= 0) { this.showGameOver(msg + " Hết mạng rồi!"); } 
+        if (this.lives <= 0) { this.showGameOver(msg + " Game Over!"); } 
         else {
             const center = Math.floor(this.boardSize / 2);
             this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}];
@@ -195,7 +192,7 @@ const SnakeEngine = {
         this.direction = this.nextDirection;
         const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
         if (this.isCollision(head)) { 
-            this.handleDeath("Rắn đụng tường!"); 
+            this.handleDeath("Hit Wall!"); 
             if(this.lives > 0) { this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; }
             else return;
         }
@@ -211,7 +208,7 @@ const SnakeEngine = {
                 this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop();
                 if (this.score >= 100) { this.win(); return; }
             } else { 
-                this.handleDeath(`Sai rồi! "${food.word}" không phải từ cần tìm!`);
+                this.handleDeath(`Wrong! "${food.word}" is not the target!`);
                 if(this.lives > 0) {
                      this.foods.splice(foodIndex, 1);
                      this.snake.pop(); this.draw();
@@ -284,7 +281,7 @@ const SnakeEngine = {
         this.nextDirection = newDir;
     },
     showGameOver: function(msg) { this.stop(); AudioEngine.playTTS("Game Over!"); document.getElementById('win-msg').innerText = msg; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; },
-    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Tuyệt vời!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
+    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Awesome!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
 /* --- LEARNING ENGINE (UPDATED: SMART TIMER & SCORING) --- */
@@ -306,9 +303,9 @@ const LearningEngine = {
             imgEl.src = item.img || 'https://img.icons8.com/color/500/controller.png';
             let titleColor = item.title.includes("GAME 1") ? "#e67e22" : (item.title.includes("GAME 2") ? "#9b59b6" : "#333");
             infoDisplay.innerHTML = `<h2 class="word-display" style="font-size:28px; color:${titleColor}; font-weight:900;">${item.title}</h2>`;
-            btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="App.enterGame()">  🚀   Chơi Ngay</button>`;
+            btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="App.enterGame()">  🚀   Play Now</button>`;
         } else {
-            imgEl.src = item.img; btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()">  🎤   Đọc Ngay</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()">  🔊   Nghe Lại</button> `;
+            imgEl.src = item.img; btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()">  🎤   Read Now</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()">  🔊   Listen</button> `;
             
             let html = '';
             let currentWordBuffer = [];
@@ -352,22 +349,23 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED: TỰ ĐỘNG ĐẾM TỪ (KHÔNG PHỤ THUỘC 'type: sent' NỮA) ---
+    // --- UPDATED START LISTENING: Smart Timer ---
     startListening: function() { 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
-        if (!SpeechRecognition) return alert("Thiết bị không hỗ trợ thu âm"); 
+        if (!SpeechRecognition) return alert("Device not supported"); 
         
         const btn = document.getElementById('mic-btn'); 
         btn.disabled = true; 
-        btn.innerText = "  👂   Đang nghe..."; 
+        btn.innerText = "  👂   Listening..."; 
         btn.style.backgroundColor = "#e74c3c"; 
         
         const currentItem = this.currentData[this.idx];
         
-        // 🔹 LOGIC MỚI: Đếm số từ thực tế
+        // AUTO-DETECT SENTENCE: >= 2 words OR explicit type='sent'
         const wordCount = currentItem.speak.trim().split(/\s+/).length;
-        // Nếu có >= 2 từ -> Chờ 15s. Nếu 1 từ -> Chờ 5s
-        const waitTime = (wordCount >= 2) ? 15000 : 5000; 
+        const isSentence = (currentItem.type === 'sent') || (wordCount >= 2);
+        
+        const waitTime = isSentence ? 15000 : 5000; 
 
         const recognition = new SpeechRecognition(); 
         recognition.lang = 'en-US'; 
@@ -379,7 +377,7 @@ const LearningEngine = {
         if(this.listenTimeout) clearTimeout(this.listenTimeout);
         this.listenTimeout = setTimeout(() => {
             if(btn.disabled) recognition.stop();
-        }, waitTime); // <-- Dùng waitTime đã tính toán ở trên
+        }, waitTime);
 
         recognition.onresult = (e) => { 
             let heard = []; 
@@ -395,12 +393,12 @@ const LearningEngine = {
         const btn = document.getElementById('mic-btn'); 
         if(btn) { 
             btn.disabled = false; 
-            btn.innerText = "  🎤   Đọc Ngay"; 
+            btn.innerText = "  🎤   Read Now"; 
             btn.style.backgroundColor = "#27ae60"; 
         } 
     },
     
-    // --- UPDATED: CHẤM ĐIỂM THÔNG MINH (Dựa trên số từ đếm được) ---
+    // --- UPDATED CHECK RESULT: Smart Scoring ---
     checkResult: function(heardArray) { 
         const item = this.currentData[this.idx]; 
         const normalize = (str) => str.toLowerCase().replace(/[.,!?;:]/g, "").trim();
@@ -409,9 +407,9 @@ const LearningEngine = {
         let validTargets = [targetRaw];
         if (item.pre) validTargets.push(normalize(item.pre + " " + item.speak));
 
-        // 🔹 Xác định loại bài bằng cách đếm từ (giống startListening)
+        // Auto-detect sentence
         const wordCount = targetRaw.split(/\s+/).length;
-        const isSentence = (wordCount >= 2);
+        const isSentence = (item.type === 'sent') || (wordCount >= 2);
 
         let bestAccuracy = 0;
 
@@ -419,7 +417,7 @@ const LearningEngine = {
             let userText = normalize(text);
             for (let target of validTargets) {
                 if (isSentence) {
-                    // LOGIC CHẤM CÂU: Đếm số từ trùng khớp
+                    // Logic for SENTENCE: Count matching words
                     const targetWords = target.split(/\s+/);
                     const userWords = userText.split(/\s+/);
                     
@@ -431,7 +429,7 @@ const LearningEngine = {
                     let accuracy = (matchCount / targetWords.length) * 100;
                     if (accuracy > bestAccuracy) bestAccuracy = accuracy;
                 } else {
-                    // LOGIC CHẤM TỪ ĐƠN: Chỉ cần chứa từ đó là đúng
+                    // Logic for WORD: Must contain the target word
                     if (userText.includes(target)) bestAccuracy = 100;
                 }
             }
@@ -460,15 +458,49 @@ const LearningEngine = {
     }
 };
 
-/* --- APP CONTROLLER --- */
+/* --- APP CONTROLLER (MAIN HUB) --- */
 const App = {
-    initMenu: function() {
-        const menuContainer = document.getElementById('menu-screen');
-        menuContainer.innerHTML = '<div class="menu-title"> 📚  CHỌN BÀI HỌC</div>';
+    currentPart: 0, // 0: Home, 1: Pronun, 2: Inton, 3: Vocab
+
+    init: function() {
+        AudioEngine.stopAllAndBlock();
+        document.getElementById('landing-screen').style.display = 'flex';
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('main-container').style.display = 'none';
+        document.getElementById('ipa-screen').style.display = 'none';
+    },
+
+    openPart: function(partId) {
+        this.currentPart = partId;
+        AudioEngine.unlock(); 
+        document.getElementById('landing-screen').style.display = 'none';
         
+        if (partId === 1) {
+            this.initPronunMenu(); 
+        } else if (partId === 2) {
+            alert("Intonation Part is coming soon! 🎬");
+            this.goHome(); 
+        } else if (partId === 3) {
+            alert("Vocabulary Part is coming soon! 📖");
+            this.goHome(); 
+        }
+    },
+
+    initPronunMenu: function() {
+        const menuContainer = document.getElementById('menu-screen');
+        menuContainer.style.display = 'flex';
+        menuContainer.innerHTML = '';
+        
+        const btnBack = document.createElement('button');
+        btnBack.className = 'btn-menu';
+        btnBack.innerText = "🏠  Home"; 
+        btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d";
+        btnBack.onclick = function() { App.goHome(); };
+        menuContainer.appendChild(btnBack);
+
         const btnIPA = document.createElement('button');
         btnIPA.className = 'btn-menu';
-        btnIPA.innerText = "🔠  Bảng Phiên Âm (IPA)";
+        btnIPA.innerText = "🔠  IPA Chart"; 
         btnIPA.style.borderColor = "#9C27B0";
         btnIPA.style.color = "#9C27B0";
         btnIPA.onclick = function() { App.openIPA(); };
@@ -497,23 +529,17 @@ const App = {
     openIPA: function() {
         document.getElementById('menu-screen').style.display = 'none';
         document.getElementById('ipa-screen').style.display = 'flex';
-        
         const content = document.getElementById('ipa-content');
         content.innerHTML = ''; 
-
         for (const [sectionName, soundFiles] of Object.entries(IPA_DATA)) {
             const secTitle = document.createElement('div');
             secTitle.className = 'ipa-sec-title';
             secTitle.innerText = sectionName;
-            
             if (sectionName.includes("Vowels")) secTitle.classList.add("bg-blue");
             else secTitle.classList.add("bg-green");
-            
             content.appendChild(secTitle);
-
             const grid = document.createElement('div');
             grid.className = 'ipa-grid';
-
             soundFiles.forEach(fileName => {
                 const item = document.createElement('div');
                 item.className = 'ipa-item';
@@ -526,7 +552,6 @@ const App = {
                 };
                 grid.appendChild(item);
             });
-
             content.appendChild(grid);
             content.appendChild(document.createElement('br'));
         }
@@ -537,24 +562,42 @@ const App = {
         document.getElementById('menu-screen').style.display = 'flex';
     },
 
-    startLesson: function(num) { AudioEngine.unlock(); document.getElementById('menu-screen').style.display = 'none'; document.getElementById('main-container').style.display = 'block'; LearningEngine.initLesson(num); LearningEngine.render(); },
-    enterGame: function() { document.getElementById('learning-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; const item = LearningEngine.currentData[LearningEngine.idx]; 
-    let vocabList = [];
-    for(let i=1; i<=25; i++) { 
-        if(!DataEngine["lesson"+i]) continue;
-        const lesson = DataEngine.getLesson(i); 
-        if (lesson.includes(item)) { 
-            vocabList = lesson.filter(l => l.img && l.type !== 'game'); 
-            break; 
-        } 
-    }
-    GameEngine.start(item, vocabList); },
+    startLesson: function(num) { 
+        AudioEngine.unlock(); 
+        document.getElementById('menu-screen').style.display = 'none'; 
+        document.getElementById('main-container').style.display = 'block'; 
+        LearningEngine.initLesson(num); 
+        LearningEngine.render(); 
+    },
+    
+    enterGame: function() { 
+        document.getElementById('learning-screen').style.display = 'none'; 
+        document.getElementById('game-screen').style.display = 'flex'; 
+        const item = LearningEngine.currentData[LearningEngine.idx]; 
+        let vocabList = [];
+        for(let i=1; i<=25; i++) { 
+            if(!DataEngine["lesson"+i]) continue;
+            const lesson = DataEngine.getLesson(i); 
+            if (lesson.includes(item)) { 
+                vocabList = lesson.filter(l => l.img && l.type !== 'game'); 
+                break; 
+            } 
+        }
+        GameEngine.start(item, vocabList);
+    },
+    
     exitGame: function() { GameEngine.stop(); LearningEngine.render(); },
-    goHome: function() { AudioEngine.stopAllAndBlock(); GameEngine.stop(); document.getElementById('main-container').style.display = 'none'; document.getElementById('menu-screen').style.display = 'flex'; }
+    
+    goHome: function() { 
+        AudioEngine.stopAllAndBlock(); 
+        GameEngine.stop(); 
+        document.getElementById('main-container').style.display = 'none'; 
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('landing-screen').style.display = 'flex'; 
+    }
 };
 
 window.onload = function() { 
-    AudioEngine.stopAllAndBlock(); 
-    App.initMenu(); 
+    App.init(); 
 };
 window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
