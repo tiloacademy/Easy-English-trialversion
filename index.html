@@ -1,31 +1,57 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bé Học Tiếng Anh (v1.15 Final)</title>
-    
+    <title>English For Kids (v2.0)</title>
     <link rel="stylesheet" href="2.style.css">
 </head>
 <body>
     <div id="cursor-hammer" class="hammer"></div>
 
-    <div id="menu-screen"></div>
+    <div id="landing-screen">
+        <div class="app-logo">🐰 ENGLISH FOR KIDS 🐻</div>
+        <div class="landing-grid">
+            <div class="landing-card c-pronun" onclick="App.openPart(1)">
+                <div class="card-icon">🗣️</div>
+                <div>
+                    <div class="card-title">Pronunciation</div>
+                    <div class="card-desc">IPA Mastery</div>
+                </div>
+            </div>
+            <div class="landing-card c-inton" onclick="App.openPart(2)">
+                <div class="card-icon">🎬</div>
+                <div>
+                    <div class="card-title">Intonation</div>
+                    <div class="card-desc">Movie Shadowing</div>
+                </div>
+            </div>
+            <div class="landing-card c-vocab" onclick="App.openPart(3)">
+                <div class="card-icon">📖</div>
+                <div>
+                    <div class="card-title">Vocabulary</div>
+                    <div class="card-desc">Reading & Quiz</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div id="ipa-screen">
-        <div class="ipa-header"><h1 class="ipa-h1">Bảng Phiên Âm (IPA)</h1></div>
+    <div id="menu-screen" style="display: none;"></div>
+
+    <div id="ipa-screen" style="display: none;">
+        <div class="ipa-header"><h1 class="ipa-h1">IPA Chart</h1></div>
         <div id="ipa-content"></div>
-        <button class="btn-back-ipa" onclick="App.closeIPA()"> ◀ Quay lại</button>
+        <button class="btn-back-ipa" onclick="App.closeIPA()"> ◀ Back</button>
     </div>
 
     <div id="main-container" style="display: none;">
         <div id="learning-screen">
             <div class="top-bar">
                 <button class="btn-home" onclick="App.goHome()"> 🏠 </button>
-                <div class="header-title"> 🐻 Bé Học Tiếng Anh 🐰 </div>
+                <div class="header-title"> 🐻 English For Kids 🐰 </div>
                 <div style="width: 40px;"></div>
             </div>
-            <div class="learn-img-wrapper"><img id="learn-img" src="" alt="Hình ảnh"></div>
+            <div class="learn-img-wrapper"><img id="learn-img" src="" alt="Image"></div>
             <div class="info-area" id="info-display"></div>
             <div class="stars" id="stars">☆☆☆☆☆</div>
             <div class="feedback-text" id="feedback">...</div>
@@ -45,8 +71,8 @@
             <div id="tower" class="tower-container" style="display:none;"></div>
             <div id="whack-wrapper" style="display:none;">
                 <div class="hud-row">
-                    <div class="wood-sign"><small>MỤC TIÊU:</small><br><div id="target-word-container"></div></div>
-                    <div class="wood-sign"><small>ĐIỂM SỐ:</small><br><span id="score-display" class="score-text">0</span></div>
+                    <div class="wood-sign"><small>TARGET:</small><br><div id="target-word-container"></div></div>
+                    <div class="wood-sign"><small>SCORE:</small><br><span id="score-display" class="score-text">0</span></div>
                 </div>
                 <div class="game-field-3d">
                     <div class="hole"><div class="mole" onclick="GameEngine.bonk(this, event)"><div class="mole-card"><img src=""></div></div></div>
@@ -63,7 +89,7 @@
             <div id="snake-game-container">
                 <div id="snake-target-bar">
                     <button class="btn-pause" onclick="SnakeEngine.togglePause()">⏸</button>
-                    <div class="target-label">Săn từ:</div>
+                    <div class="target-label">Find:</div>
                     <div id="snake-target-content"></div>
                     <div><span id="snake-lives">❤️❤️❤️</span>🏆 <span id="snake-score">0</span></div>
                 </div>
@@ -75,20 +101,20 @@
                     <div class="d-btn d-right" onclick="SnakeEngine.changeDirection('right')">➡️</div>
                 </div>
                 <div id="pause-modal">
-                    <div class="pause-text">TẠM DỪNG</div>
-                    <button class="btn-menu" style="width:auto;" onclick="SnakeEngine.togglePause()">▶ Tiếp tục chơi</button>
+                    <div class="pause-text">PAUSED</div>
+                    <button class="btn-menu" style="width:auto;" onclick="SnakeEngine.togglePause()">▶ Resume</button>
                 </div>
             </div>
             <div class="game-footer">
-                <button class="btn-action btn-nav" style="width: 60%; background-color: #e67e22;" onclick="GameEngine.restart()"> ↻ Chơi lại</button>
+                <button class="btn-action btn-nav" style="width: 60%; background-color: #e67e22;" onclick="GameEngine.restart()"> ↻ Replay</button>
             </div>
             <div id="win-modal">
-                <h1 style="color:green; font-size:36px; margin-bottom: 10px;">HOÀN THÀNH! 🎉 </h1>
-                <h2 style="color:#d35400; font-size:40px; margin: 5px 0;">Tổng điểm: <span id="final-score">0</span></h2>
-                <p id="win-msg" style="font-size:20px; color:#555; margin-bottom: 30px;">Thời gian: 00:00</p>
-                <button class="btn-action btn-nav" style="width:auto; padding: 0 40px;" onclick="GameEngine.restart()">Chơi lại</button>
+                <h1 style="color:green; font-size:36px; margin-bottom: 10px;">COMPLETED! 🎉 </h1>
+                <h2 style="color:#d35400; font-size:40px; margin: 5px 0;">Score: <span id="final-score">0</span></h2>
+                <p id="win-msg" style="font-size:20px; color:#555; margin-bottom: 30px;">Time: 00:00</p>
+                <button class="btn-action btn-nav" style="width:auto; padding: 0 40px;" onclick="GameEngine.restart()">Replay</button>
                 <br><br>
-                <button class="btn-action btn-listen" style="width:auto; padding: 0 40px;" onclick="LearningEngine.nextItem()">Bài Tiếp ➡ </button>
+                <button class="btn-action btn-listen" style="width:auto; padding: 0 40px;" onclick="LearningEngine.nextItem()">Next ➡ </button>
             </div>
         </div>
     </div>
