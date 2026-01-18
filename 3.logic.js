@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE: 3.logic.js (FINAL v2.0: 3 PARTS SYSTEM + ENGLISH UI)
+   FILE: 3.logic.js (FINAL FIXED: FULL NAVIGATION FOR 3 PARTS)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
@@ -59,7 +59,7 @@ const GameEngine = {
         this.moles = document.querySelectorAll('.mole');
         document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
         this.refillMoleWords();
-        if(this.moleRemainingWords.length === 0) return alert("No vocabulary data available!");
+        if(this.moleRemainingWords.length === 0) return alert("No words available!");
         this.startTimer(); this.nextMoleRound();
     },
     refillMoleWords: function() { const targetPhoneme = this.currentConfig.phoneme; this.moleRemainingWords = this.currentDataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(targetPhoneme))).sort(() => 0.5 - Math.random()); },
@@ -107,8 +107,10 @@ const GameEngine = {
             });
             if(original) validItems.push(original);
         });
+        
         validItems.sort(() => 0.5 - Math.random());
         validItems = validItems.slice(0, 5); 
+        
         validItems.forEach(original => {
             cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
             let htmlText = `<div class="game-card-text">`; 
@@ -284,7 +286,7 @@ const SnakeEngine = {
     win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Awesome!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
-/* --- LEARNING ENGINE (UPDATED: SMART TIMER & SCORING) --- */
+/* --- LEARNING ENGINE (UPDATED) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, 
     listenTimeout: null, 
@@ -349,7 +351,6 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED START LISTENING: Smart Timer ---
     startListening: function() { 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
         if (!SpeechRecognition) return alert("Device not supported"); 
@@ -360,11 +361,8 @@ const LearningEngine = {
         btn.style.backgroundColor = "#e74c3c"; 
         
         const currentItem = this.currentData[this.idx];
-        
-        // AUTO-DETECT SENTENCE: >= 2 words OR explicit type='sent'
         const wordCount = currentItem.speak.trim().split(/\s+/).length;
         const isSentence = (currentItem.type === 'sent') || (wordCount >= 2);
-        
         const waitTime = isSentence ? 15000 : 5000; 
 
         const recognition = new SpeechRecognition(); 
@@ -398,7 +396,6 @@ const LearningEngine = {
         } 
     },
     
-    // --- UPDATED CHECK RESULT: Smart Scoring ---
     checkResult: function(heardArray) { 
         const item = this.currentData[this.idx]; 
         const normalize = (str) => str.toLowerCase().replace(/[.,!?;:]/g, "").trim();
@@ -407,9 +404,8 @@ const LearningEngine = {
         let validTargets = [targetRaw];
         if (item.pre) validTargets.push(normalize(item.pre + " " + item.speak));
 
-        // Auto-detect sentence
         const wordCount = targetRaw.split(/\s+/).length;
-        const isSentence = (item.type === 'sent') || (wordCount >= 2);
+        const isSentence = (wordCount >= 2);
 
         let bestAccuracy = 0;
 
@@ -417,19 +413,15 @@ const LearningEngine = {
             let userText = normalize(text);
             for (let target of validTargets) {
                 if (isSentence) {
-                    // Logic for SENTENCE: Count matching words
                     const targetWords = target.split(/\s+/);
                     const userWords = userText.split(/\s+/);
-                    
                     let matchCount = 0;
                     targetWords.forEach(w => {
                         if (userWords.includes(w)) matchCount++;
                     });
-                    
                     let accuracy = (matchCount / targetWords.length) * 100;
                     if (accuracy > bestAccuracy) bestAccuracy = accuracy;
                 } else {
-                    // Logic for WORD: Must contain the target word
                     if (userText.includes(target)) bestAccuracy = 100;
                 }
             }
@@ -458,7 +450,7 @@ const LearningEngine = {
     }
 };
 
-/* --- APP CONTROLLER (MAIN HUB) --- */
+/* --- APP CONTROLLER (MAIN NAVIGATION HUB) --- */
 const App = {
     currentPart: 0, // 0: Home, 1: Pronun, 2: Inton, 3: Vocab
 
@@ -478,14 +470,13 @@ const App = {
         if (partId === 1) {
             this.initPronunMenu(); 
         } else if (partId === 2) {
-            alert("Intonation Part is coming soon! 🎬");
-            this.goHome(); 
+            this.initIntonationMenu();
         } else if (partId === 3) {
-            alert("Vocabulary Part is coming soon! 📖");
-            this.goHome(); 
+            this.initVocabMenu();
         }
     },
 
+    // --- PART 1 MENU (Pronunciation) ---
     initPronunMenu: function() {
         const menuContainer = document.getElementById('menu-screen');
         menuContainer.style.display = 'flex';
@@ -506,24 +497,87 @@ const App = {
         btnIPA.onclick = function() { App.openIPA(); };
         menuContainer.appendChild(btnIPA);
 
-        LevelMap.forEach(level => {
-            if (level.type === 'learn') {
+        // Check if LevelMap exists
+        if(typeof LevelMap !== 'undefined') {
+            LevelMap.forEach(level => {
+                if (level.type === 'learn') {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-menu';
+                    btn.innerText = level.label;
+                    if (level.label.includes("Ôn tập")) {
+                        btn.style.borderColor = "#ff9600";
+                        btn.style.color = "#d35400";
+                    }
+                    if (level.label.includes("THI THỬ")) { 
+                        btn.style.borderColor = "#e74c3c"; 
+                        btn.style.color = "#c0392b"; 
+                        btn.style.borderWidth = "4px"; 
+                    }
+                    btn.onclick = function() { App.startLesson(level.id); };
+                    menuContainer.appendChild(btn);
+                }
+            });
+        } else {
+            alert("Error: LevelMap data not found in 4.data.js");
+        }
+    },
+
+    // --- PART 2 MENU (Intonation) ---
+    initIntonationMenu: function() {
+        const menuContainer = document.getElementById('menu-screen');
+        menuContainer.style.display = 'flex';
+        menuContainer.innerHTML = '<div class="menu-title">Movie Shadowing</div>';
+        
+        const btnBack = document.createElement('button');
+        btnBack.className = 'btn-menu';
+        btnBack.innerText = "🏠  Home"; 
+        btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d";
+        btnBack.onclick = function() { App.goHome(); };
+        menuContainer.appendChild(btnBack);
+
+        if(typeof IntonationData !== 'undefined') {
+            IntonationData.forEach(item => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-menu';
-                btn.innerText = level.label;
-                if (level.label.includes("Ôn tập")) {
-                    btn.style.borderColor = "#ff9600";
-                    btn.style.color = "#d35400";
-                }
-                if (level.label.includes("THI THỬ")) { 
-                    btn.style.borderColor = "#e74c3c"; 
-                    btn.style.color = "#c0392b"; 
-                    btn.style.borderWidth = "4px"; 
-                }
-                btn.onclick = function() { App.startLesson(level.id); };
+                btn.innerText = "🎬 " + item.title;
+                btn.style.borderColor = "#2980b9";
+                btn.style.color = "#2980b9";
+                // Khi bấm vào sẽ hiện thông báo (vì chưa code chức năng chạy video)
+                btn.onclick = function() { alert("Starting Movie: " + item.title + "\n(Video player coming soon)"); };
                 menuContainer.appendChild(btn);
-            }
-        });
+            });
+        } else {
+            menuContainer.innerHTML += "<div>No Intonation Data Found</div>";
+        }
+    },
+
+    // --- PART 3 MENU (Vocabulary) ---
+    initVocabMenu: function() {
+        const menuContainer = document.getElementById('menu-screen');
+        menuContainer.style.display = 'flex';
+        menuContainer.innerHTML = '<div class="menu-title">Vocabulary Topics</div>';
+        
+        const btnBack = document.createElement('button');
+        btnBack.className = 'btn-menu';
+        btnBack.innerText = "🏠  Home"; 
+        btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d";
+        btnBack.onclick = function() { App.goHome(); };
+        menuContainer.appendChild(btnBack);
+
+        if(typeof VocabData !== 'undefined') {
+            VocabData.forEach(topic => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-menu';
+                btn.innerText = "📖 " + topic.topic;
+                btn.style.borderColor = topic.color;
+                btn.style.color = topic.color;
+                // Khi bấm vào sẽ hiện thông báo
+                btn.onclick = function() { alert("Opening Topic: " + topic.topic + "\n(Vocab exercises coming soon)"); };
+                menuContainer.appendChild(btn);
+            });
+        } else {
+            menuContainer.innerHTML += "<div>No Vocab Data Found</div>";
+        }
     },
 
     openIPA: function() {
