@@ -521,4 +521,75 @@ const DataEngine = {
         if(this["lesson" + num]) return this["lesson" + num];
         return [];
     }
+
 };
+
+/* ==========================================================================
+   DỮ LIỆU MỚI: PART 2 & PART 3
+   ========================================================================== */
+
+/* --- PART 2: INTONATION (Shadowing Movies) --- */
+const IntonationData = [
+    {
+        id: 1,
+        title: "Frozen: Do you want to build a snowman?",
+        img: "frozen.jpg", // Bạn cần chuẩn bị ảnh này
+        video: "frozen.mp4", // Bạn cần chuẩn bị video này
+        subs: [
+            { start: 0, end: 3, en: "Do you want to build a snowman?", vi: "Chị có muốn đắp người tuyết không?" },
+            { start: 4, end: 8, en: "Come on let's go and play", vi: "Ra ngoài chơi đi nè" }
+        ]
+    },
+    {
+        id: 2,
+        title: "Lion King: Hakuna Matata",
+        img: "lionking.jpg",
+        video: "lionking.mp4",
+        subs: [
+            { start: 0, end: 5, en: "Hakuna Matata! What a wonderful phrase", vi: "Hakuna Matata! Câu nói mới tuyệt làm sao" }
+        ]
+    }
+];
+
+/* --- PART 3: VOCABULARY & READING --- */
+const VocabData = [
+    {
+        id: 1,
+        topic: "Animals",
+        color: "#FF9800",
+        // 1. Học từ
+        vocab: [
+            { img: "cat.jpg", speak: "cat", mean: "Cat" },
+            { img: "dog.jpg", speak: "dog", mean: "Dog" },
+            { img: "duck.jpg", speak: "duck", mean: "Duck" },
+            { img: "pig.jpg", speak: "pig", mean: "Pig" }
+        ],
+        // 2. Bài đọc
+        reading: {
+            title: "My Pet",
+            text: "I have a cat. It is fat. It likes to sleep.",
+            audio: "reading_animals.mp3"
+        },
+        // 3. Câu hỏi trắc nghiệm
+        quiz: [
+            { question: "What does the cat like?", options: ["Run", "Sleep", "Eat"], answer: 1 }
+        ]
+    },
+    {
+        id: 2,
+        topic: "Colors",
+        color: "#9C27B0",
+        vocab: [
+            { img: "red.jpg", speak: "red", mean: "Red" },
+            { img: "blue.jpg", speak: "blue", mean: "Blue" }
+        ],
+        reading: {
+            title: "The Rainbow",
+            text: "The sky is blue. The sun is yellow.",
+            audio: "reading_colors.mp3"
+        },
+        quiz: [
+            { question: "What color is the sky?", options: ["Green", "Blue", "Red"], answer: 1 }
+        ]
+    }
+];
