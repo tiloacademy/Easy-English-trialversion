@@ -124,3 +124,35 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 #pause-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; flex-direction: column; align-items: center; justify-content: center; }
 
 .pause-text { color: white; font-size: 40px; font-weight: bold; margin-bottom: 20px; text-shadow: 0 2px 4px black; }
+
+/* --- PHẦN THÊM MỚI: LANDING SCREEN (SẢNH CHÍNH) --- */
+#landing-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #87CEEB 0%, #E0F7FA 100%);
+    z-index: 10000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.app-logo {
+    font-size: 36px; font-weight: 900; color: #d35400;
+    text-shadow: 2px 2px white; margin-bottom: 30px; text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+.landing-grid {
+    display: flex; flex-direction: column; gap: 20px; width: 90%; max-width: 400px;
+}
+.landing-card {
+    background: white; border-radius: 20px; padding: 20px;
+    display: flex; align-items: center; gap: 20px;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    border-left: 10px solid #ccc; /* Viền màu bên trái */
+}
+.landing-card:active { transform: scale(0.95); box-shadow: 0 4px 5px rgba(0,0,0,0.1); }
+.card-icon { font-size: 40px; min-width: 50px; text-align: center; }
+.card-title { font-size: 24px; font-weight: 900; color: #333; margin-bottom: 5px; }
+.card-desc { font-size: 16px; color: #666; font-style: italic; }
+
+/* Màu sắc định danh cho từng phần */
+.c-pronun { border-color: #27ae60; } /* Xanh lá */
+.c-inton { border-color: #2980b9; }  /* Xanh dương */
+.c-vocab { border-color: #e67e22; }  /* Cam */
