@@ -157,6 +157,49 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .c-inton { border-color: #2980b9; }  /* Xanh dương */
 .c-vocab { border-color: #e67e22; }  /* Cam */
 
+/* --- SHADOWING SCREEN --- */
+#shadowing-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #f0f8ff; z-index: 20; display: flex; flex-direction: column;
+}
+
+.video-main-container {
+    width: 100%; aspect-ratio: 16/9; background: black; flex-shrink: 0;
+}
+#youtube-player { width: 100%; height: 100%; }
+
+.segment-container {
+    flex: 1; overflow-y: auto; padding: 10px; padding-bottom: 50px;
+    background: #e3f2fd;
+}
+
+.segment-card {
+    background: white; border-radius: 15px; margin-bottom: 15px;
+    padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 2px solid transparent; transition: all 0.2s;
+}
+.segment-card.playing { border-color: #ff9800; background-color: #fff3e0; }
+
+.seg-controls {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px;
+}
+.btn-play-seg {
+    background: #4CAF50; color: white; border: none; padding: 5px 15px;
+    border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;
+}
+.btn-play-seg.stop { background: #f44336; }
+
+/* Tái sử dụng CSS hiển thị IPA từ phần 1 */
+.seg-text-area {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 2px;
+}
+.seg-word-group {
+    display: flex; flex-direction: column; align-items: center; margin: 0 3px;
+}
+.seg-ipa { color: #d32f2f; font-size: 14px; font-weight: bold; font-family: sans-serif; margin-bottom: 2px; }
+.seg-txt { color: #333; font-size: 18px; font-weight: bold; }
+
 /* --- SHADOWING CONTROLS (NEW) --- */
 .speed-control-bar {
     background: #333; color: white;
@@ -176,3 +219,4 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
     background: #000; color: #fff; padding: 2px 8px; border-radius: 4px;
     font-size: 14px; font-weight: bold; margin-right: 10px;
 }
+
