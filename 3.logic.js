@@ -1,10 +1,13 @@
 /* ==========================================================================
-   FILE: 3.logic.js (FINAL FIXED: FULL NAVIGATION FOR 3 PARTS)
+   FILE: 3.logic.js (FULL FIXED VERSION)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
 const AudioEngine = {
-    isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"),
+    isAudioAllowed: false, 
+    audioWin: new Audio("win.mp3"), 
+    audioCorrect: new Audio("correct.mp3"), 
+    audioWrong: new Audio("wrong.mp3"),
     unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
@@ -32,7 +35,118 @@ const AudioEngine = {
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- GAME ENGINE --- */
+/* --- SHADOWING ENGINE (VIDEO PLAYER) --- */
+const ShadowingEngine = {
+    player: null,
+    currentData: null,
+    loopInterval: null,
+    isPlayingSegment: false,
+    currentTarget: null, 
+
+    init: function(movieData) {
+        this.currentData = movieData;
+        document.getElementById('movie-title').innerText = movieData.title;
+        this.renderSegments();
+        
+        if (!this.player) {
+            this.player = new YT.Player('youtube-player', {
+                height: '100%', width: '100%',
+                videoId: movieData.youtubeId,
+                playerVars: { 'playsinline': 1, 'controls': 1, 'rel': 0, 'cc_load_policy': 0 }, 
+                events: { 'onStateChange': this.onPlayerStateChange }
+            });
+        } else {
+            this.player.loadVideoById(movieData.youtubeId);
+        }
+    },
+
+    changeSpeed: function(rate) {
+        if (this.player && this.player.setPlaybackRate) {
+            this.player.setPlaybackRate(rate);
+            document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+            const btns = document.querySelectorAll('.speed-btn');
+            btns.forEach(b => {
+                if (rate === 1 && b.innerText === 'Normal') b.classList.add('active');
+                else if (b.innerText.includes(rate)) b.classList.add('active');
+            });
+        }
+    },
+
+    renderSegments: function() {
+        const list = document.getElementById('segment-list');
+        list.innerHTML = '';
+        this.currentData.segments.forEach((seg, index) => {
+            const div = document.createElement('div');
+            div.className = 'segment-card';
+            div.id = `seg-${index}`;
+            
+            let ipaHtml = '<div class="seg-text-area">';
+            seg.parts.forEach(p => {
+                const ipa = p.i || "&nbsp;";
+                ipaHtml += `<div class="seg-word-group"><div class="seg-ipa">${ipa}</div><div class="seg-txt">${p.t}</div></div>`;
+            });
+            ipaHtml += '</div>';
+
+            div.innerHTML = `
+                <div class="seg-controls">
+                    <div style="display:flex; align-items:center;">
+                        <span class="seg-number">#${index+1}</span>
+                    </div>
+                    <button class="btn-play-seg" onclick="ShadowingEngine.toggleLoop(${index}, this)">
+                        ▶ Listen & Loop
+                    </button>
+                </div>
+                ${ipaHtml}
+            `;
+            list.appendChild(div);
+        });
+    },
+
+    toggleLoop: function(index, btn) {
+        if (this.isPlayingSegment && this.currentIndex === index) {
+            this.stopLoop();
+            return;
+        }
+        this.stopLoop(); // Stop any previous loop
+
+        this.currentIndex = index;
+        this.isPlayingSegment = true;
+        this.currentTarget = this.currentData.segments[index];
+        
+        btn.innerHTML = "⏹ Stop Loop";
+        btn.classList.add('stop');
+        document.getElementById(`seg-${index}`).classList.add('playing');
+
+        this.player.seekTo(this.currentTarget.start);
+        this.player.playVideo();
+        
+        if (this.loopInterval) clearInterval(this.loopInterval);
+        this.loopInterval = setInterval(() => {
+            if (!this.player || !this.player.getCurrentTime) return;
+            const curr = this.player.getCurrentTime();
+            if (curr >= this.currentTarget.end) {
+                this.player.seekTo(this.currentTarget.start);
+            }
+        }, 50);
+    },
+
+    stopLoop: function() {
+        this.isPlayingSegment = false;
+        this.currentTarget = null;
+        if (this.loopInterval) clearInterval(this.loopInterval);
+        if (this.player && this.player.pauseVideo) this.player.pauseVideo();
+        
+        document.querySelectorAll('.btn-play-seg').forEach(b => {
+            b.innerHTML = "▶ Listen & Loop";
+            b.classList.remove('stop');
+        });
+        document.querySelectorAll('.segment-card').forEach(c => c.classList.remove('playing'));
+    },
+
+    onPlayerStateChange: function(event) {}
+};
+
+/* --- GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
@@ -100,23 +214,15 @@ const GameEngine = {
         let cards = [];
         let validItems = [];
         this.currentConfig.pairs.forEach(key => {
-            let original = this.currentDataPool.find(d => { 
-                if(d.type === 'game' || d.type === 'sent') return false; 
-                let fullWord = d.parts.map(p => p.t).join(""); 
-                return fullWord === key; 
-            });
+            let original = this.currentDataPool.find(d => { if(d.type === 'game' || d.type === 'sent') return false; let fullWord = d.parts.map(p => p.t).join(""); return fullWord === key; });
             if(original) validItems.push(original);
         });
-        
         validItems.sort(() => 0.5 - Math.random());
         validItems = validItems.slice(0, 5); 
-        
         validItems.forEach(original => {
             cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
             let htmlText = `<div class="game-card-text">`; 
-            original.parts.forEach(p => { 
-                htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; 
-            }); 
+            original.parts.forEach(p => { htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; }); 
             htmlText += `</div>`; 
             cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); 
         });
@@ -172,52 +278,20 @@ const SnakeEngine = {
     togglePause: function() { if (!this.active) return; this.paused = !this.paused; const modal = document.getElementById('pause-modal'); if (this.paused) { modal.style.display = 'flex'; clearInterval(this.audioLoopId); } else { modal.style.display = 'none'; this.gameLoop(); this.startAudioLoop(); } },
     startAudioLoop: function() { clearInterval(this.audioLoopId); if(this.currentTargetWord) AudioEngine.playTTS(this.currentTargetWord.speak); this.audioLoopId = setInterval(() => { if (this.active && !this.paused && this.currentTargetWord) { AudioEngine.playTTS(this.currentTargetWord.speak); } }, 4000); },
     createBoard: function() { const board = document.getElementById('snake-board'); board.innerHTML = ''; board.style.gridTemplateColumns = `repeat(${this.boardSize}, 1fr)`; board.style.gridTemplateRows = `repeat(${this.boardSize}, 1fr)`; for(let i=0; i < this.boardSize * this.boardSize; i++) { const cell = document.createElement('div'); cell.className = 'grid-cell'; board.appendChild(cell); } },
-    updateLivesUI: function() {
-        let hearts = "";
-        for(let i=0; i<this.lives; i++) hearts += "❤️";
-        for(let i=this.lives; i<3; i++) hearts += "🖤";
-        document.getElementById('snake-lives').innerText = hearts;
-    },
-    handleDeath: function(msg) {
-        this.lives--;
-        this.updateLivesUI();
-        AudioEngine.playEffect('wrong');
-        if (this.lives <= 0) { this.showGameOver(msg + " Game Over!"); } 
-        else {
-            const center = Math.floor(this.boardSize / 2);
-            this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}];
-            this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
-        }
-    },
+    updateLivesUI: function() { let hearts = ""; for(let i=0; i<this.lives; i++) hearts += "❤️"; for(let i=this.lives; i<3; i++) hearts += "🖤"; document.getElementById('snake-lives').innerText = hearts; },
+    handleDeath: function(msg) { this.lives--; this.updateLivesUI(); AudioEngine.playEffect('wrong'); if (this.lives <= 0) { this.showGameOver(msg + " Game Over!"); } else { const center = Math.floor(this.boardSize / 2); this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}]; this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1}; } },
     gameLoop: function() {
         if (!this.active || this.paused) return;
         this.direction = this.nextDirection;
         const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
-        if (this.isCollision(head)) { 
-            this.handleDeath("Hit Wall!"); 
-            if(this.lives > 0) { this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; }
-            else return;
-        }
+        if (this.isCollision(head)) { this.handleDeath("Hit Wall!"); if(this.lives > 0) { this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; } else return; }
         this.snake.unshift(head);
         let ate = false;
         const foodIndex = this.foods.findIndex(f => f.x === head.x && f.y === head.y);
         if (foodIndex !== -1) {
             const food = this.foods[foodIndex];
-            if (food.isCorrect) {
-                ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score;
-                AudioEngine.playEffect('correct'); 
-                if (this.speed > 150) this.speed -= 20; 
-                this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop();
-                if (this.score >= 100) { this.win(); return; }
-            } else { 
-                this.handleDeath(`Wrong! "${food.word}" is not the target!`);
-                if(this.lives > 0) {
-                     this.foods.splice(foodIndex, 1);
-                     this.snake.pop(); this.draw();
-                     this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); 
-                     return;
-                } else return;
-            }
+            if (food.isCorrect) { ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score; AudioEngine.playEffect('correct'); if (this.speed > 150) this.speed -= 20; this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop(); if (this.score >= 100) { this.win(); return; } } 
+            else { this.handleDeath(`Wrong! "${food.word}" is not the target!`); if(this.lives > 0) { this.foods.splice(foodIndex, 1); this.snake.pop(); this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; } else return; }
         }
         if (!ate) this.snake.pop();
         this.draw();
@@ -233,69 +307,29 @@ const SnakeEngine = {
         const itemsToSpawn = [{ ...correctWord, isCorrect: true, icon: '🍎' }, { ...wrongWords[0], isCorrect: false, icon: '🍄' }];
         if (wrongWords[1]) itemsToSpawn.push({ ...wrongWords[1], isCorrect: false, icon: '💣' });
         itemsToSpawn.forEach(item => {
-            let pos; do { 
-                pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; 
-                let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10);
-                if (isSafeZone) continue; 
-                let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1);
-                if (isTooClose) continue; 
-            } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1));
+            let pos; do { pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10); if (isSafeZone) continue; let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1); if (isTooClose) continue; } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1));
             this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon });
         });
         let ipaHtml = "";
-        if (correctWord.type !== 'sent' && correctWord.speak.split(' ').length < 2) {
-             let ipaStr = "";
-             if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); }
-             ipaHtml = `<div style="color:red; font-size:14px;">/${ipaStr}/</div>`;
-        }
+        if (correctWord.type !== 'sent' && correctWord.speak.split(' ').length < 2) { let ipaStr = ""; if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); } ipaHtml = `<div style="color:red; font-size:14px;">/${ipaStr}/</div>`; }
         let fontSize = (correctWord.type === 'sent') ? '18px' : '24px';
-        document.getElementById('snake-target-content').innerHTML = 
-            `${ipaHtml}<div style="color:#d35400; font-size:${fontSize}; font-weight:900;">${correctWord.speak}</div>`;
+        document.getElementById('snake-target-content').innerHTML = `${ipaHtml}<div style="color:#d35400; font-size:${fontSize}; font-weight:900;">${correctWord.speak}</div>`;
     },
     isOccupied: function(pos) { if (this.snake.some(s => s.x === pos.x && s.y === pos.y)) return true; if (this.foods.some(f => f.x === pos.x && f.y === pos.y)) return true; const head = this.snake[0]; if (Math.abs(pos.x - head.x) < 3 && Math.abs(pos.y - head.y) < 3) return true; return false; },
     draw: function() {
         const cells = document.querySelectorAll('.grid-cell'); cells.forEach(c => { c.className = 'grid-cell'; c.innerHTML = ''; });
-        this.foods.forEach(f => {
-            const idx = f.y * this.boardSize + f.x;
-            if (cells[idx]) { 
-                const zIndex = 10; 
-                cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; 
-            }
-        });
-        this.snake.forEach((part, index) => {
-            const idx = part.y * this.boardSize + part.x;
-            if (cells[idx]) {
-                const div = document.createElement('div'); div.classList.add('snake-part');
-                if (index === 0) {
-                    div.classList.add('snake-head');
-                    if (this.direction.y === -1) div.classList.add('head-down'); else if (this.direction.y === 1) div.classList.add('head-up'); else if (this.direction.x === -1) div.classList.add('head-left'); else if (this.direction.x === 1) div.classList.add('head-right');
-                }
-                cells[idx].appendChild(div);
-            }
-        });
+        this.foods.forEach(f => { const idx = f.y * this.boardSize + f.x; if (cells[idx]) { const zIndex = 10; cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; } });
+        this.snake.forEach((part, index) => { const idx = part.y * this.boardSize + part.x; if (cells[idx]) { const div = document.createElement('div'); div.classList.add('snake-part'); if (index === 0) { div.classList.add('snake-head'); if (this.direction.y === -1) div.classList.add('head-down'); else if (this.direction.y === 1) div.classList.add('head-up'); else if (this.direction.x === -1) div.classList.add('head-left'); else if (this.direction.x === 1) div.classList.add('head-right'); } cells[idx].appendChild(div); } });
     },
-    changeDirection: function(newDirName) {
-        if (this.paused) return; 
-        let newDir = {x:0, y:0};
-        if (newDirName === 'up') newDir = {x: 0, y: -1}; if (newDirName === 'down') newDir = {x: 0, y: 1};
-        if (newDirName === 'left') newDir = {x: -1, y: 0}; if (newDirName === 'right') newDir = {x: 1, y: 0};
-        if (this.direction.x + newDir.x === 0 && this.direction.y + newDir.y === 0) return;
-        this.nextDirection = newDir;
-    },
+    changeDirection: function(newDirName) { if (this.paused) return; let newDir = {x:0, y:0}; if (newDirName === 'up') newDir = {x: 0, y: -1}; if (newDirName === 'down') newDir = {x: 0, y: 1}; if (newDirName === 'left') newDir = {x: -1, y: 0}; if (newDirName === 'right') newDir = {x: 1, y: 0}; if (this.direction.x + newDir.x === 0 && this.direction.y + newDir.y === 0) return; this.nextDirection = newDir; },
     showGameOver: function(msg) { this.stop(); AudioEngine.playTTS("Game Over!"); document.getElementById('win-msg').innerText = msg; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; },
     win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Awesome!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
 };
 
-/* --- LEARNING ENGINE (UPDATED) --- */
+/* --- LEARNING ENGINE --- */
 const LearningEngine = {
-    currentData: [], idx: 0, currentLessonId: 0, 
-    listenTimeout: null, 
-
-    initLesson: function(lessonNum) { 
-        this.currentLessonId = lessonNum;
-        this.currentData = DataEngine.getLesson(lessonNum); 
-        this.idx = 0; this.preload(); 
-    },
+    currentData: [], idx: 0, currentLessonId: 0, listenTimeout: null, 
+    initLesson: function(lessonNum) { this.currentLessonId = lessonNum; this.currentData = DataEngine.getLesson(lessonNum); this.idx = 0; this.preload(); },
     preload: function() { this.currentData.forEach(item => { if(item.img) new Image().src = item.img; }); },
     render: function() {
         const item = this.currentData[this.idx]; if(!item) return; AudioEngine.stopCurrentSound();
@@ -308,276 +342,46 @@ const LearningEngine = {
             btnContainer.innerHTML = `<button class="btn-action btn-game-entry" onclick="App.enterGame()">  🚀   Play Now</button>`;
         } else {
             imgEl.src = item.img; btnContainer.innerHTML = ` <button class="btn-action btn-mic" id="mic-btn" onclick="LearningEngine.startListening()">  🎤   Read Now</button> <button class="btn-action btn-listen" id="btn-replay" onclick="LearningEngine.onUserClickSpeak()">  🔊   Listen</button> `;
-            
-            let html = '';
-            let currentWordBuffer = [];
-            item.parts.forEach((p, index) => {
-                if (p.t === " ") {
-                    if (currentWordBuffer.length > 0) {
-                        html += `<div class="word-group">`;
-                        currentWordBuffer.forEach(subP => {
-                            const ipaHtml = subP.i || "&nbsp;";
-                            html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
-                        });
-                        html += `</div>`;
-                        currentWordBuffer = [];
-                    }
-                } else {
-                    currentWordBuffer.push(p);
-                }
-            });
-            if (currentWordBuffer.length > 0) {
-                html += `<div class="word-group">`;
-                currentWordBuffer.forEach(subP => {
-                    const ipaHtml = subP.i || "&nbsp;";
-                    html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`;
-                });
-                html += `</div>`;
-            }
+            let html = ''; let currentWordBuffer = [];
+            item.parts.forEach((p, index) => { if (p.t === " ") { if (currentWordBuffer.length > 0) { html += `<div class="word-group">`; currentWordBuffer.forEach(subP => { const ipaHtml = subP.i || "&nbsp;"; html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; }); html += `</div>`; currentWordBuffer = []; } } else { currentWordBuffer.push(p); } });
+            if (currentWordBuffer.length > 0) { html += `<div class="word-group">`; currentWordBuffer.forEach(subP => { const ipaHtml = subP.i || "&nbsp;"; html += `<div class="char-block"><div class="${(item.type === 'sent') ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${(item.type === 'sent') ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; }); html += `</div>`; }
             infoDisplay.innerHTML = html;
         }
     },
     nav: function(d) { if(this.idx + d >= 0 && this.idx + d < this.currentData.length) { this.idx += d; this.render(); } }, nextItem: function() { this.nav(1); },
     onUserClickSpeak: function() { 
-        const item = this.currentData[this.idx]; 
-        if(item && item.type !== 'game') { 
-            let soundFile = null;
-            let textToRead = item.speak; 
-            if(item.pre && item.type !== 'sent') { soundFile = "sound_" + item.pre + ".wav"; }
-            if(item.type === 'exam-ipa') { soundFile = item.speak; textToRead = null; }
-
-            if (soundFile) { AudioEngine.playSequence(soundFile, textToRead); } 
-            else { AudioEngine.playTTS(textToRead); }
-        } 
+        const item = this.currentData[this.idx]; if(item && item.type !== 'game') { let soundFile = null; let textToRead = item.speak; if(item.pre && item.type !== 'sent') { soundFile = "sound_" + item.pre + ".wav"; } if(item.type === 'exam-ipa') { soundFile = item.speak; textToRead = null; } if (soundFile) { AudioEngine.playSequence(soundFile, textToRead); } else { AudioEngine.playTTS(textToRead); } } 
     },
-    
     startListening: function() { 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
-        if (!SpeechRecognition) return alert("Device not supported"); 
-        
-        const btn = document.getElementById('mic-btn'); 
-        btn.disabled = true; 
-        btn.innerText = "  👂   Listening..."; 
-        btn.style.backgroundColor = "#e74c3c"; 
-        
-        const currentItem = this.currentData[this.idx];
-        const wordCount = currentItem.speak.trim().split(/\s+/).length;
-        const isSentence = (currentItem.type === 'sent') || (wordCount >= 2);
-        const waitTime = isSentence ? 15000 : 5000; 
-
-        const recognition = new SpeechRecognition(); 
-        recognition.lang = 'en-US'; 
-        recognition.continuous = false; 
-        recognition.interimResults = false;
-        
-        recognition.start(); 
-        
-        if(this.listenTimeout) clearTimeout(this.listenTimeout);
-        this.listenTimeout = setTimeout(() => {
-            if(btn.disabled) recognition.stop();
-        }, waitTime);
-
-        recognition.onresult = (e) => { 
-            let heard = []; 
-            for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); 
-            this.checkResult(heard); 
-        }; 
-        recognition.onerror = () => { this.resetMic(); }; 
-        recognition.onend = () => { if(btn.disabled) this.resetMic(); }; 
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Device not supported"); 
+        const btn = document.getElementById('mic-btn'); btn.disabled = true; btn.innerText = "  👂   Listening..."; btn.style.backgroundColor = "#e74c3c"; 
+        const currentItem = this.currentData[this.idx]; const wordCount = currentItem.speak.trim().split(/\s+/).length; const isSentence = (currentItem.type === 'sent') || (wordCount >= 2); const waitTime = isSentence ? 15000 : 5000; 
+        const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.continuous = false; recognition.interimResults = false; recognition.start(); 
+        if(this.listenTimeout) clearTimeout(this.listenTimeout); this.listenTimeout = setTimeout(() => { if(btn.disabled) recognition.stop(); }, waitTime);
+        recognition.onresult = (e) => { let heard = []; for(let i=0; i<e.results[0].length; i++) heard.push(e.results[0][i].transcript.toLowerCase()); this.checkResult(heard); }; 
+        recognition.onerror = () => { this.resetMic(); }; recognition.onend = () => { if(btn.disabled) this.resetMic(); }; 
     },
-    
-    resetMic: function() { 
-        if(this.listenTimeout) clearTimeout(this.listenTimeout);
-        const btn = document.getElementById('mic-btn'); 
-        if(btn) { 
-            btn.disabled = false; 
-            btn.innerText = "  🎤   Read Now"; 
-            btn.style.backgroundColor = "#27ae60"; 
-        } 
-    },
-    
+    resetMic: function() { if(this.listenTimeout) clearTimeout(this.listenTimeout); const btn = document.getElementById('mic-btn'); if(btn) { btn.disabled = false; btn.innerText = "  🎤   Read Now"; btn.style.backgroundColor = "#27ae60"; } },
     checkResult: function(heardArray) { 
-        const item = this.currentData[this.idx]; 
-        const normalize = (str) => str.toLowerCase().replace(/[.,!?;:]/g, "").trim();
-        const targetRaw = normalize(item.speak);
-        
-        let validTargets = [targetRaw];
-        if (item.pre) validTargets.push(normalize(item.pre + " " + item.speak));
-
-        const wordCount = targetRaw.split(/\s+/).length;
-        const isSentence = (wordCount >= 2);
-
-        let bestAccuracy = 0;
-
+        const item = this.currentData[this.idx]; const normalize = (str) => str.toLowerCase().replace(/[.,!?;:]/g, "").trim(); const targetRaw = normalize(item.speak);
+        let validTargets = [targetRaw]; if (item.pre) validTargets.push(normalize(item.pre + " " + item.speak));
+        const wordCount = targetRaw.split(/\s+/).length; const isSentence = (item.type === 'sent') || (wordCount >= 2); let bestAccuracy = 0;
         for (let text of heardArray) {
             let userText = normalize(text);
             for (let target of validTargets) {
-                if (isSentence) {
-                    const targetWords = target.split(/\s+/);
-                    const userWords = userText.split(/\s+/);
-                    let matchCount = 0;
-                    targetWords.forEach(w => {
-                        if (userWords.includes(w)) matchCount++;
-                    });
-                    let accuracy = (matchCount / targetWords.length) * 100;
-                    if (accuracy > bestAccuracy) bestAccuracy = accuracy;
-                } else {
-                    if (userText.includes(target)) bestAccuracy = 100;
-                }
+                if (isSentence) { const targetWords = target.split(/\s+/); const userWords = userText.split(/\s+/); let matchCount = 0; targetWords.forEach(w => { if (userWords.includes(w)) matchCount++; }); let accuracy = (matchCount / targetWords.length) * 100; if (accuracy > bestAccuracy) bestAccuracy = accuracy; } 
+                else { if (userText.includes(target)) bestAccuracy = 100; }
             }
         }
-
-        let finalStars = 1;
-        let msg = "Try again!";
-        
-        if (bestAccuracy >= 100) { 
-            finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win');
-        } else if (bestAccuracy >= 75) { 
-            finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win');
-        } else if (bestAccuracy >= 50) { 
-            finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct');
-        } else {
-            finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong');
-        }
-        
-        let s = ""; 
-        for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; 
-        document.getElementById('stars').innerText = s; 
-        document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; 
-        document.getElementById('feedback').innerText = msg; 
-        
-        this.resetMic(); 
+        let finalStars = 1; let msg = "Try again!";
+        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct'); } else { finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong'); }
+        let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); 
     }
 };
 
-/* --- SHADOWING ENGINE (UPDATED: SPEED CONTROL) --- */
-const ShadowingEngine = {
-    player: null,
-    currentData: null,
-    loopInterval: null,
-    isPlayingSegment: false,
-    currentTarget: null, 
-
-    init: function(movieData) {
-        this.currentData = movieData;
-        document.getElementById('movie-title').innerText = movieData.title;
-        this.renderSegments();
-        
-        if (!this.player) {
-            this.player = new YT.Player('youtube-player', {
-                height: '100%', width: '100%',
-                videoId: movieData.youtubeId,
-                playerVars: { 'playsinline': 1, 'controls': 1, 'rel': 0, 'cc_load_policy': 0 }, // Tắt caption tự động
-                events: { 'onStateChange': this.onPlayerStateChange }
-            });
-        } else {
-            this.player.loadVideoById(movieData.youtubeId);
-        }
-    },
-
-    // Hàm thay đổi tốc độ
-    changeSpeed: function(rate) {
-        if (this.player && this.player.setPlaybackRate) {
-            this.player.setPlaybackRate(rate);
-            
-            // Cập nhật giao diện nút bấm
-            document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
-            // Tìm nút có text tương ứng để active (cách đơn giản)
-            const btns = document.querySelectorAll('.speed-btn');
-            btns.forEach(b => {
-                if (rate === 1 && b.innerText === 'Normal') b.classList.add('active');
-                else if (b.innerText.includes(rate)) b.classList.add('active');
-            });
-        }
-    },
-
-    renderSegments: function() {
-        const list = document.getElementById('segment-list');
-        list.innerHTML = '';
-        this.currentData.segments.forEach((seg, index) => {
-            const div = document.createElement('div');
-            div.className = 'segment-card';
-            div.id = `seg-${index}`;
-            
-            let ipaHtml = '<div class="seg-text-area">';
-            seg.parts.forEach(p => {
-                const ipa = p.i || "&nbsp;";
-                ipaHtml += `<div class="seg-word-group"><div class="seg-ipa">${ipa}</div><div class="seg-txt">${p.t}</div></div>`;
-            });
-            ipaHtml += '</div>';
-
-            // Thêm số thứ tự câu (index + 1)
-            div.innerHTML = `
-                <div class="seg-controls">
-                    <div style="display:flex; align-items:center;">
-                        <span class="seg-number">#${index+1}</span>
-                    </div>
-                    <button class="btn-play-seg" onclick="ShadowingEngine.toggleLoop(${index}, this)">
-                        ▶ Listen & Loop
-                    </button>
-                </div>
-                ${ipaHtml}
-            `;
-            list.appendChild(div);
-        });
-    },
-
-    toggleLoop: function(index, btn) {
-        if (this.isPlayingSegment && this.currentIndex === index) {
-            this.stopLoop();
-            btn.innerHTML = "▶ Listen & Loop";
-            btn.classList.remove('stop');
-            return;
-        }
-
-        document.querySelectorAll('.btn-play-seg').forEach(b => {
-            b.innerHTML = "▶ Listen & Loop";
-            b.classList.remove('stop');
-        });
-        document.querySelectorAll('.segment-card').forEach(c => c.classList.remove('playing'));
-
-        this.currentIndex = index;
-        this.isPlayingSegment = true;
-        this.currentTarget = this.currentData.segments[index];
-        
-        btn.innerHTML = "⏹ Stop Loop";
-        btn.classList.add('stop');
-        document.getElementById(`seg-${index}`).classList.add('playing');
-
-        this.player.seekTo(this.currentTarget.start);
-        this.player.playVideo();
-        
-        if (this.loopInterval) clearInterval(this.loopInterval);
-        this.loopInterval = setInterval(() => {
-            if (!this.player || !this.player.getCurrentTime) return;
-            const curr = this.player.getCurrentTime();
-            // Cộng thêm 0.5s ở cuối để tránh bị ngắt quá cụt
-            if (curr >= this.currentTarget.end) {
-                this.player.seekTo(this.currentTarget.start);
-            }
-        }, 50); // Check nhanh hơn để loop mượt hơn
-    },
-
-    stopLoop: function() {
-        this.isPlayingSegment = false;
-        this.currentTarget = null;
-        if (this.loopInterval) clearInterval(this.loopInterval);
-        if (this.player) this.player.pauseVideo();
-        
-        document.querySelectorAll('.btn-play-seg').forEach(b => {
-            b.innerHTML = "▶ Listen & Loop";
-            b.classList.remove('stop');
-        });
-        document.querySelectorAll('.segment-card').forEach(c => c.classList.remove('playing'));
-    },
-
-    onPlayerStateChange: function(event) {}
-};
-
-/* --- APP CONTROLLER (UPDATED) --- */
+/* --- APP CONTROLLER --- */
 const App = {
     currentPart: 0, 
-
     init: function() {
         AudioEngine.stopAllAndBlock();
         document.getElementById('landing-screen').style.display = 'flex';
@@ -586,249 +390,38 @@ const App = {
         document.getElementById('ipa-screen').style.display = 'none';
         document.getElementById('shadowing-screen').style.display = 'none';
     },
-
     openPart: function(partId) {
-        this.currentPart = partId;
-        AudioEngine.unlock(); 
-        
-        // Ẩn tất cả màn hình trước
-        document.getElementById('landing-screen').style.display = 'none';
-        document.getElementById('shadowing-screen').style.display = 'none';
-        document.getElementById('menu-screen').style.display = 'none';
-
-        if (partId === 1) {
-            this.initPronunMenu(); 
-        } else if (partId === 2) {
-            this.initIntonationMenu();
-        } else if (partId === 3) {
-            this.initVocabMenu();
-        }
+        this.currentPart = partId; AudioEngine.unlock(); 
+        document.getElementById('landing-screen').style.display = 'none'; document.getElementById('shadowing-screen').style.display = 'none'; document.getElementById('menu-screen').style.display = 'none';
+        if (partId === 1) { this.initPronunMenu(); } else if (partId === 2) { this.initIntonationMenu(); } else if (partId === 3) { this.initVocabMenu(); }
     },
-
-    // MENU PART 2: INTONATION
-    initIntonationMenu: function() {
-        const menuContainer = document.getElementById('menu-screen');
-        menuContainer.style.display = 'flex';
-        menuContainer.innerHTML = '<div class="menu-title">Movie Shadowing</div>';
-        
-        const btnBack = document.createElement('button');
-        btnBack.className = 'btn-menu';
-        btnBack.innerText = "🏠  Home"; 
-        btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d";
-        btnBack.onclick = function() { App.goHome(); };
-        menuContainer.appendChild(btnBack);
-
-        if(typeof IntonationData !== 'undefined') {
-            IntonationData.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-menu';
-                btn.innerText = "🎬 " + item.title;
-                btn.style.borderColor = "#2980b9";
-                btn.style.color = "#2980b9";
-                // KHI BẤM VÀO PHIM -> MỞ SHADOWING SCREEN
-                btn.onclick = function() { App.startShadowing(item); };
-                menuContainer.appendChild(btn);
-            });
-        }
-    },
-
-    // HÀM MỚI: BẮT ĐẦU HỌC SHADOWING
-    startShadowing: function(movieData) {
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('shadowing-screen').style.display = 'flex';
-        ShadowingEngine.init(movieData);
-    },
-
-    // ... (Giữ nguyên các hàm initPronunMenu, initVocabMenu, openIPA, closeIPA, startLesson, enterGame, exitGame) ...
-    // ... Bạn copy lại từ code cũ ... 
-    
-    // Đảm bảo hàm goHome xử lý đầy đủ các màn hình
-    goHome: function() { 
-        AudioEngine.stopAllAndBlock(); 
-        GameEngine.stop();
-        ShadowingEngine.stopLoop(); // Dừng video nếu đang chạy
-        
-        document.getElementById('main-container').style.display = 'none'; 
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('ipa-screen').style.display = 'none';
-        document.getElementById('shadowing-screen').style.display = 'none';
-        
-        document.getElementById('landing-screen').style.display = 'flex'; 
-    },
-    
-    // ...
-    initVocabMenu: function() {
-        const menuContainer = document.getElementById('menu-screen');
-        menuContainer.style.display = 'flex';
-        menuContainer.innerHTML = '<div class="menu-title">Vocabulary Topics</div>';
-        
-        const btnBack = document.createElement('button');
-        btnBack.className = 'btn-menu';
-        btnBack.innerText = "🏠  Home"; 
-        btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d";
-        btnBack.onclick = function() { App.goHome(); };
-        menuContainer.appendChild(btnBack);
-
-        if(typeof VocabData !== 'undefined') {
-            VocabData.forEach(topic => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-menu';
-                btn.innerText = "📖 " + topic.topic;
-                btn.style.borderColor = topic.color;
-                btn.style.color = topic.color;
-                btn.onclick = function() { alert("Opening Topic: " + topic.topic + "\n(Vocab exercises coming soon)"); };
-                menuContainer.appendChild(btn);
-            });
-        }
-    },
-    
-    // ... Paste lại các hàm openIPA, closeIPA, startLesson, enterGame, exitGame từ code cũ vào đây ...
-    // Để cho gọn mình không paste lại, nhưng bạn nhớ giữ chúng nhé.
-   openIPA: function() {
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('ipa-screen').style.display = 'flex';
-        const content = document.getElementById('ipa-content');
-        content.innerHTML = ''; 
-        for (const [sectionName, soundFiles] of Object.entries(IPA_DATA)) {
-            const secTitle = document.createElement('div');
-            secTitle.className = 'ipa-sec-title';
-            secTitle.innerText = sectionName;
-            if (sectionName.includes("Vowels")) secTitle.classList.add("bg-blue");
-            else secTitle.classList.add("bg-green");
-            content.appendChild(secTitle);
-            const grid = document.createElement('div');
-            grid.className = 'ipa-grid';
-            soundFiles.forEach(fileName => {
-                const item = document.createElement('div');
-                item.className = 'ipa-item';
-                item.innerHTML = `<img src="${fileName}.jpg" onerror="this.style.display='none'">`;
-                item.onclick = function() {
-                    const audio = new Audio(fileName + ".wav");
-                    audio.play();
-                    this.style.transform = "scale(0.9)";
-                    setTimeout(() => this.style.transform = "scale(1)", 150);
-                };
-                grid.appendChild(item);
-            });
-            content.appendChild(grid);
-            content.appendChild(document.createElement('br'));
-        }
-    },
-
-    closeIPA: function() {
-        document.getElementById('ipa-screen').style.display = 'none';
-        document.getElementById('menu-screen').style.display = 'flex';
-    },
-
-    startLesson: function(num) { 
-        AudioEngine.unlock(); 
-        document.getElementById('menu-screen').style.display = 'none'; 
-        document.getElementById('main-container').style.display = 'block'; 
-        LearningEngine.initLesson(num); 
-        LearningEngine.render(); 
-    },
-    
-    enterGame: function() { 
-        document.getElementById('learning-screen').style.display = 'none'; 
-        document.getElementById('game-screen').style.display = 'flex'; 
-        const item = LearningEngine.currentData[LearningEngine.idx]; 
-        let vocabList = [];
-        for(let i=1; i<=25; i++) { 
-            if(!DataEngine["lesson"+i]) continue;
-            const lesson = DataEngine.getLesson(i); 
-            if (lesson.includes(item)) { 
-                vocabList = lesson.filter(l => l.img && l.type !== 'game'); 
-                break; 
-            } 
-        }
-        GameEngine.start(item, vocabList);
-    },
-    
-    exitGame: function() { GameEngine.stop(); LearningEngine.render(); },
-    
-    goHome: function() { 
-        AudioEngine.stopAllAndBlock(); 
-        GameEngine.stop(); 
-        document.getElementById('main-container').style.display = 'none'; 
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('landing-screen').style.display = 'flex'; 
-    }
-};
-
     initPronunMenu: function() {
-        const menuContainer = document.getElementById('menu-screen');
-        menuContainer.style.display = 'flex';
-        menuContainer.innerHTML = '';
-        
-        const btnBack = document.createElement('button');
-        btnBack.className = 'btn-menu';
-        btnBack.innerText = "🏠  Home"; 
-        btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d";
-        btnBack.onclick = function() { App.goHome(); };
-        menuContainer.appendChild(btnBack);
-
-        const btnIPA = document.createElement('button');
-        btnIPA.className = 'btn-menu';
-        btnIPA.innerText = "🔠  IPA Chart"; 
-        btnIPA.style.borderColor = "#9C27B0";
-        btnIPA.style.color = "#9C27B0";
-        btnIPA.onclick = function() { App.openIPA(); };
-        menuContainer.appendChild(btnIPA);
-
-        LevelMap.forEach(level => {
-            if (level.type === 'learn') {
-                const btn = document.createElement('button');
-                btn.className = 'btn-menu';
-                btn.innerText = level.label;
-                if (level.label.includes("Ôn tập")) {
-                    btn.style.borderColor = "#ff9600";
-                    btn.style.color = "#d35400";
-                }
-                if (level.label.includes("THI THỬ")) { 
-                    btn.style.borderColor = "#e74c3c"; 
-                    btn.style.color = "#c0392b"; 
-                    btn.style.borderWidth = "4px"; 
-                }
-                btn.onclick = function() { App.startLesson(level.id); };
-                menuContainer.appendChild(btn);
-            }
-        });
+        const menuContainer = document.getElementById('menu-screen'); menuContainer.style.display = 'flex'; menuContainer.innerHTML = '';
+        const btnBack = document.createElement('button'); btnBack.className = 'btn-menu'; btnBack.innerText = "🏠  Home"; btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d"; btnBack.onclick = function() { App.goHome(); }; menuContainer.appendChild(btnBack);
+        const btnIPA = document.createElement('button'); btnIPA.className = 'btn-menu'; btnIPA.innerText = "🔠  IPA Chart"; btnIPA.style.borderColor = "#9C27B0"; btnIPA.style.color = "#9C27B0"; btnIPA.onclick = function() { App.openIPA(); }; menuContainer.appendChild(btnIPA);
+        if(typeof LevelMap !== 'undefined') { LevelMap.forEach(level => { if (level.type === 'learn') { const btn = document.createElement('button'); btn.className = 'btn-menu'; btn.innerText = level.label; if (level.label.includes("Ôn tập")) { btn.style.borderColor = "#ff9600"; btn.style.color = "#d35400"; } if (level.label.includes("THI THỬ")) { btn.style.borderColor = "#e74c3c"; btn.style.color = "#c0392b"; btn.style.borderWidth = "4px"; } btn.onclick = function() { App.startLesson(level.id); }; menuContainer.appendChild(btn); } }); } else { alert("Error: LevelMap data not found in 4.data.js"); }
+    },
+    initIntonationMenu: function() {
+        const menuContainer = document.getElementById('menu-screen'); menuContainer.style.display = 'flex'; menuContainer.innerHTML = '<div class="menu-title">Movie Shadowing</div>';
+        const btnBack = document.createElement('button'); btnBack.className = 'btn-menu'; btnBack.innerText = "🏠  Home"; btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d"; btnBack.onclick = function() { App.goHome(); }; menuContainer.appendChild(btnBack);
+        if(typeof IntonationData !== 'undefined') { IntonationData.forEach(item => { const btn = document.createElement('button'); btn.className = 'btn-menu'; btn.innerText = "🎬 " + item.title; btn.style.borderColor = "#2980b9"; btn.style.color = "#2980b9"; btn.onclick = function() { App.startShadowing(item); }; menuContainer.appendChild(btn); }); }
+    },
+    startShadowing: function(movieData) { document.getElementById('menu-screen').style.display = 'none'; document.getElementById('shadowing-screen').style.display = 'flex'; ShadowingEngine.init(movieData); },
+    initVocabMenu: function() {
+        const menuContainer = document.getElementById('menu-screen'); menuContainer.style.display = 'flex'; menuContainer.innerHTML = '<div class="menu-title">Vocabulary Topics</div>';
+        const btnBack = document.createElement('button'); btnBack.className = 'btn-menu'; btnBack.innerText = "🏠  Home"; btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d"; btnBack.onclick = function() { App.goHome(); }; menuContainer.appendChild(btnBack);
+        if(typeof VocabData !== 'undefined') { VocabData.forEach(topic => { const btn = document.createElement('button'); btn.className = 'btn-menu'; btn.innerText = "📖 " + topic.topic; btn.style.borderColor = topic.color; btn.style.color = topic.color; btn.onclick = function() { alert("Opening Topic: " + topic.topic + "\n(Vocab exercises coming soon)"); }; menuContainer.appendChild(btn); }); } else { menuContainer.innerHTML += "<div>No Vocab Data Found</div>"; }
     },
     openIPA: function() {
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('ipa-screen').style.display = 'flex';
-        const content = document.getElementById('ipa-content');
-        content.innerHTML = ''; 
-        for (const [sectionName, soundFiles] of Object.entries(IPA_DATA)) {
-            const secTitle = document.createElement('div');
-            secTitle.className = 'ipa-sec-title';
-            secTitle.innerText = sectionName;
-            if (sectionName.includes("Vowels")) secTitle.classList.add("bg-blue");
-            else secTitle.classList.add("bg-green");
-            content.appendChild(secTitle);
-            const grid = document.createElement('div');
-            grid.className = 'ipa-grid';
-            soundFiles.forEach(fileName => {
-                const item = document.createElement('div');
-                item.className = 'ipa-item';
-                item.innerHTML = `<img src="${fileName}.jpg" onerror="this.style.display='none'">`;
-                item.onclick = function() {
-                    const audio = new Audio(fileName + ".wav");
-                    audio.play();
-                    this.style.transform = "scale(0.9)";
-                    setTimeout(() => this.style.transform = "scale(1)", 150);
-                };
-                grid.appendChild(item);
-            });
-            content.appendChild(grid);
-            content.appendChild(document.createElement('br'));
-        }
+        document.getElementById('menu-screen').style.display = 'none'; document.getElementById('ipa-screen').style.display = 'flex'; const content = document.getElementById('ipa-content'); content.innerHTML = ''; 
+        for (const [sectionName, soundFiles] of Object.entries(IPA_DATA)) { const secTitle = document.createElement('div'); secTitle.className = 'ipa-sec-title'; secTitle.innerText = sectionName; if (sectionName.includes("Vowels")) secTitle.classList.add("bg-blue"); else secTitle.classList.add("bg-green"); content.appendChild(secTitle); const grid = document.createElement('div'); grid.className = 'ipa-grid'; soundFiles.forEach(fileName => { const item = document.createElement('div'); item.className = 'ipa-item'; item.innerHTML = `<img src="${fileName}.jpg" onerror="this.style.display='none'">`; item.onclick = function() { const audio = new Audio(fileName + ".wav"); audio.play(); this.style.transform = "scale(0.9)"; setTimeout(() => this.style.transform = "scale(1)", 150); }; grid.appendChild(item); }); content.appendChild(grid); content.appendChild(document.createElement('br')); }
     },
-    closeIPA: function() {
-        document.getElementById('ipa-screen').style.display = 'none';
-        document.getElementById('menu-screen').style.display = 'flex';
-    },
+    closeIPA: function() { document.getElementById('ipa-screen').style.display = 'none'; document.getElementById('menu-screen').style.display = 'flex'; },
     startLesson: function(num) { AudioEngine.unlock(); document.getElementById('menu-screen').style.display = 'none'; document.getElementById('main-container').style.display = 'block'; LearningEngine.initLesson(num); LearningEngine.render(); },
     enterGame: function() { document.getElementById('learning-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; const item = LearningEngine.currentData[LearningEngine.idx]; let vocabList = []; for(let i=1; i<=25; i++) { if(!DataEngine["lesson"+i]) continue; const lesson = DataEngine.getLesson(i); if (lesson.includes(item)) { vocabList = lesson.filter(l => l.img && l.type !== 'game'); break; } } GameEngine.start(item, vocabList); },
-    exitGame: function() { GameEngine.stop(); LearningEngine.render(); }
+    exitGame: function() { GameEngine.stop(); LearningEngine.render(); },
+    goHome: function() { AudioEngine.stopAllAndBlock(); GameEngine.stop(); ShadowingEngine.stopLoop(); document.getElementById('main-container').style.display = 'none'; document.getElementById('menu-screen').style.display = 'none'; document.getElementById('ipa-screen').style.display = 'none'; document.getElementById('shadowing-screen').style.display = 'none'; document.getElementById('landing-screen').style.display = 'flex'; }
 };
+
+window.onload = function() { App.init(); };
+window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
