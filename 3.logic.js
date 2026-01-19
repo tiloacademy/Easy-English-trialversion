@@ -1,13 +1,10 @@
 /* ==========================================================================
-   FILE: 3.logic.js (FULL FIXED VERSION)
+   FILE: 3.logic.js (FIXED SPEED BUTTONS & SYNTAX)
    ========================================================================== */
 
 /* --- AUDIO ENGINE --- */
 const AudioEngine = {
-    isAudioAllowed: false, 
-    audioWin: new Audio("win.mp3"), 
-    audioCorrect: new Audio("correct.mp3"), 
-    audioWrong: new Audio("wrong.mp3"),
+    isAudioAllowed: false, audioWin: new Audio("win.mp3"), audioCorrect: new Audio("correct.mp3"), audioWrong: new Audio("wrong.mp3"),
     unlock: function() { this.isAudioAllowed = true; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(u); window.speechSynthesis.cancel(); } },
     stopAllAndBlock: function() { this.isAudioAllowed = false; window.speechSynthesis.cancel(); this.audioWin.pause(); this.audioWin.currentTime = 0; this.audioCorrect.pause(); this.audioCorrect.currentTime = 0; this.audioWrong.pause(); this.audioWrong.currentTime = 0; },
     stopCurrentSound: function() { window.speechSynthesis.cancel(); },
@@ -35,7 +32,7 @@ const AudioEngine = {
     playEffect: function(type) { if (!this.isAudioAllowed) return; if (type === 'correct') this.audioCorrect.play().catch(e=>{}); if (type === 'wrong') this.audioWrong.play().catch(e=>{}); if (type === 'win') this.audioWin.play().catch(e=>{}); }
 };
 
-/* --- SHADOWING ENGINE (VIDEO PLAYER) --- */
+/* --- SHADOWING ENGINE (FIXED SPEED LOGIC) --- */
 const ShadowingEngine = {
     player: null,
     currentData: null,
@@ -64,19 +61,16 @@ const ShadowingEngine = {
         if (this.player && this.player.setPlaybackRate) {
             this.player.setPlaybackRate(rate);
             
-            // Xóa class active cũ
+            // Xóa active cũ
             document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
             
-            // Tìm nút mới để active (Sửa logic so sánh chính xác)
+            // Active nút mới (Logic so sánh chính xác)
             const btns = document.querySelectorAll('.speed-btn');
             btns.forEach(b => {
-                const btnText = b.innerText;
-                // Nếu là nút Normal (rate = 1)
-                if (rate === 1 && btnText === 'Normal') {
+                const txt = b.innerText;
+                if (rate === 1 && txt === 'Normal') {
                     b.classList.add('active');
-                }
-                // Nếu là các nút số (0.5x, 1.25x...) -> Cắt bỏ chữ 'x' rồi so sánh số
-                else if (btnText !== 'Normal' && parseFloat(btnText) === rate) {
+                } else if (parseFloat(txt) === rate) {
                     b.classList.add('active');
                 }
             });
@@ -118,7 +112,7 @@ const ShadowingEngine = {
             this.stopLoop();
             return;
         }
-        this.stopLoop(); // Stop any previous loop
+        this.stopLoop(); 
 
         this.currentIndex = index;
         this.isPlayingSegment = true;
@@ -157,7 +151,7 @@ const ShadowingEngine = {
     onPlayerStateChange: function(event) {}
 };
 
-/* --- GAME ENGINE (WHACK-A-MOLE & FLIP) --- */
+/* --- GAME ENGINE --- */
 const GameEngine = {
     active: false, moleLoop: null, moleAudioLoop: null, hammerTimeout: null, timerInt: null, 
     score: 0, sec: 0, moles: [], moleRemainingWords: [], moleTarget: null,
@@ -177,8 +171,6 @@ const GameEngine = {
         const hammer = document.getElementById('cursor-hammer'); if(hammer) hammer.classList.remove('active');
         SnakeEngine.stop();
     },
-    
-    // MOLE Logic
     startMoleGame: function() {
         this.stop(); this.active = true; this.score = 0; this.sec = 0; this.updateScore(0);
         this.moles = document.querySelectorAll('.mole');
@@ -216,37 +208,26 @@ const GameEngine = {
         else { AudioEngine.playEffect('wrong'); moleEl.classList.remove('up'); this.updateScore(-50); this.showFloatingText(touchX, touchY, "-50", "red"); }
     },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
-    
-    // FLIP GAME
     startFlipGame: function() {
         this.stop(); this.active = true; this.sec = 0; this.matches = 0;
         document.getElementById('tower').style.display = 'flex'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'none';
         const tower = document.getElementById('tower'); tower.innerHTML = '';
-        let cards = [];
-        let validItems = [];
+        let cards = []; let validItems = [];
         this.currentConfig.pairs.forEach(key => {
             let original = this.currentDataPool.find(d => { if(d.type === 'game' || d.type === 'sent') return false; let fullWord = d.parts.map(p => p.t).join(""); return fullWord === key; });
             if(original) validItems.push(original);
         });
-        validItems.sort(() => 0.5 - Math.random());
-        validItems = validItems.slice(0, 5); 
+        validItems.sort(() => 0.5 - Math.random()); validItems = validItems.slice(0, 5); 
         validItems.forEach(original => {
             cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); 
-            let htmlText = `<div class="game-card-text">`; 
-            original.parts.forEach(p => { htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; }); 
-            htmlText += `</div>`; 
+            let htmlText = `<div class="game-card-text">`; original.parts.forEach(p => { htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; }); htmlText += `</div>`; 
             cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); 
         });
         cards.sort(() => 0.5 - Math.random());
         let cCount = 0; let num = 1; const rows = [3, 2, 3, 2];
         rows.forEach(cnt => {
             const rowDiv = document.createElement('div'); rowDiv.className = 'tower-row';
-            for(let k=0; k<cnt; k++) {
-                if(cCount >= cards.length) break; 
-                const c = cards[cCount]; const el = document.createElement('div'); el.className = 'card-flip'; el.dataset.speak = c.speak; el.dataset.id = c.id;
-                el.innerHTML = `<div class="card-inner"><div class="face front">${num}</div><div class="face back">${c.content}</div></div>`;
-                el.onclick = function() { GameEngine.cardClick(this); }; rowDiv.appendChild(el); cCount++; num++;
-            }
+            for(let k=0; k<cnt; k++) { if(cCount >= cards.length) break; const c = cards[cCount]; const el = document.createElement('div'); el.className = 'card-flip'; el.dataset.speak = c.speak; el.dataset.id = c.id; el.innerHTML = `<div class="card-inner"><div class="face front">${num}</div><div class="face back">${c.content}</div></div>`; el.onclick = function() { GameEngine.cardClick(this); }; rowDiv.appendChild(el); cCount++; num++; }
             tower.appendChild(rowDiv);
         });
         this.startTimer();
@@ -254,10 +235,7 @@ const GameEngine = {
     cardClick: function(el) {
         if(el.classList.contains('flipped') || el.classList.contains('matched')) return;
         el.classList.add('flipped'); AudioEngine.playTTS(el.dataset.speak);
-        if(!this.c1) { this.c1 = el; } else { this.c2 = el;
-            if(this.c1.dataset.id === this.c2.dataset.id) { setTimeout(() => { this.c1.classList.add('matched'); this.c2.classList.add('matched'); this.c1 = null; this.c2 = null; this.matches++; AudioEngine.playEffect('correct'); if(this.matches === 5) this.win(); }, 600); }
-            else { setTimeout(() => { this.c1.classList.remove('flipped'); this.c2.classList.remove('flipped'); this.c1 = null; this.c2 = null; AudioEngine.playEffect('wrong'); }, 1000); }
-        }
+        if(!this.c1) { this.c1 = el; } else { this.c2 = el; if(this.c1.dataset.id === this.c2.dataset.id) { setTimeout(() => { this.c1.classList.add('matched'); this.c2.classList.add('matched'); this.c1 = null; this.c2 = null; this.matches++; AudioEngine.playEffect('correct'); if(this.matches === 5) this.win(); }, 600); } else { setTimeout(() => { this.c1.classList.remove('flipped'); this.c2.classList.remove('flipped'); this.c1 = null; this.c2 = null; AudioEngine.playEffect('wrong'); }, 1000); } }
     },
     startTimer: function() { clearInterval(this.timerInt); document.getElementById('timer').innerText = "00:00"; this.timerInt = setInterval(() => { this.sec++; let m=Math.floor(this.sec/60).toString().padStart(2,'0'); let s=(this.sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `${m}:${s}`; }, 1000); },
     updateScore: function(val) { this.score += val; if(this.score < 0) this.score = 0; document.getElementById('score-display').innerText = this.score; },
@@ -267,22 +245,14 @@ const GameEngine = {
 
 /* --- SNAKE ENGINE --- */
 const SnakeEngine = {
-    active: false, paused: false, gameLoopId: null, audioLoopId: null, boardSize: 15, snake: [], direction: {x: 0, y: 0}, nextDirection: {x: 0, y: 0}, 
-    foods: [], score: 0, speed: 300, targetPhoneme: "", currentTargetWord: null, poolCorrect: [], poolWrong: [],
-    lives: 3,
-
+    active: false, paused: false, gameLoopId: null, audioLoopId: null, boardSize: 15, snake: [], direction: {x: 0, y: 0}, nextDirection: {x: 0, y: 0}, foods: [], score: 0, speed: 300, targetPhoneme: "", currentTargetWord: null, poolCorrect: [], poolWrong: [], lives: 3,
     start: function(config, dataPool) {
         this.stop(); this.active = true; this.paused = false; this.score = 0; this.speed = 550; this.lives = 3; this.targetPhoneme = config.phoneme;
         this.poolCorrect = dataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         this.poolWrong = dataPool.filter(w => !w.parts || !w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         if (this.poolCorrect.length === 0) return alert("Missing data for /" + this.targetPhoneme + "/");
-
-        document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('pause-modal').style.display = 'none'; document.getElementById('snake-score').innerText = this.score;
-        this.updateLivesUI();
-        
-        const center = Math.floor(this.boardSize / 2);
-        this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}];
-        this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
+        document.getElementById('tower').style.display = 'none'; document.getElementById('whack-wrapper').style.display = 'none'; document.getElementById('snake-game-container').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('pause-modal').style.display = 'none'; document.getElementById('snake-score').innerText = this.score; this.updateLivesUI();
+        const center = Math.floor(this.boardSize / 2); this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}]; this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1};
         this.createBoard(); this.spawnFoods(); this.gameLoop(); this.startAudioLoop();
     },
     stop: function() { this.active = false; clearTimeout(this.gameLoopId); clearInterval(this.audioLoopId); },
@@ -292,52 +262,24 @@ const SnakeEngine = {
     updateLivesUI: function() { let hearts = ""; for(let i=0; i<this.lives; i++) hearts += "❤️"; for(let i=this.lives; i<3; i++) hearts += "🖤"; document.getElementById('snake-lives').innerText = hearts; },
     handleDeath: function(msg) { this.lives--; this.updateLivesUI(); AudioEngine.playEffect('wrong'); if (this.lives <= 0) { this.showGameOver(msg + " Game Over!"); } else { const center = Math.floor(this.boardSize / 2); this.snake = [{x: center, y: center}, {x: center, y: center + 1}, {x: center, y: center + 2}]; this.direction = {x: 0, y: -1}; this.nextDirection = {x: 0, y: -1}; } },
     gameLoop: function() {
-        if (!this.active || this.paused) return;
-        this.direction = this.nextDirection;
-        const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
+        if (!this.active || this.paused) return; this.direction = this.nextDirection; const head = { ...this.snake[0] }; head.x += this.direction.x; head.y += this.direction.y;
         if (this.isCollision(head)) { this.handleDeath("Hit Wall!"); if(this.lives > 0) { this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; } else return; }
-        this.snake.unshift(head);
-        let ate = false;
-        const foodIndex = this.foods.findIndex(f => f.x === head.x && f.y === head.y);
-        if (foodIndex !== -1) {
-            const food = this.foods[foodIndex];
-            if (food.isCorrect) { ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score; AudioEngine.playEffect('correct'); if (this.speed > 150) this.speed -= 20; this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop(); if (this.score >= 100) { this.win(); return; } } 
-            else { this.handleDeath(`Wrong! "${food.word}" is not the target!`); if(this.lives > 0) { this.foods.splice(foodIndex, 1); this.snake.pop(); this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; } else return; }
-        }
-        if (!ate) this.snake.pop();
-        this.draw();
-        this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed);
+        this.snake.unshift(head); let ate = false; const foodIndex = this.foods.findIndex(f => f.x === head.x && f.y === head.y);
+        if (foodIndex !== -1) { const food = this.foods[foodIndex]; if (food.isCorrect) { ate = true; this.score += 10; document.getElementById('snake-score').innerText = this.score; AudioEngine.playEffect('correct'); if (this.speed > 150) this.speed -= 20; this.foods.splice(foodIndex, 1); this.spawnFoods(); this.startAudioLoop(); if (this.score >= 100) { this.win(); return; } } else { this.handleDeath(`Wrong! "${food.word}" is not the target!`); if(this.lives > 0) { this.foods.splice(foodIndex, 1); this.snake.pop(); this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed); return; } else return; } }
+        if (!ate) this.snake.pop(); this.draw(); this.gameLoopId = setTimeout(() => { if(this.active) this.gameLoop(); }, this.speed);
     },
     isCollision: function(pos) { if (pos.x < 0 || pos.x >= this.boardSize || pos.y < 0 || pos.y >= this.boardSize) return true; for (let i = 1; i < this.snake.length; i++) if (pos.x === this.snake[i].x && pos.y === this.snake[i].y) return true; return false; },
     spawnFoods: function() {
-        this.foods = [];
-        const correctWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)];
-        this.currentTargetWord = correctWord; 
-        const validWrongPool = this.poolWrong.filter(w => !w.img.includes("card.jpg"));
-        const wrongWords = validWrongPool.sort(() => 0.5 - Math.random()).slice(0, 2); 
-        const itemsToSpawn = [{ ...correctWord, isCorrect: true, icon: '🍎' }, { ...wrongWords[0], isCorrect: false, icon: '🍄' }];
-        if (wrongWords[1]) itemsToSpawn.push({ ...wrongWords[1], isCorrect: false, icon: '💣' });
-        itemsToSpawn.forEach(item => {
-            let pos; do { pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10); if (isSafeZone) continue; let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1); if (isTooClose) continue; } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1));
-            this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon });
-        });
-        let ipaHtml = "";
-        if (correctWord.type !== 'sent' && correctWord.speak.split(' ').length < 2) { let ipaStr = ""; if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); } ipaHtml = `<div style="color:red; font-size:14px;">/${ipaStr}/</div>`; }
-        let fontSize = (correctWord.type === 'sent') ? '18px' : '24px';
-        document.getElementById('snake-target-content').innerHTML = `${ipaHtml}<div style="color:#d35400; font-size:${fontSize}; font-weight:900;">${correctWord.speak}</div>`;
+        this.foods = []; const correctWord = this.poolCorrect[Math.floor(Math.random() * this.poolCorrect.length)]; this.currentTargetWord = correctWord; const validWrongPool = this.poolWrong.filter(w => !w.img.includes("card.jpg")); const wrongWords = validWrongPool.sort(() => 0.5 - Math.random()).slice(0, 2); const itemsToSpawn = [{ ...correctWord, isCorrect: true, icon: '🍎' }, { ...wrongWords[0], isCorrect: false, icon: '🍄' }]; if (wrongWords[1]) itemsToSpawn.push({ ...wrongWords[1], isCorrect: false, icon: '💣' });
+        itemsToSpawn.forEach(item => { let pos; do { pos = { x: Math.floor(Math.random() * (this.boardSize - 2)) + 1, y: Math.floor(Math.random() * (this.boardSize - 2)) + 1 }; let isSafeZone = (pos.y >= 11 && pos.x >= 4 && pos.x <= 10); if (isSafeZone) continue; let isTooClose = this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1); if (isTooClose) continue; } while (this.isOccupied(pos) || this.foods.some(f => Math.abs(f.x - pos.x) <= 1 && Math.abs(f.y - pos.y) <= 1)); this.foods.push({ x: pos.x, y: pos.y, img: item.img, word: item.speak, isCorrect: item.isCorrect, icon: item.icon }); });
+        let ipaHtml = ""; if (correctWord.type !== 'sent' && correctWord.speak.split(' ').length < 2) { let ipaStr = ""; if (correctWord.parts) { ipaStr = correctWord.parts.map(p => p.i).join("").replace(/&nbsp;/g, ""); } ipaHtml = `<div style="color:red; font-size:14px;">/${ipaStr}/</div>`; }
+        let fontSize = (correctWord.type === 'sent') ? '18px' : '24px'; document.getElementById('snake-target-content').innerHTML = `${ipaHtml}<div style="color:#d35400; font-size:${fontSize}; font-weight:900;">${correctWord.speak}</div>`;
     },
     isOccupied: function(pos) { if (this.snake.some(s => s.x === pos.x && s.y === pos.y)) return true; if (this.foods.some(f => f.x === pos.x && f.y === pos.y)) return true; const head = this.snake[0]; if (Math.abs(pos.x - head.x) < 3 && Math.abs(pos.y - head.y) < 3) return true; return false; },
-    draw: function() {
-        const cells = document.querySelectorAll('.grid-cell'); cells.forEach(c => { c.className = 'grid-cell'; c.innerHTML = ''; });
-        this.foods.forEach(f => { const idx = f.y * this.boardSize + f.x; if (cells[idx]) { const zIndex = 10; cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; } });
-        this.snake.forEach((part, index) => { const idx = part.y * this.boardSize + part.x; if (cells[idx]) { const div = document.createElement('div'); div.classList.add('snake-part'); if (index === 0) { div.classList.add('snake-head'); if (this.direction.y === -1) div.classList.add('head-down'); else if (this.direction.y === 1) div.classList.add('head-up'); else if (this.direction.x === -1) div.classList.add('head-left'); else if (this.direction.x === 1) div.classList.add('head-right'); } cells[idx].appendChild(div); } });
-    },
-    changeDirection: function(newDirName) { if (this.paused) return; let newDir = {x:0, y:0}; if (newDirName === 'up') newDir = {x: 0, y: -1}; if (newDirName === 'down') newDir = {x: 0, y: 1}; if (newDirName === 'left') newDir = {x: -1, y: 0}; if (newDirName === 'right') newDir = {x: 1, y: 0}; if (this.direction.x + newDir.x === 0 && this.direction.y + newDir.y === 0) return; this.nextDirection = newDir; },
-    showGameOver: function(msg) { this.stop(); AudioEngine.playTTS("Game Over!"); document.getElementById('win-msg').innerText = msg; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; },
-    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Awesome!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
+    draw: function() { const cells = document.querySelectorAll('.grid-cell'); cells.forEach(c => { c.className = 'grid-cell'; c.innerHTML = ''; }); this.foods.forEach(f => { const idx = f.y * this.boardSize + f.x; if (cells[idx]) { const zIndex = 10; cells[idx].innerHTML = `<div class="food-item" style="z-index:${zIndex}"><img class="food-img" src="${f.img}" onerror="this.style.display='none'"><div class="food-core">${f.icon}</div></div>`; } }); this.snake.forEach((part, index) => { const idx = part.y * this.boardSize + part.x; if (cells[idx]) { const div = document.createElement('div'); div.classList.add('snake-part'); if (index === 0) { div.classList.add('snake-head'); if (this.direction.y === -1) div.classList.add('head-down'); else if (this.direction.y === 1) div.classList.add('head-up'); else if (this.direction.x === -1) div.classList.add('head-left'); else if (this.direction.x === 1) div.classList.add('head-right'); } cells[idx].appendChild(div); } }); },
 };
 
-/* --- LEARNING ENGINE --- */
+/* --- LEARNING ENGINE (UPDATED) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, listenTimeout: null, 
     initLesson: function(lessonNum) { this.currentLessonId = lessonNum; this.currentData = DataEngine.getLesson(lessonNum); this.idx = 0; this.preload(); },
@@ -436,4 +378,3 @@ const App = {
 
 window.onload = function() { App.init(); };
 window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
-
