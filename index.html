@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>English Learning Hub</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <link rel="stylesheet" href="2.style.css">
 </head>
 <body>
@@ -36,6 +37,30 @@
         </div>
     </div>
 
+    <div id="shadowing-screen" style="display: none;">
+        <div class="top-bar">
+            <button class="btn-home" onclick="App.openPart(2)"> 🔙 Back </button>
+            <div class="header-title" id="movie-title">Movie Title</div>
+            <div style="width: 40px;"></div>
+        </div>
+        
+        <div class="video-main-container">
+            <div id="youtube-player"></div>
+        </div>
+
+        <div class="speed-control-bar">
+            <span>Speed: </span>
+            <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(0.5)">0.5x</button>
+            <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(0.75)">0.75x</button>
+            <button class="speed-btn active" onclick="ShadowingEngine.changeSpeed(1)" id="speed-1">Normal</button>
+            <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(1.25)">1.25x</button>
+            <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(1.5)">1.5x</button>
+        </div>
+
+        <div id="segment-list" class="segment-container">
+            </div>
+    </div>
+    
     <div id="menu-screen" style="display: none;"></div>
 
     <div id="ipa-screen" style="display: none;">
@@ -123,3 +148,4 @@
     <script src="3.logic.js"></script>
 </body>
 </html>
+
