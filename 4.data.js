@@ -532,21 +532,288 @@ const DataEngine = {
 const IntonationData = [
     {
         id: 1,
-        title: "Frozen: Do you want to build a snowman?",
-        img: "frozen.jpg", // Bạn cần chuẩn bị ảnh này
-        video: "frozen.mp4", // Bạn cần chuẩn bị video này
-        subs: [
-            { start: 0, end: 3, en: "Do you want to build a snowman?", vi: "Chị có muốn đắp người tuyết không?" },
-            { start: 4, end: 8, en: "Come on let's go and play", vi: "Ra ngoài chơi đi nè" }
-        ]
-    },
-    {
-        id: 2,
-        title: "Lion King: Hakuna Matata",
-        img: "lionking.jpg",
-        video: "lionking.mp4",
-        subs: [
-            { start: 0, end: 5, en: "Hakuna Matata! What a wonderful phrase", vi: "Hakuna Matata! Câu nói mới tuyệt làm sao" }
+        title: "Frozen: Anna meets Olaf (Full Scene)",
+        img: "frozen.jpg", 
+        youtubeId: "Zvgt-yPEmxs", // ID VIDEO MỚI CỦA BẠN
+        segments: [
+            {
+                // Câu 1: Anna khen mùa đông
+                start: 2.0, end: 5.0,
+                text: "I never knew winter could be so beautiful.",
+                parts: [
+                    {t:"I", i:"aɪ"}, {t:"never", i:"ˈnɛv.ər"}, {t:"knew", i:"njuː"}, 
+                    {t:"winter", i:"ˈwɪn.tər"}, {t:"could", i:"kʊd"}, {t:"be", i:"biː"}, 
+                    {t:"so", i:"soʊ"}, {t:"beautiful.", i:"ˈbjuː.tɪ.fəl"}
+                ]
+            },
+            {
+                // Câu 2: Olaf xuất hiện
+                start: 6.0, end: 8.5,
+                text: "Yeah... It really is beautiful, isn't it?",
+                parts: [
+                    {t:"Yeah...", i:"jɛə"}, {t:"It", i:"ɪt"}, {t:"really", i:"ˈrɪə.li"}, 
+                    {t:"is", i:"ɪz"}, {t:"beautiful,", i:"ˈbjuː.tɪ.fəl"}, 
+                    {t:"isn't", i:"ˈɪz.ənt"}, {t:"it?", i:"ɪt"}
+                ]
+            },
+            {
+                // Câu 3: Olaf chê màu trắng
+                start: 8.6, end: 12.0,
+                text: "But it's so white. You know, how about a little color?",
+                parts: [
+                    {t:"But", i:"bʌt"}, {t:"it's", i:"ɪts"}, {t:"so", i:"soʊ"}, {t:"white.", i:"waɪt"},
+                    {t:"You", i:"juː"}, {t:"know,", i:"noʊ"}, {t:"how", i:"haʊ"}, 
+                    {t:"about", i:"əˈbaʊt"}, {t:"a", i:"ə"}, {t:"little", i:"ˈlɪt.əl"}, {t:"color?", i:"ˈkʌl.ər"}
+                ]
+            },
+            {
+                // Câu 4: Olaf gợi ý màu
+                start: 12.1, end: 15.5,
+                text: "I'm thinking like maybe some crimson, chartreuse...",
+                parts: [
+                    {t:"I'm", i:"aɪm"}, {t:"thinking", i:"ˈθɪŋ.kɪŋ"}, {t:"like", i:"laɪk"}, 
+                    {t:"maybe", i:"ˈmeɪ.bi"}, {t:"some", i:"sʌm"}, 
+                    {t:"crimson,", i:"ˈkrɪm.zən"}, {t:"chartreuse...", i:"ʃɑːrˈtruːz"}
+                ]
+            },
+            {
+                // Câu 5: Olaf nhắc đến màu vàng
+                start: 15.6, end: 18.0,
+                text: "How about yellow? No, not yellow. Yellow and snow?",
+                parts: [
+                    {t:"How", i:"haʊ"}, {t:"about", i:"əˈbaʊt"}, {t:"yellow?", i:"ˈjɛl.oʊ"},
+                    {t:"No,", i:"noʊ"}, {t:"not", i:"nɑːt"}, {t:"yellow.", i:"ˈjɛl.oʊ"},
+                    {t:"Yellow", i:"ˈjɛl.oʊ"}, {t:"and", i:"ænd"}, {t:"snow?", i:"snoʊ"}
+                ]
+            },
+            {
+                // Câu 6: Olaf ghê sợ màu vàng (Câu bạn nhắc bổ sung)
+                start: 18.1, end: 19.5,
+                text: "Brrr... No.", 
+                parts: [
+                    {t:"Brrr...", i:"brrr"}, {t:"No.", i:"noʊ"}
+                ]
+            },
+            {
+                // Câu 7: Am I right?
+                start: 19.6, end: 20.8,
+                text: "Am I right?",
+                parts: [
+                    {t:"Am", i:"æm"}, {t:"I", i:"aɪ"}, {t:"right?", i:"raɪt"}
+                ]
+            },
+            {
+                // Câu 8: Hi!
+                start: 20.9, end: 21.8,
+                text: "Hi!",
+                parts: [
+                    {t:"Hi!", i:"haɪ"}
+                ]
+            },
+            {
+                // Câu 9: Anna sợ
+                start: 21.9, end: 23.0,
+                text: "You're creepy.",
+                parts: [
+                    {t:"You're", i:"jʊr"}, {t:"creepy.", i:"ˈkriː.pi"}
+                ]
+            },
+            {
+                // Câu 10: Olaf la lên
+                start: 23.1, end: 24.5,
+                text: "I don't want it!",
+                parts: [
+                    {t:"I", i:"aɪ"}, {t:"don't", i:"doʊnt"}, 
+                    {t:"want", i:"wɑːnt"}, {t:"it!", i:"ɪt"}
+                ]
+            },
+            {
+                // Câu 11: Ném đầu (Câu bạn nhắc bổ sung)
+                start: 24.6, end: 25.5,
+                text: "Back at you!",
+                parts: [
+                    {t:"Back", i:"bæk"}, {t:"at", i:"æt"}, {t:"you!", i:"juː"}
+                ]
+            },
+            {
+                // Câu 12: Bay trên không (Câu bạn nhắc bổ sung)
+                start: 25.6, end: 26.5,
+                text: "Please don't drop me!",
+                parts: [
+                    {t:"Please", i:"pliːz"}, {t:"don't", i:"doʊnt"}, 
+                    {t:"drop", i:"drɑːp"}, {t:"me!", i:"miː"}
+                ]
+            },
+            {
+                // Câu 13: Anna ngạc nhiên
+                start: 26.6, end: 28.5,
+                text: "It's a talking snowman.",
+                parts: [
+                    {t:"It's", i:"ɪts"}, {t:"a", i:"ə"}, {t:"talking", i:"ˈtɔː.kɪŋ"}, 
+                    {t:"snowman.", i:"ˈsnoʊ.mæn"}
+                ]
+            },
+            {
+                // Câu 14: Olaf giới thiệu
+                start: 30.5, end: 33.5,
+                text: "I'm Olaf and I like warm hugs!",
+                parts: [
+                    {t:"I'm", i:"aɪm"}, {t:"Olaf", i:"ˈoʊ.læf"}, {t:"and", i:"ænd"}, 
+                    {t:"I", i:"aɪ"}, {t:"like", i:"laɪk"}, {t:"warm", i:"wɔːrm"}, 
+                    {t:"hugs!", i:"hʌgz"}
+                ]
+            },
+            {
+                // Câu 15: Anna hỏi lại
+                start: 33.6, end: 34.5,
+                text: "Olaf?",
+                parts: [
+                    {t:"Olaf?", i:"ˈoʊ.læf"}
+                ]
+            },
+            {
+                // Câu 16: Olaf xác nhận
+                start: 34.6, end: 36.8,
+                text: "That's right, Olaf.",
+                parts: [
+                    {t:"That's", i:"ðæts"}, {t:"right,", i:"raɪt"}, {t:"Olaf.", i:"ˈoʊ.læf"}
+                ]
+            },
+            {
+                // Câu 17: Hỏi tên Anna
+                start: 36.9, end: 38.0,
+                text: "And you are?",
+                parts: [
+                    {t:"And", i:"ænd"}, {t:"you", i:"juː"}, {t:"are?", i:"ɑːr"}
+                ]
+            },
+            {
+                // Câu 18: Anna trả lời
+                start: 38.1, end: 39.8,
+                text: "Oh, I'm Anna.",
+                parts: [
+                    {t:"Oh,", i:"oʊ"}, {t:"I'm", i:"aɪm"}, {t:"Anna.", i:"ˈæn.ə"}
+                ]
+            },
+            {
+                // Câu 19: Hỏi về con lừa
+                start: 39.9, end: 42.8,
+                text: "And who's the funky-looking donkey over there?",
+                parts: [
+                    {t:"And", i:"ænd"}, {t:"who's", i:"huːz"}, {t:"the", i:"ðə"}, 
+                    {t:"funky-looking", i:"ˈfʌŋ.ki-ˈlʊk.ɪŋ"}, {t:"donkey", i:"ˈdɔŋ.ki"}, 
+                    {t:"over", i:"ˈoʊ.vər"}, {t:"there?", i:"ðɛr"}
+                ]
+            },
+            {
+                // Câu 20: Sven
+                start: 42.9, end: 44.0,
+                text: "That's Sven.",
+                parts: [
+                    {t:"That's", i:"ðæts"}, {t:"Sven.", i:"svɛn"}
+                ]
+            },
+            {
+                // Câu 21: Hỏi về tuần lộc
+                start: 44.1, end: 46.5,
+                text: "Uh-huh. And who's the reindeer?",
+                parts: [
+                    {t:"Uh-huh.", i:"ʌ-hʌ"}, {t:"And", i:"ænd"}, {t:"who's", i:"huːz"}, 
+                    {t:"the", i:"ðə"}, {t:"reindeer?", i:"ˈreɪn.dɪr"}
+                ]
+            },
+            {
+                // Câu 22: Anna bối rối
+                start: 46.6, end: 47.8,
+                text: "... Sven.",
+                parts: [
+                    {t:"...", i:""}, {t:"Sven.", i:"svɛn"}
+                ]
+            },
+            {
+                // Câu 23: Olaf hiểu nhầm
+                start: 47.9, end: 51.5,
+                text: "Oh. They're - oh, okay. Makes things easier for me.",
+                parts: [
+                    {t:"Oh.", i:"oʊ"}, {t:"They're", i:"ðɛr"}, {t:"-", i:""}, 
+                    {t:"oh,", i:"oʊ"}, {t:"okay.", i:"oʊˈkeɪ"}, 
+                    {t:"Makes", i:"meɪks"}, {t:"things", i:"θɪŋz"}, 
+                    {t:"easier", i:"ˈiː.zi.ər"}, {t:"for", i:"fɔːr"}, {t:"me.", i:"miː"}
+                ]
+            },
+            {
+                // Câu 24: Hôn mũi
+                start: 51.6, end: 54.0,
+                text: "Aw, look at him trying to kiss my nose.",
+                parts: [
+                    {t:"Aw,", i:"ɔː"}, {t:"look", i:"lʊk"}, {t:"at", i:"æt"}, 
+                    {t:"him", i:"hɪm"}, {t:"trying", i:"ˈtraɪ.ɪŋ"}, {t:"to", i:"tuː"}, 
+                    {t:"kiss", i:"kɪs"}, {t:"my", i:"maɪ"}, {t:"nose.", i:"noʊz"}
+                ]
+            },
+            {
+                // Câu 25: Sven thích Olaf
+                start: 54.1, end: 55.3,
+                text: "I like you, too!",
+                parts: [
+                    {t:"I", i:"aɪ"}, {t:"like", i:"laɪk"}, {t:"you,", i:"juː"}, {t:"too!", i:"tuː"}
+                ]
+            },
+            {
+                // Câu 26: Anna ngạc nhiên
+                start: 55.4, end: 57.0,
+                text: "Olaf. Did you just say that?",
+                parts: [
+                    {t:"Olaf.", i:"ˈoʊ.læf"}, {t:"Did", i:"dɪd"}, {t:"you", i:"juː"}, 
+                    {t:"just", i:"dʒʌst"}, {t:"say", i:"seɪ"}, {t:"that?", i:"ðæt"}
+                ]
+            },
+            {
+                // Câu 27: Olaf thắc mắc
+                start: 57.1, end: 58.5,
+                text: "Yeah. Why?",
+                parts: [
+                    {t:"Yeah.", i:"jɛə"}, {t:"Why?", i:"waɪ"}
+                ]
+            },
+            {
+                // Câu 28: Anna giải thích
+                start: 58.6, end: 63.0,
+                text: "I don't know... It's just... I've always wanted a nose.",
+                parts: [
+                    {t:"I", i:"aɪ"}, {t:"don't", i:"doʊnt"}, {t:"know...", i:"noʊ"},
+                    {t:"It's", i:"ɪts"}, {t:"just...", i:"dʒʌst"}, 
+                    {t:"I've", i:"aɪv"}, {t:"always", i:"ˈɔːl.weɪz"}, 
+                    {t:"wanted", i:"ˈwɑːn.tɪd"}, {t:"a", i:"ə"}, {t:"nose.", i:"noʊz"}
+                ]
+            },
+            {
+                // Câu 29: Olaf sung sướng
+                start: 63.1, end: 65.2,
+                text: "So cute. It's like a little baby unicorn.",
+                parts: [
+                    {t:"So", i:"soʊ"}, {t:"cute.", i:"kjuːt"}, 
+                    {t:"It's", i:"ɪts"}, {t:"like", i:"laɪk"}, {t:"a", i:"ə"}, 
+                    {t:"little", i:"ˈlɪt.əl"}, {t:"baby", i:"ˈbeɪ.bi"}, {t:"unicorn.", i:"ˈjuː.nɪ.kɔːrn"}
+                ]
+            },
+            {
+                // Câu 30: Olaf bị đẩy đầu
+                start: 65.3, end: 67.0,
+                text: "What? Hey! Whoa!",
+                parts: [
+                    {t:"What?", i:"wʌt"}, {t:"Hey!", i:"heɪ"}, {t:"Whoa!", i:"woʊ"}
+                ]
+            },
+            {
+                // Câu 31: Olaf thích thú
+                start: 67.1, end: 69.5,
+                text: "Oh, I love it! It's so cute!",
+                parts: [
+                    {t:"Oh,", i:"oʊ"}, {t:"I", i:"aɪ"}, {t:"love", i:"lʌv"}, {t:"it!", i:"ɪt"},
+                    {t:"It's", i:"ɪts"}, {t:"so", i:"soʊ"}, {t:"cute!", i:"kjuːt"}
+                ]
+            }
         ]
     }
 ];
@@ -557,39 +824,19 @@ const VocabData = [
         id: 1,
         topic: "Animals",
         color: "#FF9800",
-        // 1. Học từ
         vocab: [
             { img: "cat.jpg", speak: "cat", mean: "Cat" },
             { img: "dog.jpg", speak: "dog", mean: "Dog" },
             { img: "duck.jpg", speak: "duck", mean: "Duck" },
             { img: "pig.jpg", speak: "pig", mean: "Pig" }
         ],
-        // 2. Bài đọc
         reading: {
             title: "My Pet",
             text: "I have a cat. It is fat. It likes to sleep.",
             audio: "reading_animals.mp3"
         },
-        // 3. Câu hỏi trắc nghiệm
         quiz: [
             { question: "What does the cat like?", options: ["Run", "Sleep", "Eat"], answer: 1 }
-        ]
-    },
-    {
-        id: 2,
-        topic: "Colors",
-        color: "#9C27B0",
-        vocab: [
-            { img: "red.jpg", speak: "red", mean: "Red" },
-            { img: "blue.jpg", speak: "blue", mean: "Blue" }
-        ],
-        reading: {
-            title: "The Rainbow",
-            text: "The sky is blue. The sun is yellow.",
-            audio: "reading_colors.mp3"
-        },
-        quiz: [
-            { question: "What color is the sky?", options: ["Green", "Blue", "Red"], answer: 1 }
         ]
     }
 ];
