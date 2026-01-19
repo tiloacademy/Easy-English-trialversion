@@ -525,294 +525,274 @@ const DataEngine = {
 };
 
 /* ==========================================================================
-   DỮ LIỆU MỚI: PART 2 & PART 3
+   DỮ LIỆU MỚI: PART 2 & PART 3 (Cập nhật theo file SRT chuẩn)
    ========================================================================== */
 
 /* --- PART 2: INTONATION (Shadowing Movies) --- */
 const IntonationData = [
     {
         id: 1,
-        title: "Frozen: Anna meets Olaf (Full Scene)",
+        title: "Frozen: Anna meets Olaf (Final)",
         img: "frozen.jpg", 
-        youtubeId: "Zvgt-yPEmxs", // ID VIDEO MỚI CỦA BẠN
+        youtubeId: "Zvgt-yPEmxs", // Video ID mới
         segments: [
             {
-                // Câu 1: Anna khen mùa đông
-                start: 2.0, end: 5.0,
+                [cite_start]// #1 [cite: 1]
+                start: 0.0, end: 3.36,
                 text: "I never knew winter could be so beautiful.",
-                parts: [
-                    {t:"I", i:"aɪ"}, {t:"never", i:"ˈnɛv.ər"}, {t:"knew", i:"njuː"}, 
-                    {t:"winter", i:"ˈwɪn.tər"}, {t:"could", i:"kʊd"}, {t:"be", i:"biː"}, 
-                    {t:"so", i:"soʊ"}, {t:"beautiful.", i:"ˈbjuː.tɪ.fəl"}
-                ]
+                parts: [{t:"I", i:"aɪ"}, {t:"never", i:"ˈnɛv.ər"}, {t:"knew", i:"njuː"}, {t:"winter", i:"ˈwɪn.tər"}, {t:"could", i:"kʊd"}, {t:"be", i:"biː"}, {t:"so", i:"soʊ"}, {t:"beautiful.", i:"ˈbjuː.tɪ.fəl"}]
             },
             {
-                // Câu 2: Olaf xuất hiện
-                start: 6.0, end: 8.5,
-                text: "Yeah... It really is beautiful, isn't it?",
-                parts: [
-                    {t:"Yeah...", i:"jɛə"}, {t:"It", i:"ɪt"}, {t:"really", i:"ˈrɪə.li"}, 
-                    {t:"is", i:"ɪz"}, {t:"beautiful,", i:"ˈbjuː.tɪ.fəl"}, 
-                    {t:"isn't", i:"ˈɪz.ənt"}, {t:"it?", i:"ɪt"}
-                ]
+                [cite_start]// #2 + #3 (Gộp cho liền mạch) [cite: 1]
+                start: 4.23, end: 8.26,
+                text: "Yeah, it really is beautiful, isn't it?",
+                parts: [{t:"Yeah,", i:"jɛə"}, {t:"it", i:"ɪt"}, {t:"really", i:"ˈrɪə.li"}, {t:"is", i:"ɪz"}, {t:"beautiful,", i:"ˈbjuː.tɪ.fəl"}, {t:"isn't", i:"ˈɪz.ənt"}, {t:"it?", i:"ɪt"}]
             },
             {
-                // Câu 3: Olaf chê màu trắng
-                start: 8.6, end: 12.0,
-                text: "But it's so white. You know, how about a little color?",
-                parts: [
-                    {t:"But", i:"bʌt"}, {t:"it's", i:"ɪts"}, {t:"so", i:"soʊ"}, {t:"white.", i:"waɪt"},
-                    {t:"You", i:"juː"}, {t:"know,", i:"noʊ"}, {t:"how", i:"haʊ"}, 
-                    {t:"about", i:"əˈbaʊt"}, {t:"a", i:"ə"}, {t:"little", i:"ˈlɪt.əl"}, {t:"color?", i:"ˈkʌl.ər"}
-                ]
+                [cite_start]// #4 [cite: 2]
+                start: 8.26, end: 10.0,
+                text: "But it's so white.",
+                parts: [{t:"But", i:"bʌt"}, {t:"it's", i:"ɪts"}, {t:"so", i:"soʊ"}, {t:"white.", i:"waɪt"}]
             },
             {
-                // Câu 4: Olaf gợi ý màu
-                start: 12.1, end: 15.5,
-                text: "I'm thinking like maybe some crimson, chartreuse...",
-                parts: [
-                    {t:"I'm", i:"aɪm"}, {t:"thinking", i:"ˈθɪŋ.kɪŋ"}, {t:"like", i:"laɪk"}, 
-                    {t:"maybe", i:"ˈmeɪ.bi"}, {t:"some", i:"sʌm"}, 
-                    {t:"crimson,", i:"ˈkrɪm.zən"}, {t:"chartreuse...", i:"ʃɑːrˈtruːz"}
-                ]
+                [cite_start]// #5 + #6 [cite: 2]
+                start: 10.0, end: 15.26,
+                text: "You know, I have a little color. I'm thinking like maybe some crimson, chartreuse...",
+                parts: [{t:"You", i:"juː"}, {t:"know,", i:"noʊ"}, {t:"I", i:"aɪ"}, {t:"have", i:"hæv"}, {t:"a", i:"ə"}, {t:"little", i:"ˈlɪt.əl"}, {t:"color.", i:"ˈkʌl.ər"}, {t:"I'm", i:"aɪm"}, {t:"thinking", i:"ˈθɪŋ.kɪŋ"}, {t:"like", i:"laɪk"}, {t:"maybe", i:"ˈmeɪ.bi"}, {t:"some", i:"sʌm"}, {t:"crimson,", i:"ˈkrɪm.zən"}, {t:"chartreuse...", i:"ʃɑːrˈtruːz"}]
             },
             {
-                // Câu 5: Olaf nhắc đến màu vàng
-                start: 15.6, end: 18.0,
-                text: "How about yellow? No, not yellow. Yellow and snow?",
-                parts: [
-                    {t:"How", i:"haʊ"}, {t:"about", i:"əˈbaʊt"}, {t:"yellow?", i:"ˈjɛl.oʊ"},
-                    {t:"No,", i:"noʊ"}, {t:"not", i:"nɑːt"}, {t:"yellow.", i:"ˈjɛl.oʊ"},
-                    {t:"Yellow", i:"ˈjɛl.oʊ"}, {t:"and", i:"ænd"}, {t:"snow?", i:"snoʊ"}
-                ]
+                [cite_start]// #7 [cite: 2]
+                start: 15.3, end: 17.2,
+                text: "How about yellow?",
+                parts: [{t:"How", i:"haʊ"}, {t:"about", i:"əˈbaʊt"}, {t:"yellow?", i:"ˈjɛl.oʊ"}]
             },
             {
-                // Câu 6: Olaf ghê sợ màu vàng (Câu bạn nhắc bổ sung)
-                start: 18.1, end: 19.5,
-                text: "Brrr... No.", 
-                parts: [
-                    {t:"Brrr...", i:"brrr"}, {t:"No.", i:"noʊ"}
-                ]
+                [cite_start]// #8 + #9 + #10 [cite: 3]
+                start: 17.2, end: 21.1,
+                text: "No, not yellow. Yellow and snow? No go.",
+                parts: [{t:"No,", i:"noʊ"}, {t:"not", i:"nɑːt"}, {t:"yellow.", i:"ˈjɛl.oʊ"}, {t:"Yellow", i:"ˈjɛl.oʊ"}, {t:"and", i:"ænd"}, {t:"snow?", i:"snoʊ"}, {t:"No", i:"noʊ"}, {t:"go.", i:"goʊ"}]
             },
             {
-                // Câu 7: Am I right?
-                start: 19.6, end: 20.8,
+                // #11
+                start: 24.23, end: 26.0,
                 text: "Am I right?",
-                parts: [
-                    {t:"Am", i:"æm"}, {t:"I", i:"aɪ"}, {t:"right?", i:"raɪt"}
-                ]
+                parts: [{t:"Am", i:"æm"}, {t:"I", i:"aɪ"}, {t:"right?", i:"raɪt"}]
             },
             {
-                // Câu 8: Hi!
-                start: 20.9, end: 21.8,
-                text: "Hi!",
-                parts: [
-                    {t:"Hi!", i:"haɪ"}
-                ]
+                [cite_start]// #12 + #13 + #14 + #15 [cite: 4]
+                start: 26.0, end: 28.03,
+                text: "Ah! Hi! You're creepy. Wow.",
+                parts: [{t:"Ah!", i:"ɑː"}, {t:"Hi!", i:"haɪ"}, {t:"You're", i:"jʊr"}, {t:"creepy.", i:"ˈkriː.pi"}, {t:"Wow.", i:"waʊ"}]
             },
             {
-                // Câu 9: Anna sợ
-                start: 21.9, end: 23.0,
-                text: "You're creepy.",
-                parts: [
-                    {t:"You're", i:"jʊr"}, {t:"creepy.", i:"ˈkriː.pi"}
-                ]
+                [cite_start]// #16 + #17 [cite: 4]
+                start: 28.03, end: 29.06,
+                text: "I don't want it. Wow.",
+                parts: [{t:"I", i:"aɪ"}, {t:"don't", i:"doʊnt"}, {t:"want", i:"wɑːnt"}, {t:"it.", i:"ɪt"}, {t:"Wow.", i:"waʊ"}]
             },
             {
-                // Câu 10: Olaf la lên
-                start: 23.1, end: 24.5,
-                text: "I don't want it!",
-                parts: [
-                    {t:"I", i:"aɪ"}, {t:"don't", i:"doʊnt"}, 
-                    {t:"want", i:"wɑːnt"}, {t:"it!", i:"ɪt"}
-                ]
+                [cite_start]// #18 (Câu bạn nhắc) [cite: 4]
+                start: 29.06, end: 29.56,
+                text: "Back at you.",
+                parts: [{t:"Back", i:"bæk"}, {t:"at", i:"æt"}, {t:"you.", i:"juː"}]
             },
             {
-                // Câu 11: Ném đầu (Câu bạn nhắc bổ sung)
-                start: 24.6, end: 25.5,
-                text: "Back at you!",
-                parts: [
-                    {t:"Back", i:"bæk"}, {t:"at", i:"æt"}, {t:"you!", i:"juː"}
-                ]
+                [cite_start]// #19 (Câu bạn nhắc) [cite: 4]
+                start: 29.56, end: 30.46,
+                text: "Please don't drop me.",
+                parts: [{t:"Please", i:"pliːz"}, {t:"don't", i:"doʊnt"}, {t:"drop", i:"drɑːp"}, {t:"me.", i:"miː"}]
             },
             {
-                // Câu 12: Bay trên không (Câu bạn nhắc bổ sung)
-                start: 25.6, end: 26.5,
-                text: "Please don't drop me!",
-                parts: [
-                    {t:"Please", i:"pliːz"}, {t:"don't", i:"doʊnt"}, 
-                    {t:"drop", i:"drɑːp"}, {t:"me!", i:"miː"}
-                ]
+                [cite_start]// #20 + #21 [cite: 4]
+                start: 30.46, end: 31.76,
+                text: "Come on, it's just a head. No!",
+                parts: [{t:"Come", i:"kʌm"}, {t:"on,", i:"ɑːn"}, {t:"it's", i:"ɪts"}, {t:"just", i:"dʒʌst"}, {t:"a", i:"ə"}, {t:"head.", i:"hɛd"}, {t:"No!", i:"noʊ"}]
             },
             {
-                // Câu 13: Anna ngạc nhiên
-                start: 26.6, end: 28.5,
-                text: "It's a talking snowman.",
-                parts: [
-                    {t:"It's", i:"ɪts"}, {t:"a", i:"ə"}, {t:"talking", i:"ˈtɔː.kɪŋ"}, 
-                    {t:"snowman.", i:"ˈsnoʊ.mæn"}
-                ]
+                [cite_start]// #22 + #23 [cite: 4]
+                start: 31.76, end: 34.4,
+                text: "Alright, we got off to a bad start. Ew, ew, the body!",
+                parts: [{t:"Alright,", i:"ɔːlˈraɪt"}, {t:"we", i:"wiː"}, {t:"got", i:"gɑːt"}, {t:"off", i:"ɔːf"}, {t:"to", i:"tuː"}, {t:"a", i:"ə"}, {t:"bad", i:"bæd"}, {t:"start.", i:"stɑːrt"}, {t:"Ew,", i:"uː"}, {t:"the", i:"ðə"}, {t:"body!", i:"ˈbɑː.di"}]
             },
             {
-                // Câu 14: Olaf giới thiệu
-                start: 30.5, end: 33.5,
-                text: "I'm Olaf and I like warm hugs!",
-                parts: [
-                    {t:"I'm", i:"aɪm"}, {t:"Olaf", i:"ˈoʊ.læf"}, {t:"and", i:"ænd"}, 
-                    {t:"I", i:"aɪ"}, {t:"like", i:"laɪk"}, {t:"warm", i:"wɔːrm"}, 
-                    {t:"hugs!", i:"hʌgz"}
-                ]
+                [cite_start]// #24 + #25 + #26 [cite: 4, 5]
+                start: 38.3, end: 41.96,
+                text: "Wait, what am I looking at right now? Why are you hanging off the earth like a bat?",
+                parts: [{t:"Wait,", i:"weɪt"}, {t:"what", i:"wʌt"}, {t:"am", i:"æm"}, {t:"I", i:"aɪ"}, {t:"looking", i:"ˈlʊk.ɪŋ"}, {t:"at", i:"æt"}, {t:"right", i:"raɪt"}, {t:"now?", i:"naʊ"}, {t:"Why", i:"waɪ"}, {t:"are", i:"ɑːr"}, {t:"you", i:"juː"}, {t:"hanging", i:"ˈhæŋ.ɪŋ"}, {t:"off", i:"ɔːf"}, {t:"the", i:"ðə"}, {t:"earth", i:"ɜːrθ"}, {t:"like", i:"laɪk"}, {t:"a", i:"ə"}, {t:"bat?", i:"bæt"}]
             },
             {
-                // Câu 15: Anna hỏi lại
-                start: 33.6, end: 34.5,
-                text: "Olaf?",
-                parts: [
-                    {t:"Olaf?", i:"ˈoʊ.læf"}
-                ]
+                [cite_start]// #27 [cite: 6]
+                start: 42.9, end: 44.2,
+                text: "Alright, wait one second.",
+                parts: [{t:"Alright,", i:"ɔːlˈraɪt"}, {t:"wait", i:"weɪt"}, {t:"one", i:"wʌn"}, {t:"second.", i:"ˈsɛk.ənd"}]
             },
             {
-                // Câu 16: Olaf xác nhận
-                start: 34.6, end: 36.8,
-                text: "That's right, Olaf.",
-                parts: [
-                    {t:"That's", i:"ðæts"}, {t:"right,", i:"raɪt"}, {t:"Olaf.", i:"ˈoʊ.læf"}
-                ]
+                [cite_start]// #28 + #29 [cite: 6]
+                start: 46.16, end: 48.9,
+                text: "Oh, thank you. You're welcome.",
+                parts: [{t:"Oh,", i:"oʊ"}, {t:"thank", i:"θæŋk"}, {t:"you.", i:"juː"}, {t:"You're", i:"jʊr"}, {t:"welcome.", i:"ˈwɛl.kəm"}]
             },
             {
-                // Câu 17: Hỏi tên Anna
-                start: 36.9, end: 38.0,
-                text: "And you are?",
-                parts: [
-                    {t:"And", i:"ænd"}, {t:"you", i:"juː"}, {t:"are?", i:"ɑːr"}
-                ]
+                [cite_start]// #30 [cite: 6]
+                start: 48.9, end: 50.06,
+                text: "Now I'm perfect.",
+                parts: [{t:"Now", i:"naʊ"}, {t:"I'm", i:"aɪm"}, {t:"perfect.", i:"ˈpɝː.fɪkt"}]
             },
             {
-                // Câu 18: Anna trả lời
-                start: 38.1, end: 39.8,
-                text: "Oh, I'm Anna.",
-                parts: [
-                    {t:"Oh,", i:"oʊ"}, {t:"I'm", i:"aɪm"}, {t:"Anna.", i:"ˈæn.ə"}
-                ]
+                [cite_start]// #31 + #32 [cite: 6]
+                start: 50.9, end: 54.86,
+                text: "Well, almost. It was like my whole life got turned upside down.",
+                parts: [{t:"Well,", i:"wɛl"}, {t:"almost.", i:"ˈɔːl.moʊst"}, {t:"It", i:"ɪt"}, {t:"was", i:"wʌz"}, {t:"like", i:"laɪk"}, {t:"my", i:"maɪ"}, {t:"whole", i:"hoʊl"}, {t:"life", i:"laɪf"}, {t:"got", i:"gɑːt"}, {t:"turned", i:"tɜːrnd"}, {t:"upside", i:"ˈʌp.saɪd"}, {t:"down.", i:"daʊn"}]
             },
             {
-                // Câu 19: Hỏi về con lừa
-                start: 39.9, end: 42.8,
-                text: "And who's the funky-looking donkey over there?",
-                parts: [
-                    {t:"And", i:"ænd"}, {t:"who's", i:"huːz"}, {t:"the", i:"ðə"}, 
-                    {t:"funky-looking", i:"ˈfʌŋ.ki-ˈlʊk.ɪŋ"}, {t:"donkey", i:"ˈdɔŋ.ki"}, 
-                    {t:"over", i:"ˈoʊ.vər"}, {t:"there?", i:"ðɛr"}
-                ]
+                [cite_start]// #33 - #36 [cite: 6, 7]
+                start: 55.0, end: 58.6,
+                text: "Oh! Too hard. I'm sorry! I was just... Are you OK?",
+                parts: [{t:"Oh!", i:"oʊ"}, {t:"Too", i:"tuː"}, {t:"hard.", i:"hɑːrd"}, {t:"I'm", i:"aɪm"}, {t:"sorry!", i:"ˈsɔː.ri"}, {t:"I", i:"aɪ"}, {t:"was", i:"wʌz"}, {t:"just...", i:"dʒʌst"}, {t:"Are", i:"ɑːr"}, {t:"you", i:"juː"}, {t:"OK?", i:"oʊˈkeɪ"}]
             },
             {
-                // Câu 20: Sven
-                start: 42.9, end: 44.0,
-                text: "That's Sven.",
-                parts: [
-                    {t:"That's", i:"ðæts"}, {t:"Sven.", i:"svɛn"}
-                ]
+                [cite_start]// #37 + #38 + #39 [cite: 7]
+                start: 58.63, end: 63.86,
+                text: "Are you kidding me? I am wonderful! I've always wanted a nose.",
+                parts: [{t:"Are", i:"ɑːr"}, {t:"you", i:"juː"}, {t:"kidding", i:"ˈkɪd.ɪŋ"}, {t:"me?", i:"miː"}, {t:"I", i:"aɪ"}, {t:"am", i:"æm"}, {t:"wonderful!", i:"ˈwʌn.dər.fəl"}, {t:"I've", i:"aɪv"}, {t:"always", i:"ˈɔːl.weɪz"}, {t:"wanted", i:"ˈwɑːn.tɪd"}, {t:"a", i:"ə"}, {t:"nose.", i:"noʊz"}]
             },
             {
-                // Câu 21: Hỏi về tuần lộc
-                start: 44.1, end: 46.5,
-                text: "Uh-huh. And who's the reindeer?",
-                parts: [
-                    {t:"Uh-huh.", i:"ʌ-hʌ"}, {t:"And", i:"ænd"}, {t:"who's", i:"huːz"}, 
-                    {t:"the", i:"ðə"}, {t:"reindeer?", i:"ˈreɪn.dɪr"}
-                ]
+                [cite_start]// #40 + #41 [cite: 7]
+                start: 64.86, end: 67.66,
+                text: "It's like a little baby unicorn. What?",
+                parts: [{t:"It's", i:"ɪts"}, {t:"like", i:"laɪk"}, {t:"a", i:"ə"}, {t:"little", i:"ˈlɪt.əl"}, {t:"baby", i:"ˈbeɪ.bi"}, {t:"unicorn.", i:"ˈjuː.nɪ.kɔːrn"}, {t:"What?", i:"wʌt"}]
             },
             {
-                // Câu 22: Anna bối rối
-                start: 46.6, end: 47.8,
-                text: "... Sven.",
-                parts: [
-                    {t:"...", i:""}, {t:"Sven.", i:"svɛn"}
-                ]
+                [cite_start]// #42 + #43 + #44 [cite: 8]
+                start: 67.66, end: 72.16,
+                text: "Hey! Whoa! Oh, I love it even more! Huh.",
+                parts: [{t:"Hey!", i:"heɪ"}, {t:"Whoa!", i:"woʊ"}, {t:"Oh,", i:"oʊ"}, {t:"I", i:"aɪ"}, {t:"love", i:"lʌv"}, {t:"it", i:"ɪt"}, {t:"even", i:"ˈiː.vən"}, {t:"more!", i:"mɔːr"}, {t:"Huh.", i:"hʌ"}]
             },
             {
-                // Câu 23: Olaf hiểu nhầm
-                start: 47.9, end: 51.5,
-                text: "Oh. They're - oh, okay. Makes things easier for me.",
-                parts: [
-                    {t:"Oh.", i:"oʊ"}, {t:"They're", i:"ðɛr"}, {t:"-", i:""}, 
-                    {t:"oh,", i:"oʊ"}, {t:"okay.", i:"oʊˈkeɪ"}, 
-                    {t:"Makes", i:"meɪks"}, {t:"things", i:"θɪŋz"}, 
-                    {t:"easier", i:"ˈiː.zi.ər"}, {t:"for", i:"fɔːr"}, {t:"me.", i:"miː"}
-                ]
+                [cite_start]// #45 + #46 + #47 [cite: 8]
+                start: 72.26, end: 78.13,
+                text: "Alright, let's start this thing over. Hi everyone, I'm Olaf and I like warm hugs.",
+                parts: [{t:"Alright,", i:"ɔːlˈraɪt"}, {t:"let's", i:"lɛts"}, {t:"start", i:"stɑːrt"}, {t:"this", i:"ðɪs"}, {t:"thing", i:"θɪŋ"}, {t:"over.", i:"ˈoʊ.vər"}, {t:"Hi", i:"haɪ"}, {t:"everyone,", i:"ˈɛv.ri.wʌn"}, {t:"I'm", i:"aɪm"}, {t:"Olaf", i:"ˈoʊ.læf"}, {t:"and", i:"ænd"}, {t:"I", i:"aɪ"}, {t:"like", i:"laɪk"}, {t:"warm", i:"wɔːrm"}, {t:"hugs.", i:"hʌgz"}]
             },
             {
-                // Câu 24: Hôn mũi
-                start: 51.6, end: 54.0,
-                text: "Aw, look at him trying to kiss my nose.",
-                parts: [
-                    {t:"Aw,", i:"ɔː"}, {t:"look", i:"lʊk"}, {t:"at", i:"æt"}, 
-                    {t:"him", i:"hɪm"}, {t:"trying", i:"ˈtraɪ.ɪŋ"}, {t:"to", i:"tuː"}, 
-                    {t:"kiss", i:"kɪs"}, {t:"my", i:"maɪ"}, {t:"nose.", i:"noʊz"}
-                ]
+                [cite_start]// #48 + #49 + #50 [cite: 8]
+                start: 79.2, end: 85.7,
+                text: "Olaf? That's right, Olaf.",
+                parts: [{t:"Olaf?", i:"ˈoʊ.læf"}, {t:"That's", i:"ðæts"}, {t:"right,", i:"raɪt"}, {t:"Olaf.", i:"ˈoʊ.læf"}]
             },
             {
-                // Câu 25: Sven thích Olaf
-                start: 54.1, end: 55.3,
-                text: "I like you, too!",
-                parts: [
-                    {t:"I", i:"aɪ"}, {t:"like", i:"laɪk"}, {t:"you,", i:"juː"}, {t:"too!", i:"tuː"}
-                ]
+                [cite_start]// #51 [cite: 8]
+                start: 86.46, end: 89.13,
+                text: "And you are...?",
+                parts: [{t:"And", i:"ænd"}, {t:"you", i:"juː"}, {t:"are...?", i:"ɑːr"}]
             },
             {
-                // Câu 26: Anna ngạc nhiên
-                start: 55.4, end: 57.0,
-                text: "Olaf. Did you just say that?",
-                parts: [
-                    {t:"Olaf.", i:"ˈoʊ.læf"}, {t:"Did", i:"dɪd"}, {t:"you", i:"juː"}, 
-                    {t:"just", i:"dʒʌst"}, {t:"say", i:"seɪ"}, {t:"that?", i:"ðæt"}
-                ]
+                [cite_start]// #52 + #53 [cite: 8]
+                start: 89.13, end: 90.96,
+                text: "Oh, um... I'm Anna.",
+                parts: [{t:"Oh,", i:"oʊ"}, {t:"um...", i:"ʌm"}, {t:"I'm", i:"aɪm"}, {t:"Anna.", i:"ˈæn.ə"}]
             },
             {
-                // Câu 27: Olaf thắc mắc
-                start: 57.1, end: 58.5,
-                text: "Yeah. Why?",
-                parts: [
-                    {t:"Yeah.", i:"jɛə"}, {t:"Why?", i:"waɪ"}
-                ]
+                [cite_start]// #54 + #55 [cite: 8]
+                start: 90.96, end: 94.86,
+                text: "And who's the funky looking donkey over there? That's Sven.",
+                parts: [{t:"And", i:"ænd"}, {t:"who's", i:"huːz"}, {t:"the", i:"ðə"}, {t:"funky", i:"ˈfʌŋ.ki"}, {t:"looking", i:"ˈlʊk.ɪŋ"}, {t:"donkey", i:"ˈdɔŋ.ki"}, {t:"over", i:"ˈoʊ.vər"}, {t:"there?", i:"ðɛr"}, {t:"That's", i:"ðæts"}, {t:"Sven.", i:"svɛn"}]
             },
             {
-                // Câu 28: Anna giải thích
-                start: 58.6, end: 63.0,
-                text: "I don't know... It's just... I've always wanted a nose.",
-                parts: [
-                    {t:"I", i:"aɪ"}, {t:"don't", i:"doʊnt"}, {t:"know...", i:"noʊ"},
-                    {t:"It's", i:"ɪts"}, {t:"just...", i:"dʒʌst"}, 
-                    {t:"I've", i:"aɪv"}, {t:"always", i:"ˈɔːl.weɪz"}, 
-                    {t:"wanted", i:"ˈwɑːn.tɪd"}, {t:"a", i:"ə"}, {t:"nose.", i:"noʊz"}
-                ]
+                [cite_start]// #56 + #57 + #58 [cite: 8, 9]
+                start: 94.86, end: 98.13,
+                text: "Uh-huh. And who's the reindeer? ...Sven.",
+                parts: [{t:"Uh-huh.", i:"ʌ-hʌ"}, {t:"And", i:"ænd"}, {t:"who's", i:"huːz"}, {t:"the", i:"ðə"}, {t:"reindeer?", i:"ˈreɪn.dɪr"}, {t:"...", i:""}, {t:"Sven.", i:"svɛn"}]
             },
             {
-                // Câu 29: Olaf sung sướng
-                start: 63.1, end: 65.2,
-                text: "So cute. It's like a little baby unicorn.",
-                parts: [
-                    {t:"So", i:"soʊ"}, {t:"cute.", i:"kjuːt"}, 
-                    {t:"It's", i:"ɪts"}, {t:"like", i:"laɪk"}, {t:"a", i:"ə"}, 
-                    {t:"little", i:"ˈlɪt.əl"}, {t:"baby", i:"ˈbeɪ.bi"}, {t:"unicorn.", i:"ˈjuː.nɪ.kɔːrn"}
-                ]
+                [cite_start]// #59 + #60 + #61 [cite: 9]
+                start: 98.13, end: 101.8,
+                text: "Oh. Oh okay. Make things easier for me.",
+                parts: [{t:"Oh.", i:"oʊ"}, {t:"Oh", i:"oʊ"}, {t:"okay.", i:"oʊˈkeɪ"}, {t:"Make", i:"meɪk"}, {t:"things", i:"θɪŋz"}, {t:"easier", i:"ˈiː.zi.ər"}, {t:"for", i:"fɔːr"}, {t:"me.", i:"miː"}]
             },
             {
-                // Câu 30: Olaf bị đẩy đầu
-                start: 65.3, end: 67.0,
-                text: "What? Hey! Whoa!",
-                parts: [
-                    {t:"What?", i:"wʌt"}, {t:"Hey!", i:"heɪ"}, {t:"Whoa!", i:"woʊ"}
-                ]
+                [cite_start]// #62 + #63 [cite: 9]
+                start: 102.6, end: 105.83,
+                text: "Aw, look at him trying to kiss my nose. I like you too!",
+                parts: [{t:"Aw,", i:"ɔː"}, {t:"look", i:"lʊk"}, {t:"at", i:"æt"}, {t:"him", i:"hɪm"}, {t:"trying", i:"ˈtraɪ.ɪŋ"}, {t:"to", i:"tuː"}, {t:"kiss", i:"kɪs"}, {t:"my", i:"maɪ"}, {t:"nose.", i:"noʊz"}, {t:"I", i:"aɪ"}, {t:"like", i:"laɪk"}, {t:"you", i:"juː"}, {t:"too!", i:"tuː"}]
             },
             {
-                // Câu 31: Olaf thích thú
-                start: 67.1, end: 69.5,
-                text: "Oh, I love it! It's so cute!",
-                parts: [
-                    {t:"Oh,", i:"oʊ"}, {t:"I", i:"aɪ"}, {t:"love", i:"lʌv"}, {t:"it!", i:"ɪt"},
-                    {t:"It's", i:"ɪts"}, {t:"so", i:"soʊ"}, {t:"cute!", i:"kjuːt"}
-                ]
+                [cite_start]// #64 + #65 [cite: 9]
+                start: 105.83, end: 107.9,
+                text: "Olaf. Did Elsa build you?",
+                parts: [{t:"Olaf.", i:"ˈoʊ.læf"}, {t:"Did", i:"dɪd"}, {t:"Elsa", i:"ˈɛl.sə"}, {t:"build", i:"bɪld"}, {t:"you?", i:"juː"}]
+            },
+            {
+                [cite_start]// #66 [cite: 10]
+                start: 107.96, end: 108.5,
+                text: "Yeah, why?",
+                parts: [{t:"Yeah,", i:"jɛə"}, {t:"why?", i:"waɪ"}]
+            },
+            {
+                [cite_start]// #67 [cite: 10]
+                start: 108.5, end: 110.1,
+                text: "Do you know where she is?",
+                parts: [{t:"Do", i:"duː"}, {t:"you", i:"juː"}, {t:"know", i:"noʊ"}, {t:"where", i:"wɛr"}, {t:"she", i:"ʃiː"}, {t:"is?", i:"ɪz"}]
+            },
+            {
+                [cite_start]// #68 [cite: 10]
+                start: 110.3, end: 110.8,
+                text: "Yeah, why?",
+                parts: [{t:"Yeah,", i:"jɛə"}, {t:"why?", i:"waɪ"}]
+            },
+            {
+                [cite_start]// #69 + #70 [cite: 11]
+                start: 110.8, end: 113.13,
+                text: "Do you think you could show us the way?",
+                parts: [{t:"Do", i:"duː"}, {t:"you", i:"juː"}, {t:"think", i:"θɪŋk"}, {t:"you", i:"juː"}, {t:"could", i:"kʊd"}, {t:"show", i:"ʃoʊ"}, {t:"us", i:"ʌs"}, {t:"the", i:"ðə"}, {t:"way?", i:"weɪ"}]
+            },
+            {
+                [cite_start]// #71 [cite: 11, 12]
+                start: 113.13, end: 113.66,
+                text: "Yeah, why?",
+                parts: [{t:"Yeah,", i:"jɛə"}, {t:"why?", i:"waɪ"}]
+            },
+            {
+                [cite_start]// #72 - #76 (Sven chơi nghịch + Olaf hỏi Why) [cite: 12]
+                start: 113.66, end: 118.63,
+                text: "How does this work? Aw, stop it Sven... Yeah, why?",
+                parts: [{t:"How", i:"haʊ"}, {t:"does", i:"dʌz"}, {t:"this", i:"ðɪs"}, {t:"work?", i:"wɜːrk"}, {t:"Aw,", i:"ɔː"}, {t:"stop", i:"stɑːp"}, {t:"it,", i:"ɪt"}, {t:"Sven...", i:"svɛn"}, {t:"Yeah,", i:"jɛə"}, {t:"why?", i:"waɪ"}]
+            },
+            {
+                [cite_start]// #77 + #78 [cite: 13]
+                start: 118.63, end: 121.93,
+                text: "I'll tell you why. We need Elsa to bring back summer.",
+                parts: [{t:"I'll", i:"aɪl"}, {t:"tell", i:"tɛl"}, {t:"you", i:"juː"}, {t:"why.", i:"waɪ"}, {t:"We", i:"wiː"}, {t:"need", i:"niːd"}, {t:"Elsa", i:"ˈɛl.sə"}, {t:"to", i:"tuː"}, {t:"bring", i:"brɪŋ"}, {t:"back", i:"bæk"}, {t:"summer.", i:"ˈsʌm.ər"}]
+            },
+            {
+                [cite_start]// #79 + #80 + #81 [cite: 13]
+                start: 122.23, end: 125.2,
+                text: "Summer? Uh-huh. Oh, I don't know why.",
+                parts: [{t:"Summer?", i:"ˈsʌm.ər"}, {t:"Uh-huh.", i:"ʌ-hʌ"}, {t:"Oh,", i:"oʊ"}, {t:"I", i:"aɪ"}, {t:"don't", i:"doʊnt"}, {t:"know", i:"noʊ"}, {t:"why.", i:"waɪ"}]
+            },
+            {
+                [cite_start]// #82 + #83 [cite: 13]
+                start: 125.2, end: 132.33,
+                text: "But I've always loved the idea of summer, and sun, and all things hot.",
+                parts: [{t:"But", i:"bʌt"}, {t:"I've", i:"aɪv"}, {t:"always", i:"ˈɔːl.weɪz"}, {t:"loved", i:"lʌvd"}, {t:"the", i:"ðə"}, {t:"idea", i:"aɪˈdiː.ə"}, {t:"of", i:"ʌv"}, {t:"summer,", i:"ˈsʌm.ər"}, {t:"and", i:"ænd"}, {t:"sun,", i:"sʌn"}, {t:"and", i:"ænd"}, {t:"all", i:"ɔːl"}, {t:"things", i:"θɪŋz"}, {t:"hot.", i:"hɑːt"}]
+            },
+            {
+                [cite_start]// #84 [cite: 13]
+                start: 132.33, end: 133.33,
+                text: "Really?",
+                parts: [{t:"Really?", i:"ˈrɪə.li"}]
+            },
+            {
+                [cite_start]// #85 [cite: 14]
+                start: 133.46, end: 135.7,
+                text: "I'm guessing you don't have much experience with heat.",
+                parts: [{t:"I'm", i:"aɪm"}, {t:"guessing", i:"ˈgɛs.ɪŋ"}, {t:"you", i:"juː"}, {t:"don't", i:"doʊnt"}, {t:"have", i:"hæv"}, {t:"much", i:"mʌtʃ"}, {t:"experience", i:"ɪkˈspɪr.i.əns"}, {t:"with", i:"wɪð"}, {t:"heat.", i:"hiːt"}]
+            },
+            {
+                [cite_start]// #86 [cite: 14]
+                start: 136.2, end: 137.0,
+                text: "Nope!",
+                parts: [{t:"Nope!", i:"noʊp"}]
             }
         ]
     }
