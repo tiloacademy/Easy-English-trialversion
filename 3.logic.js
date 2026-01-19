@@ -63,11 +63,22 @@ const ShadowingEngine = {
     changeSpeed: function(rate) {
         if (this.player && this.player.setPlaybackRate) {
             this.player.setPlaybackRate(rate);
+            
+            // Xóa class active cũ
             document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Tìm nút mới để active (Sửa logic so sánh chính xác)
             const btns = document.querySelectorAll('.speed-btn');
             btns.forEach(b => {
-                if (rate === 1 && b.innerText === 'Normal') b.classList.add('active');
-                else if (b.innerText.includes(rate)) b.classList.add('active');
+                const btnText = b.innerText;
+                // Nếu là nút Normal (rate = 1)
+                if (rate === 1 && btnText === 'Normal') {
+                    b.classList.add('active');
+                }
+                // Nếu là các nút số (0.5x, 1.25x...) -> Cắt bỏ chữ 'x' rồi so sánh số
+                else if (btnText !== 'Normal' && parseFloat(btnText) === rate) {
+                    b.classList.add('active');
+                }
             });
         }
     },
@@ -425,3 +436,4 @@ const App = {
 
 window.onload = function() { App.init(); };
 window.addEventListener('keydown', (e) => { if (!SnakeEngine.active) return; if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); });
+
