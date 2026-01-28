@@ -602,3 +602,36 @@ const VocabData = [
     }
 ];
 
+/* --- PART 3: VOCABULARY & READING (Unit 1: Colors - Theo PDF) --- */
+const VocabData = [
+    {
+        id: 1,
+        topic: "Unit 1: Colors",
+        color: "#FF9800",
+        vocab: [
+            // 1. Blue /u:/ [cite: 819]
+            { img: "blue.jpg", speak: "blue", parts: [{t:"b"}, {t:"l"}, {i:"uː", t:"ue"}] },
+            // 2. Yellow /e ǝʊ/ [cite: 822]
+            { img: "yellow.jpg", speak: "yellow", parts: [{i:"j", t:"y"}, {i:"e", t:"e"}, {t:"ll"}, {i:"oʊ", t:"ow"}] },
+            // 3. Red /e/ [cite: 823, 832]
+            { img: "red.jpg", speak: "red", parts: [{t:"r"}, {i:"e", t:"e"}, {t:"d"}] },
+            // 4. Green /i:/ [cite: 824]
+            { img: "green.jpg", speak: "green", parts: [{t:"gr"}, {i:"iː", t:"ee"}, {t:"n"}] },
+            // 5. Purple /3:r/ [cite: 825]
+            { img: "purple.jpg", speak: "purple", parts: [{t:"p"}, {i:"ɜːr", t:"ur"}, {t:"p"}, {i:"əl", t:"le"}] },
+            // 6. Brown /au/ [cite: 827] (PDF ghi /au/ nhưng IPA chuẩn là /aʊ/)
+            { img: "brown.jpg", speak: "brown", parts: [{t:"br"}, {i:"aʊ", t:"own"}] },
+            // 7. Pink /ɪ ŋ/ [cite: 828]
+            { img: "pink.jpg", speak: "pink", parts: [{t:"p"}, {i:"ɪ", t:"i"}, {i:"ŋ k", t:"nk"}] },
+            // 8. Black /æ/ [cite: 829]
+            { img: "black.jpg", speak: "black", parts: [{t:"bl"}, {i:"æ", t:"a"}, {i:"k", t:"ck"}] },
+            // 9. Orange /ɔːr/ [cite: 831]
+            { img: "orange.jpg", speak: "orange", parts: [{i:"ɔːr", t:"or"}, {i:"ɪ", t:"a"}, {i:"n dʒ", t:"nge"}] },
+            // 10. White /aɪ/ [cite: 834]
+            { img: "white.jpg", speak: "white", parts: [{t:"wh"}, {i:"aɪ", t:"i"}, {t:"t"}, {i:"_", t:"e"}] },
+            // 11. Grey /eɪ/ [cite: 838]
+            { img: "grey.jpg", speak: "grey", parts: [{t:"gr"}, {i:"eɪ", t:"ey"}] }
+        ],
+        reading: { title: "Colors", text: "I see a blue bird.", audio: "reading_colors.mp3" }
+    }
+];
