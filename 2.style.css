@@ -220,3 +220,66 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
     font-size: 14px; font-weight: bold; margin-right: 10px;
 }
 
+/* --- VOCABULARY SCREEN --- */
+#vocab-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #FFF8E1; z-index: 20; display: flex; flex-direction: column;
+}
+
+/* MENU CHỌN CHẾ ĐỘ */
+#vocab-mode-menu {
+    flex: 1; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; gap: 20px;
+}
+.vocab-mode-btn {
+    width: 80%; max-width: 300px; padding: 20px;
+    border-radius: 15px; border: none; font-size: 22px; font-weight: bold;
+    color: white; cursor: pointer; box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+}
+.vocab-mode-btn:active { transform: scale(0.95); }
+.vocab-mode-btn.learn { background: #4CAF50; }
+.vocab-mode-btn.game { background: #FF9800; }
+
+/* LEARNING CONTAINER (TÁI SỬ DỤNG STYLE CŨ) */
+#vocab-learn-container {
+    flex: 1; display: flex; flex-direction: column; align-items: center; padding-bottom: 20px;
+}
+
+/* GAME CONTAINER (6 GRID) */
+#vocab-game-container {
+    flex: 1; display: flex; flex-direction: column; padding: 10px;
+}
+.game-hud {
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: 10px; padding: 0 10px;
+}
+.game-instruction { font-size: 18px; font-weight: bold; color: #555; }
+.btn-audio-replay {
+    background: #2196F3; color: white; border: none; padding: 8px 15px;
+    border-radius: 20px; font-weight: bold; cursor: pointer;
+}
+
+/* LƯỚI 6 HÌNH */
+.vocab-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    flex: 1; align-content: center;
+}
+.v-card-game {
+    background: white; border-radius: 10px; padding: 5px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.1); border: 3px solid transparent;
+    cursor: pointer; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    position: relative;
+}
+.v-card-game img {
+    max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;
+}
+/* Hiệu ứng Đúng/Sai */
+.v-card-game.correct { border-color: #4CAF50; background: #E8F5E9; }
+.v-card-game.correct::after { content: '✅'; position: absolute; font-size: 40px; }
+.v-card-game.wrong { border-color: #F44336; opacity: 0.6; }
+.v-card-game.wrong::after { content: '❌'; position: absolute; font-size: 40px; }
+
+.game-status {
+    text-align: center; font-size: 20px; font-weight: bold; color: #E91E63; margin-top: 10px;
+}
