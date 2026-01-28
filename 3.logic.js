@@ -240,6 +240,235 @@ const LearningEngine = {
     }
 };
 
+/* --- VOCAB ENGINE (HỌC & GAME) --- */
+const VocabEngine = {
+    currentTopic: null,
+    idx: 0, 
+    
+    // Biến cho Game
+    gameQueue: [],     
+    retryQueue: [],    
+    currentQuestion: null,
+    score: 0,
+    streak: 0, // <-- Biến đếm chuỗi đúng liên tiếp
+    isProcessing: false, 
+
+    // Khởi tạo
+    init: function(topicData) {
+        this.currentTopic = topicData;
+        document.getElementById('vocab-title').innerText = topicData.topic;
+        document.getElementById('vocab-mode-menu').style.display = 'flex';
+        document.getElementById('vocab-learn-container').style.display = 'none';
+        document.getElementById('vocab-game-container').style.display = 'none';
+    },
+
+    // --- CHẾ ĐỘ 1: HỌC TỪ ---
+    startLearn: function() {
+        document.getElementById('vocab-mode-menu').style.display = 'none';
+        document.getElementById('vocab-learn-container').style.display = 'flex';
+        this.idx = 0;
+        this.renderLearnCard();
+    },
+
+    renderLearnCard: function() {
+        const item = this.currentTopic.vocab[this.idx];
+        document.getElementById('v-learn-img').src = item.img;
+        document.getElementById('v-stars').innerText = "☆☆☆☆☆";
+        document.getElementById('v-stars').className = "stars";
+        document.getElementById('v-feedback').innerText = "...";
+
+        let html = '<div class="word-group">';
+        if (item.parts) {
+            item.parts.forEach(p => {
+                const ipa = p.i || "&nbsp;";
+                html += `<div class="char-block"><div class="cb-ipa" style="font-size:18px;">${ipa}</div><div class="cb-text" style="font-size:32px;">${p.t}</div></div>`;
+            });
+        }
+        html += '</div>';
+        document.getElementById('v-info-display').innerHTML = html;
+        setTimeout(() => this.playCurrentWord(), 300);
+    },
+
+    playCurrentWord: function() {
+        const item = this.currentTopic.vocab[this.idx];
+        const audioSrc = item.speak + ".mp3"; 
+        AudioEngine.playSequence(audioSrc, null); 
+    },
+
+    nav: function(d) {
+        if (this.idx + d >= 0 && this.idx + d < this.currentTopic.vocab.length) {
+            this.idx += d;
+            this.renderLearnCard();
+        }
+    },
+
+    startListening: function() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return alert("Device not supported");
+        const btn = document.getElementById('v-mic-btn');
+        btn.disabled = true; btn.innerText = "👂 Listening..."; btn.style.backgroundColor = "#e74c3c";
+        
+        const currentItem = this.currentTopic.vocab[this.idx];
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.start();
+
+        recognition.onresult = (e) => {
+            const heard = e.results[0][0].transcript.toLowerCase();
+            const target = currentItem.speak.toLowerCase();
+            if (heard.includes(target)) {
+                document.getElementById('v-stars').innerText = "⭐⭐⭐⭐⭐";
+                document.getElementById('v-stars').className = "stars active";
+                document.getElementById('v-feedback').innerText = "Correct: " + heard;
+                AudioEngine.playEffect('correct');
+            } else {
+                document.getElementById('v-stars').innerText = "⭐☆☆☆☆";
+                document.getElementById('v-feedback').innerText = "Heard: " + heard;
+                AudioEngine.playEffect('wrong');
+            }
+            this.resetMic();
+        };
+        recognition.onerror = () => this.resetMic();
+        recognition.onend = () => this.resetMic();
+    },
+    resetMic: function() {
+        const btn = document.getElementById('v-mic-btn');
+        btn.disabled = false; btn.innerText = "🎤 Read"; btn.style.backgroundColor = "#27ae60";
+    },
+
+    // --- CHẾ ĐỘ 2: GAME (COMBO & TRỘN ĐỀ) ---
+    startGame: function() {
+        document.getElementById('vocab-mode-menu').style.display = 'none';
+        document.getElementById('vocab-game-container').style.display = 'flex';
+        
+        // 1. COPY và TRỘN ngẫu nhiên
+        this.gameQueue = [...this.currentTopic.vocab];
+        this.gameQueue.sort(() => 0.5 - Math.random()); 
+
+        this.retryQueue = []; 
+        this.score = 0;
+        this.streak = 0; // Reset chuỗi thắng
+        this.updateScore();
+        this.nextQuestion();
+    },
+
+    nextQuestion: function() {
+        this.isProcessing = false;
+        
+        if (this.gameQueue.length === 0) {
+            if (this.retryQueue.length > 0) {
+                alert("Reviewing wrong answers! 💪");
+                this.gameQueue = [...this.retryQueue];
+                this.retryQueue = [];
+                this.gameQueue.sort(() => 0.5 - Math.random());
+            } else {
+                AudioEngine.playEffect('win');
+                alert(`GAME OVER! \n🏆 Final Score: ${this.score}`);
+                App.openPart(3); 
+                return;
+            }
+        }
+
+        this.currentQuestion = this.gameQueue.shift(); 
+        this.renderGameGrid();
+        setTimeout(() => this.playQuestion(), 500);
+    },
+
+    renderGameGrid: function() {
+        const grid = document.getElementById('vocab-grid');
+        grid.innerHTML = '';
+        
+        let options = [this.currentQuestion];
+        let distractors = this.currentTopic.vocab.filter(v => v.speak !== this.currentQuestion.speak);
+        distractors.sort(() => 0.5 - Math.random());
+        options = options.concat(distractors.slice(0, 5));
+        options.sort(() => 0.5 - Math.random());
+
+        options.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'v-card-game';
+            div.innerHTML = `<img src="${item.img}">`;
+            div.onclick = (e) => this.checkAnswer(item, div, e);
+            grid.appendChild(div);
+        });
+    },
+
+    playQuestion: function() {
+        const stemAudio = new Audio("sound_stem_find.mp3");
+        
+        stemAudio.onended = () => {
+            const wordAudio = new Audio(this.currentQuestion.speak + ".mp3");
+            wordAudio.play();
+        };
+        stemAudio.onerror = () => {
+            const wordAudio = new Audio(this.currentQuestion.speak + ".mp3");
+            wordAudio.play();
+        };
+        stemAudio.play().catch(e => {
+            const wordAudio = new Audio(this.currentQuestion.speak + ".mp3");
+            wordAudio.play();
+        });
+    },
+
+    checkAnswer: function(selectedItem, divElement, event) {
+        if (this.isProcessing) return;
+        
+        if (selectedItem.speak === this.currentQuestion.speak) {
+            // --- ĐÚNG ---
+            this.isProcessing = true;
+            divElement.classList.add('correct');
+            AudioEngine.playEffect('correct');
+            
+            // Tính điểm Combo
+            this.streak++;
+            const bonus = this.streak * 10; // 10, 20, 30...
+            this.score += bonus;
+            
+            // Hiệu ứng bay số điểm
+            let comboText = this.streak > 1 ? " Combo!" : "";
+            this.showFloatingText(event.clientX, event.clientY, `+${bonus}${comboText}`, "#4CAF50");
+
+            this.updateScore();
+            setTimeout(() => this.nextQuestion(), 1500);
+        } else {
+            // --- SAI ---
+            divElement.classList.add('wrong');
+            AudioEngine.playEffect('wrong');
+            
+            // Trừ điểm và mất chuỗi
+            this.score -= 10;
+            if (this.score < 0) this.score = 0;
+            this.streak = 0;
+            
+            // Hiệu ứng trừ điểm
+            this.showFloatingText(event.clientX, event.clientY, `-10`, "#F44336");
+            this.updateScore();
+
+            if (!this.retryQueue.find(i => i.speak === this.currentQuestion.speak)) {
+                this.retryQueue.push(this.currentQuestion);
+            }
+        }
+    },
+
+    showFloatingText: function(x, y, text, color) {
+        const el = document.createElement('div');
+        el.className = 'floating-text';
+        el.innerText = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.color = color;
+        el.style.fontSize = "30px"; // To hơn chút
+        el.style.zIndex = "9999";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+    },
+
+    updateScore: function() {
+        let fire = this.streak > 1 ? "🔥 x" + this.streak : "";
+        document.getElementById('game-status').innerHTML = `Score: ${this.score} <span style="color:orange; margin-left:10px;">${fire}</span>`;
+    }
+};
+
 /* --- APP CONTROLLER --- */
 const App = {
     currentPart: 0, 
@@ -305,3 +534,4 @@ window.addEventListener('keydown', (e) => {
     else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); 
     else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); 
 });
+
