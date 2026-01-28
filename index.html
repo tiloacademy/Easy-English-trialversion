@@ -69,6 +69,52 @@
         <button class="btn-back-ipa" onclick="App.closeIPA()"> ◀ Back</button>
     </div>
 
+    <div id="vocab-screen" style="display: none;">
+        <div class="top-bar">
+            <button class="btn-home" onclick="App.openPart(3)"> 🔙 Topics </button>
+            <div class="header-title" id="vocab-title">Topic Name</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div id="vocab-mode-menu">
+            <button class="vocab-mode-btn learn" onclick="VocabEngine.startLearn()">
+                🗣️ Learn Words <br><small>(Học từ vựng)</small>
+            </button>
+            <button class="vocab-mode-btn game" onclick="VocabEngine.startGame()">
+                🎮 Play Game <br><small>(Tìm hình đúng)</small>
+            </button>
+        </div>
+
+        <div id="vocab-learn-container" style="display: none;">
+            <div class="learn-img-wrapper"><img id="v-learn-img" src=""></div>
+            <div class="info-area" id="v-info-display"></div>
+            <div class="stars" id="v-stars">☆☆☆☆☆</div>
+            <div class="feedback-text" id="v-feedback">...</div>
+            
+            <div class="action-row">
+                <button class="btn-action btn-mic" id="v-mic-btn" onclick="VocabEngine.startListening()">🎤 Read</button>
+                <button class="btn-action btn-listen" onclick="VocabEngine.playCurrentWord()">🔊 Listen</button>
+            </div>
+            
+            <div class="nav-row">
+                <button class="btn-nav" onclick="VocabEngine.nav(-1)"> ◀ </button>
+                <button class="btn-nav" onclick="VocabEngine.nav(1)"> ▶ </button>
+            </div>
+        </div>
+
+        <div id="vocab-game-container" style="display: none;">
+            <div class="game-hud">
+                <div class="game-instruction">🔊 Listen & Choose:</div>
+                <button class="btn-audio-replay" onclick="VocabEngine.playQuestion()">🔊 Replay</button>
+            </div>
+            
+            <div class="vocab-grid" id="vocab-grid">
+                </div>
+            
+            <div class="game-status" id="game-status">Score: 0</div>
+        </div>
+    </div>
+
     <div id="main-container" style="display: none;">
         <div id="learning-screen">
             <div class="top-bar">
@@ -148,4 +194,5 @@
     <script src="3.logic.js"></script>
 </body>
 </html>
+
 
