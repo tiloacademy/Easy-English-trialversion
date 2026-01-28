@@ -498,9 +498,45 @@ const App = {
     },
     startShadowing: function(movieData) { document.getElementById('menu-screen').style.display = 'none'; document.getElementById('shadowing-screen').style.display = 'flex'; ShadowingEngine.init(movieData); },
     initVocabMenu: function() {
-        const menuContainer = document.getElementById('menu-screen'); menuContainer.style.display = 'flex'; menuContainer.innerHTML = '<div class="menu-title">Vocabulary Topics</div>';
-        const btnBack = document.createElement('button'); btnBack.className = 'btn-menu'; btnBack.innerText = "🏠  Home"; btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d"; btnBack.onclick = function() { App.goHome(); }; menuContainer.appendChild(btnBack);
-        if(typeof VocabData !== 'undefined') { VocabData.forEach(topic => { const btn = document.createElement('button'); btn.className = 'btn-menu'; btn.innerText = "📖 " + topic.topic; btn.style.borderColor = topic.color; btn.style.color = topic.color; btn.onclick = function() { alert("Opening Topic: " + topic.topic + "\n(Vocab exercises coming soon)"); }; menuContainer.appendChild(btn); }); } else { menuContainer.innerHTML += "<div>No Vocab Data Found</div>"; }
+        const menuContainer = document.getElementById('menu-screen'); 
+        menuContainer.style.display = 'flex'; 
+        menuContainer.innerHTML = '<div class="menu-title">Vocabulary Topics</div>';
+        
+        // Nút quay về Home
+        const btnBack = document.createElement('button'); 
+        btnBack.className = 'btn-menu'; 
+        btnBack.innerText = "🏠  Home"; 
+        btnBack.style.borderColor = "#7f8c8d"; 
+        btnBack.style.color = "#7f8c8d"; 
+        btnBack.onclick = function() { App.goHome(); }; 
+        menuContainer.appendChild(btnBack);
+
+        // Tạo danh sách các chủ đề từ vựng
+        if(typeof VocabData !== 'undefined') { 
+            VocabData.forEach(topic => { 
+                const btn = document.createElement('button'); 
+                btn.className = 'btn-menu'; 
+                btn.innerText = "📖 " + topic.topic; 
+                btn.style.borderColor = topic.color; 
+                btn.style.color = topic.color;
+                
+                // --- PHẦN QUAN TRỌNG ĐÃ SỬA ---
+                // Thay vì hiện alert, giờ nó sẽ mở màn hình học
+                btn.onclick = function() { 
+                    // 1. Ẩn menu chọn bài
+                    document.getElementById('menu-screen').style.display = 'none';
+                    // 2. Hiện màn hình từ vựng
+                    document.getElementById('vocab-screen').style.display = 'flex';
+                    // 3. Khởi động bộ máy VocabEngine với chủ đề này
+                    VocabEngine.init(topic); 
+                }; 
+                // ------------------------------
+
+                menuContainer.appendChild(btn); 
+            }); 
+        } else { 
+            menuContainer.innerHTML += "<div>No Vocab Data Found</div>"; 
+        }
     },
     openIPA: function() {
         document.getElementById('menu-screen').style.display = 'none'; document.getElementById('ipa-screen').style.display = 'flex'; const content = document.getElementById('ipa-content'); content.innerHTML = ''; 
@@ -534,4 +570,5 @@ window.addEventListener('keydown', (e) => {
     else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); 
     else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); 
 });
+
 
