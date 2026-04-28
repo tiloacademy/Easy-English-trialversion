@@ -1,3 +1,59 @@
+/* --- STORAGE ENGINE (Lưu trữ tiến trình) --- */
+const StorageEngine = {
+    saveProgress: function(lessonId, stars) {
+        let progress = JSON.parse(localStorage.getItem('eng_progress') || '{}');
+        // Chỉ lưu nếu số sao mới cao hơn số sao cũ
+        if (!progress[lessonId] || stars > progress[lessonId]) {
+            progress[lessonId] = stars;
+            localStorage.setItem('eng_progress', JSON.stringify(progress));
+        }
+    },
+    getProgress: function() {
+        return JSON.parse(localStorage.getItem('eng_progress') || '{}');
+    },
+    saveBadge: function(badgeId) {
+        let badges = JSON.parse(localStorage.getItem('eng_badges') || '[]');
+        if (!badges.includes(badgeId)) {
+            badges.push(badgeId);
+            localStorage.setItem('eng_badges', JSON.stringify(badges));
+            return true; // Trả về true nếu nhận được huy hiệu mới
+        }
+        return false;
+    }
+};
+
+/* --- QUEST ENGINE (Nhiệm vụ tuần) --- */
+const QuestEngine = {
+    initQuest: function() {
+        let quest = JSON.parse(localStorage.getItem('weekly_quest'));
+        const now = new Date().getTime();
+        
+        // Nếu chưa có nhiệm vụ hoặc đã quá 7 ngày, tạo mới
+        if (!quest || (now - quest.startTime > 7 * 24 * 60 * 60 * 1000)) {
+            quest = {
+                startTime: now,
+                targetLessons: 5, // Nhiệm vụ: Hoàn thành 5 bài học
+                currentLessons: 0,
+                completed: false,
+                badgeId: 'explorer_1' // Huy hiệu sẽ nhận được
+            };
+            localStorage.setItem('weekly_quest', JSON.stringify(quest));
+        }
+        return quest;
+    },
+    updateProgress: function() {
+        let quest = this.initQuest();
+        if (quest.completed) return;
+        
+        quest.currentLessons++;
+        if (quest.currentLessons >= quest.targetLessons) {
+            quest.completed = true;
+            StorageEngine.saveBadge(quest.badgeId);
+            alert("Chúc mừng! Con đã hoàn thành nhiệm vụ tuần và nhận được Huy hiệu Nhà Thám Hiểm! 🎉");
+        }
+        localStorage.setItem('weekly_quest', JSON.stringify(quest));
+    }
+};
 /* ==========================================================================
    FILE: 3.logic.js (FINAL COMBINED: New Shadowing + Old Snake)
    ========================================================================== */
