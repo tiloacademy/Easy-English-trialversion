@@ -292,8 +292,21 @@ const LearningEngine = {
                 else { if (userText.includes(target)) bestAccuracy = 100; }
             }
         }
-        let finalStars = 1; let msg = "Try again!";
-        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct'); } else { finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong'); }
+       let finalStars = 1; let msg = "Try again!";
+        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win'); } 
+        else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win'); } 
+        else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct'); } 
+        else { finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong'); }
+        
+        // --- LOGIC MỚI: Mở khóa & Cập nhật nhiệm vụ ---
+        if (finalStars >= 3) {
+            // Mở khóa bài tiếp theo
+            StorageEngine.unlockNextLevel(this.currentLessonId + 1);
+            // Cập nhật nhiệm vụ tuần
+            QuestEngine.updateProgress();
+        }
+        // ----------------------------------------------
+
         let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); 
     }
 };
