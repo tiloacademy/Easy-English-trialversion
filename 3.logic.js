@@ -1,42 +1,44 @@
-/* --- STORAGE ENGINE (Lưu trữ tiến trình) --- */
+/* --- STORAGE & QUEST ENGINE --- */
 const StorageEngine = {
-    saveProgress: function(lessonId, stars) {
-        let progress = JSON.parse(localStorage.getItem('eng_progress') || '{}');
-        // Chỉ lưu nếu số sao mới cao hơn số sao cũ
-        if (!progress[lessonId] || stars > progress[lessonId]) {
-            progress[lessonId] = stars;
-            localStorage.setItem('eng_progress', JSON.stringify(progress));
+    getUnlockedLevel: function() {
+        return parseInt(localStorage.getItem('eng_unlocked') || '1');
+    },
+    unlockNextLevel: function(nextLevelId) {
+        let currentUnlocked = this.getUnlockedLevel();
+        if (nextLevelId > currentUnlocked) {
+            localStorage.setItem('eng_unlocked', nextLevelId);
         }
     },
-    getProgress: function() {
-        return JSON.parse(localStorage.getItem('eng_progress') || '{}');
+    saveHighScore: function(gameId, currentScore) {
+        let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
+        let isNewRecord = false;
+        if (!highScores[gameId] || currentScore > highScores[gameId]) {
+            highScores[gameId] = currentScore;
+            localStorage.setItem('eng_highscores', JSON.stringify(highScores));
+            isNewRecord = true;
+        }
+        return { highScore: highScores[gameId], isNewRecord: isNewRecord };
+    },
+    getHighScore: function(gameId) {
+        let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
+        return highScores[gameId] || 0;
     },
     saveBadge: function(badgeId) {
         let badges = JSON.parse(localStorage.getItem('eng_badges') || '[]');
         if (!badges.includes(badgeId)) {
             badges.push(badgeId);
             localStorage.setItem('eng_badges', JSON.stringify(badges));
-            return true; // Trả về true nếu nhận được huy hiệu mới
         }
-        return false;
     }
 };
 
-/* --- QUEST ENGINE (Nhiệm vụ tuần) --- */
 const QuestEngine = {
     initQuest: function() {
         let quest = JSON.parse(localStorage.getItem('weekly_quest'));
         const now = new Date().getTime();
-        
-        // Nếu chưa có nhiệm vụ hoặc đã quá 7 ngày, tạo mới
+        // Reset nếu chưa có hoặc đã qua 7 ngày
         if (!quest || (now - quest.startTime > 7 * 24 * 60 * 60 * 1000)) {
-            quest = {
-                startTime: now,
-                targetLessons: 5, // Nhiệm vụ: Hoàn thành 5 bài học
-                currentLessons: 0,
-                completed: false,
-                badgeId: 'explorer_1' // Huy hiệu sẽ nhận được
-            };
+            quest = { startTime: now, targetLessons: 5, currentLessons: 0, completed: false, badgeId: 'explorer_1' };
             localStorage.setItem('weekly_quest', JSON.stringify(quest));
         }
         return quest;
@@ -44,12 +46,12 @@ const QuestEngine = {
     updateProgress: function() {
         let quest = this.initQuest();
         if (quest.completed) return;
-        
         quest.currentLessons++;
         if (quest.currentLessons >= quest.targetLessons) {
             quest.completed = true;
             StorageEngine.saveBadge(quest.badgeId);
-            alert("Chúc mừng! Con đã hoàn thành nhiệm vụ tuần và nhận được Huy hiệu Nhà Thám Hiểm! 🎉");
+            AudioEngine.playEffect('win');
+            setTimeout(() => alert("🎉 Chúc mừng! Con đã hoàn thành nhiệm vụ tuần và nhận được Huy hiệu Nhà Thám Hiểm!"), 500);
         }
         localStorage.setItem('weekly_quest', JSON.stringify(quest));
     }
