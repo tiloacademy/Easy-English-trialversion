@@ -562,5 +562,3 @@ window.addEventListener('keydown', (e) => {
     else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); 
     else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); 
 });
-
-
