@@ -1,61 +1,3 @@
-/* --- STORAGE & QUEST ENGINE --- */
-const StorageEngine = {
-    getUnlockedLevel: function() {
-        return parseInt(localStorage.getItem('eng_unlocked') || '1');
-    },
-    unlockNextLevel: function(nextLevelId) {
-        let currentUnlocked = this.getUnlockedLevel();
-        if (nextLevelId > currentUnlocked) {
-            localStorage.setItem('eng_unlocked', nextLevelId);
-        }
-    },
-    saveHighScore: function(gameId, currentScore) {
-        let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
-        let isNewRecord = false;
-        if (!highScores[gameId] || currentScore > highScores[gameId]) {
-            highScores[gameId] = currentScore;
-            localStorage.setItem('eng_highscores', JSON.stringify(highScores));
-            isNewRecord = true;
-        }
-        return { highScore: highScores[gameId], isNewRecord: isNewRecord };
-    },
-    getHighScore: function(gameId) {
-        let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
-        return highScores[gameId] || 0;
-    },
-    saveBadge: function(badgeId) {
-        let badges = JSON.parse(localStorage.getItem('eng_badges') || '[]');
-        if (!badges.includes(badgeId)) {
-            badges.push(badgeId);
-            localStorage.setItem('eng_badges', JSON.stringify(badges));
-        }
-    }
-};
-
-const QuestEngine = {
-    initQuest: function() {
-        let quest = JSON.parse(localStorage.getItem('weekly_quest'));
-        const now = new Date().getTime();
-        // Reset nếu chưa có hoặc đã qua 7 ngày
-        if (!quest || (now - quest.startTime > 7 * 24 * 60 * 60 * 1000)) {
-            quest = { startTime: now, targetLessons: 5, currentLessons: 0, completed: false, badgeId: 'explorer_1' };
-            localStorage.setItem('weekly_quest', JSON.stringify(quest));
-        }
-        return quest;
-    },
-    updateProgress: function() {
-        let quest = this.initQuest();
-        if (quest.completed) return;
-        quest.currentLessons++;
-        if (quest.currentLessons >= quest.targetLessons) {
-            quest.completed = true;
-            StorageEngine.saveBadge(quest.badgeId);
-            AudioEngine.playEffect('win');
-            setTimeout(() => alert("🎉 Chúc mừng! Con đã hoàn thành nhiệm vụ tuần và nhận được Huy hiệu Nhà Thám Hiểm!"), 500);
-        }
-        localStorage.setItem('weekly_quest', JSON.stringify(quest));
-    }
-};
 /* ==========================================================================
    FILE: 3.logic.js (FINAL COMBINED: New Shadowing + Old Snake)
    ========================================================================== */
@@ -292,21 +234,8 @@ const LearningEngine = {
                 else { if (userText.includes(target)) bestAccuracy = 100; }
             }
         }
-       let finalStars = 1; let msg = "Try again!";
-        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win'); } 
-        else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win'); } 
-        else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct'); } 
-        else { finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong'); }
-        
-        // --- LOGIC MỚI: Mở khóa & Cập nhật nhiệm vụ ---
-        if (finalStars >= 3) {
-            // Mở khóa bài tiếp theo
-            StorageEngine.unlockNextLevel(this.currentLessonId + 1);
-            // Cập nhật nhiệm vụ tuần
-            QuestEngine.updateProgress();
-        }
-        // ----------------------------------------------
-
+        let finalStars = 1; let msg = "Try again!";
+        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct'); } else { finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong'); }
         let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); 
     }
 };
