@@ -1,6 +1,54 @@
 /* ==========================================================================
    FILE: 3.logic.js (FINAL COMBINED: New Shadowing + Old Snake)
    ========================================================================== */
+/* --- STORAGE & QUEST ENGINE --- */
+const StorageEngine = {
+    setUserName: (name) => localStorage.setItem('eng_username', name),
+    getUserName: () => localStorage.getItem('eng_username'),
+    setGems: (val) => localStorage.setItem('eng_gems', val),
+    getGems: () => parseInt(localStorage.getItem('eng_gems') || '0'),
+    
+    // Lưu Kỷ lục game
+    saveHighScore: function(gameId, currentScore) {
+        let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
+        let isNewRecord = false;
+        if (!highScores[gameId] || currentScore > highScores[gameId]) {
+            highScores[gameId] = currentScore;
+            localStorage.setItem('eng_highscores', JSON.stringify(highScores));
+            isNewRecord = true;
+        }
+        return { highScore: highScores[gameId], isNewRecord: isNewRecord };
+    },
+
+    // Lưu % bài học
+    saveLessonProgress: (lessonId, itemIdx) => {
+        let progress = JSON.parse(localStorage.getItem('eng_lesson_map') || '{}');
+        if (!progress[lessonId]) progress[lessonId] = [];
+        if (!progress[lessonId].includes(itemIdx)) {
+            progress[lessonId].push(itemIdx);
+            localStorage.setItem('eng_lesson_map', JSON.stringify(progress));
+        }
+    },
+    getLessonProgress: (lessonId, totalItems) => {
+        let progress = JSON.parse(localStorage.getItem('eng_lesson_map') || '{}');
+        let completed = progress[lessonId] ? progress[lessonId].length : 0;
+        return Math.floor((completed / totalItems) * 100);
+    }
+};
+
+const QuestEngine = {
+    updateWeeklyQuest: () => {
+        let quest = JSON.parse(localStorage.getItem('eng_weekly_quest') || '{"count":0}');
+        quest.count++;
+        localStorage.setItem('eng_weekly_quest', JSON.stringify(quest));
+        App.renderQuests();
+        if(quest.count === 5) {
+            setTimeout(() => alert("🎉 Wow! You completed the weekly quest!\n(Tuyệt vời! Bạn đã hoàn thành nhiệm vụ tuần!) +100 Gems 💎"), 500);
+            StorageEngine.setGems(StorageEngine.getGems() + 100);
+            App.updateGemDisplay();
+        }
+    }
+};
 
 /* --- AUDIO ENGINE --- */
 const AudioEngine = {
