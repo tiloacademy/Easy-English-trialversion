@@ -219,3 +219,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
     background: #000; color: #fff; padding: 2px 8px; border-radius: 4px;
     font-size: 14px; font-weight: bold; margin-right: 10px;
 }
+/* --- GIAO DIỆN DUOLINGO STYLE --- */
+.user-bar { width: 90%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 18px; font-weight: bold; background: rgba(255,255,255,0.7); padding: 10px 15px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.user-info { color: #333; }
+.gem-badge { background: white; padding: 5px 15px; border-radius: 20px; color: #2196F3; border: 2px solid #BBDEFB; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.quest-section { background: white; width: 90%; max-width: 400px; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 3px solid #FF9800; box-shadow: 0 5px 0 #E67E22; text-align: center; }
+.progress-container { background: #eee; border-radius: 10px; height: 14px; width: 100%; overflow: hidden; margin: 8px 0; border: 1px solid #ccc; }
+.progress-bar { background: #4CAF50; height: 100%; width: 0%; transition: width 0.5s ease; border-radius: 10px; }
+
+/* Tiến trình trong menu bài học */
+.lesson-progress-text { font-size: 12px; color: #666; display: block; margin-top: 5px; font-weight: normal; }
+.menu-btn-progress { height: 6px; background: #eee; width: 80%; margin: 5px auto 0; border-radius: 3px; overflow: hidden; }
+.menu-btn-fill { background: #4CAF50; height: 100%; width: 0%; border-radius: 3px; }
