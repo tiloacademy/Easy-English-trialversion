@@ -522,22 +522,65 @@ const App = {
     currentPart: 0, 
     init: function() {
         AudioEngine.stopAllAndBlock();
+        const name = StorageEngine.getUserName();
+        if (!name) {
+            document.getElementById('onboarding-screen').style.display = 'flex';
+        } else {
+            document.getElementById('onboarding-screen').style.display = 'none';
+            document.getElementById('display-user-name').innerText = name;
+            this.updateGemDisplay();
+            this.renderQuests();
+        }
         document.getElementById('landing-screen').style.display = 'flex';
         document.getElementById('menu-screen').style.display = 'none';
         document.getElementById('main-container').style.display = 'none';
         document.getElementById('ipa-screen').style.display = 'none';
         document.getElementById('shadowing-screen').style.display = 'none';
     },
-    openPart: function(partId) {
+    saveUserName: function() {
+        const val = document.getElementById('user-name-input').value.trim();
+        if (val) { StorageEngine.setUserName(val); this.init(); }
+    },
+    updateGemDisplay: function() { document.getElementById('total-gems').innerText = StorageEngine.getGems(); },
+    renderQuests: function() {
+        let quest = JSON.parse(localStorage.getItem('eng_weekly_quest') || '{"count":0}');
+        let percent = (quest.count / 5) * 100;
+        document.getElementById('quest-bar').style.width = Math.min(percent, 100) + "%";
+        document.getElementById('quest-status').innerText = `${quest.count}/5 lessons (bài học)`;
+    },
+    openPart: function(partId) { /* giữ nguyên của bạn */
         this.currentPart = partId; AudioEngine.unlock(); 
         document.getElementById('landing-screen').style.display = 'none'; document.getElementById('shadowing-screen').style.display = 'none'; document.getElementById('menu-screen').style.display = 'none';
         if (partId === 1) { this.initPronunMenu(); } else if (partId === 2) { this.initIntonationMenu(); } else if (partId === 3) { this.initVocabMenu(); }
     },
     initPronunMenu: function() {
         const menuContainer = document.getElementById('menu-screen'); menuContainer.style.display = 'flex'; menuContainer.innerHTML = '';
-        const btnBack = document.createElement('button'); btnBack.className = 'btn-menu'; btnBack.innerText = "🏠  Home"; btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d"; btnBack.onclick = function() { App.goHome(); }; menuContainer.appendChild(btnBack);
-        const btnIPA = document.createElement('button'); btnIPA.className = 'btn-menu'; btnIPA.innerText = "🔠  IPA Chart"; btnIPA.style.borderColor = "#9C27B0"; btnIPA.style.color = "#9C27B0"; btnIPA.onclick = function() { App.openIPA(); }; menuContainer.appendChild(btnIPA);
-        if(typeof LevelMap !== 'undefined') { LevelMap.forEach(level => { if (level.type === 'learn') { const btn = document.createElement('button'); btn.className = 'btn-menu'; btn.innerText = level.label; if (level.label.includes("Ôn tập")) { btn.style.borderColor = "#ff9600"; btn.style.color = "#d35400"; } if (level.label.includes("THI THỬ")) { btn.style.borderColor = "#e74c3c"; btn.style.color = "#c0392b"; btn.style.borderWidth = "4px"; } btn.onclick = function() { App.startLesson(level.id); }; menuContainer.appendChild(btn); } }); } else { alert("Error: LevelMap data not found in 4.data.js"); }
+        const btnBack = document.createElement('button'); btnBack.className = 'btn-menu'; btnBack.innerText = "🏠  Home (Trang chủ)"; btnBack.style.borderColor = "#7f8c8d"; btnBack.style.color = "#7f8c8d"; btnBack.onclick = function() { App.goHome(); }; menuContainer.appendChild(btnBack);
+        const btnIPA = document.createElement('button'); btnIPA.className = 'btn-menu'; btnIPA.innerText = "🔠  IPA Chart (Bảng phiên âm)"; btnIPA.style.borderColor = "#9C27B0"; btnIPA.style.color = "#9C27B0"; btnIPA.onclick = function() { App.openIPA(); }; menuContainer.appendChild(btnIPA);
+        
+        if(typeof LevelMap !== 'undefined') { 
+            LevelMap.forEach(level => { 
+                if (level.type === 'learn') { 
+                    const btn = document.createElement('button'); 
+                    btn.className = 'btn-menu'; 
+                    
+                    // Tính phần trăm tiến độ
+                    const totalItems = DataEngine.getLesson(level.id).length;
+                    const percent = StorageEngine.getLessonProgress(level.id, totalItems);
+
+                    btn.innerHTML = `
+                        ${level.label}
+                        <span class="lesson-progress-text">${percent}% completed (hoàn thành)</span>
+                        <div class="menu-btn-progress"><div class="menu-btn-fill" style="width:${percent}%"></div></div>
+                    `;
+
+                    if (level.label.includes("Ôn tập")) { btn.style.borderColor = "#ff9600"; btn.style.color = "#d35400"; } 
+                    if (level.label.includes("THI THỬ")) { btn.style.borderColor = "#e74c3c"; btn.style.color = "#c0392b"; btn.style.borderWidth = "4px"; } 
+                    btn.onclick = function() { App.startLesson(level.id); }; 
+                    menuContainer.appendChild(btn); 
+                } 
+            }); 
+        }
     },
     initIntonationMenu: function() {
         const menuContainer = document.getElementById('menu-screen'); menuContainer.style.display = 'flex'; menuContainer.innerHTML = '<div class="menu-title">Movie Shadowing</div>';
