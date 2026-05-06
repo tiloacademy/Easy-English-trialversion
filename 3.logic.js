@@ -94,7 +94,21 @@ const GameEngine = {
     startTimer: function() { clearInterval(this.timerInt); document.getElementById('timer').innerText = "00:00"; this.timerInt = setInterval(() => { this.sec++; let m=Math.floor(this.sec/60).toString().padStart(2,'0'); let s=(this.sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `${m}:${s}`; }, 1000); },
     updateScore: function(val) { this.score += val; if(this.score < 0) this.score = 0; document.getElementById('score-display').innerText = this.score; },
     showFloatingText: function(x, y, text, color) { const el = document.createElement('div'); el.className = 'floating-text'; el.innerText = text; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.color = color; document.body.appendChild(el); setTimeout(() => el.remove(), 800); },
-    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("Excellent job!"); document.getElementById('win-msg').innerText = "Time: " + document.getElementById('timer').innerText; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
+    win: function() { 
+        this.stop(); 
+        AudioEngine.playEffect('win'); 
+        AudioEngine.playTTS("Excellent job!"); 
+        document.getElementById('win-msg').innerText = "Time (Thời gian): " + document.getElementById('timer').innerText; 
+        document.getElementById('final-score').innerText = this.score; 
+
+        // Xử lý kỷ lục
+        const gameId = this.currentConfig.gameType || 'flip'; 
+        const recordData = StorageEngine.saveHighScore(gameId, this.score);
+        document.getElementById('high-score-display').innerText = "🏆 High Score (Kỷ lục): " + recordData.highScore;
+        document.getElementById('new-record-msg').style.display = recordData.isNewRecord ? 'block' : 'none';
+
+        document.getElementById('win-modal').style.display = 'flex'; 
+    }
 };
 
 /* --- SNAKE ENGINE (OLD ORIGINAL CODE RESTORED) --- */
@@ -231,9 +245,22 @@ const SnakeEngine = {
         if (this.direction.x + newDir.x === 0 && this.direction.y + newDir.y === 0) return;
         this.nextDirection = newDir;
     },
-    showGameOver: function(msg) { this.stop(); AudioEngine.playTTS("Game Over!"); document.getElementById('win-msg').innerText = msg; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; },
-    win: function() { this.stop(); AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); document.getElementById('win-msg').innerText = "Awesome!"; document.getElementById('final-score').innerText = this.score; document.getElementById('win-modal').style.display = 'flex'; }
-};
+    endGame: function(msg, isWin) {
+        this.stop(); 
+        if(isWin) { AudioEngine.playEffect('win'); AudioEngine.playTTS("You Win!"); }
+        else { AudioEngine.playTTS("Game Over!"); }
+        
+        document.getElementById('win-msg').innerText = msg; 
+        document.getElementById('final-score').innerText = this.score; 
+
+        const recordData = StorageEngine.saveHighScore('snake', this.score);
+        document.getElementById('high-score-display').innerText = "🏆 High Score (Kỷ lục): " + recordData.highScore;
+        document.getElementById('new-record-msg').style.display = recordData.isNewRecord ? 'block' : 'none';
+        
+        document.getElementById('win-modal').style.display = 'flex'; 
+    },
+    showGameOver: function(msg) { this.endGame(msg + " (Thử lại nhé!)", false); },
+    win: function() { this.endGame("Awesome! (Tuyệt vời!)", true); }
 
 /* --- LEARNING ENGINE (UPDATED) --- */
 const LearningEngine = {
