@@ -11,7 +11,7 @@ const StorageEngine = {
     // Lưu Kỷ lục game
     saveHighScore: function(gameId, currentScore) {
         let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
-        let isNewRecord = false;
+        let isNewRecord = false;checkResult
         if (!highScores[gameId] || currentScore > highScores[gameId]) {
             highScores[gameId] = currentScore;
             localStorage.setItem('eng_highscores', JSON.stringify(highScores));
@@ -282,10 +282,39 @@ const LearningEngine = {
                 else { if (userText.includes(target)) bestAccuracy = 100; }
             }
         }
-        let finalStars = 1; let msg = "Try again!";
-        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉"; AudioEngine.playEffect('win'); } else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try!"; AudioEngine.playEffect('correct'); } else { finalStars = 1; msg = "Try again!"; AudioEngine.playEffect('wrong'); }
-        let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; document.getElementById('stars').innerText = s; document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; document.getElementById('feedback').innerText = msg; this.resetMic(); 
-    }
+       let finalStars = 1; let msg = "Try again! (Thử lại nhé!)";
+        if (bestAccuracy >= 100) { finalStars = 5; msg = "Excellent! 🎉 (Tuyệt vời!)"; AudioEngine.playEffect('win'); } 
+        else if (bestAccuracy >= 75) { finalStars = 4; msg = "Very Good! 🎉 (Rất tốt!)"; AudioEngine.playEffect('win'); } 
+        else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try! (Cố lên nhé!)"; AudioEngine.playEffect('correct'); } 
+        else { finalStars = 1; msg = "Try again! (Thử lại nhé!)"; AudioEngine.playEffect('wrong'); }
+
+        // Tính % tiến độ và Gem
+        if (finalStars >= 3) {
+            StorageEngine.saveLessonProgress(this.currentLessonId, this.idx);
+            
+            // Tặng 2 Gem cho mỗi lần đọc đúng
+            StorageEngine.setGems(StorageEngine.getGems() + 2);
+            App.updateGemDisplay();
+
+            // Kiểm tra xem đã hoàn thành 100% bài học chưa
+            let totalItems = this.currentData.length;
+            let currentProgress = StorageEngine.getLessonProgress(this.currentLessonId, totalItems);
+            if (currentProgress >= 100) {
+                // Đảm bảo chỉ cộng quest 1 lần mỗi bài bằng cách check flag tạm
+                if(!this.currentData.completedFlag) {
+                    this.currentData.completedFlag = true;
+                    QuestEngine.updateWeeklyQuest();
+                    StorageEngine.setGems(StorageEngine.getGems() + 20); // Thưởng hoàn thành bài
+                    App.updateGemDisplay();
+                }
+            }
+        }
+
+        let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; 
+        document.getElementById('stars').innerText = s; 
+        document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; 
+        document.getElementById('feedback').innerText = msg; 
+        this.resetMic();
 };
 
 /* --- VOCAB ENGINE (HỌC & GAME) --- */
