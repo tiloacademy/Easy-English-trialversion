@@ -11,7 +11,7 @@ const StorageEngine = {
     // Lưu Kỷ lục game
     saveHighScore: function(gameId, currentScore) {
         let highScores = JSON.parse(localStorage.getItem('eng_highscores') || '{}');
-        let isNewRecord = false;checkResult
+        let isNewRecord = false;
         if (!highScores[gameId] || currentScore > highScores[gameId]) {
             highScores[gameId] = currentScore;
             localStorage.setItem('eng_highscores', JSON.stringify(highScores));
@@ -261,6 +261,7 @@ const SnakeEngine = {
     },
     showGameOver: function(msg) { this.endGame(msg + " (Thử lại nhé!)", false); },
     win: function() { this.endGame("Awesome! (Tuyệt vời!)", true); }
+   };
 
 /* --- LEARNING ENGINE (UPDATED) --- */
 const LearningEngine = {
@@ -342,6 +343,7 @@ const LearningEngine = {
         document.getElementById('stars').className = (finalStars >= 3) ? "stars active" : "stars"; 
         document.getElementById('feedback').innerText = msg; 
         this.resetMic();
+        }
 };
 
 /* --- VOCAB ENGINE (HỌC & GAME) --- */
