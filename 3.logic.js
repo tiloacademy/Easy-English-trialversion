@@ -281,9 +281,28 @@ const LearningEngine = {
     },
     initLesson: function(lessonNum) { this.currentLessonId = lessonNum; this.currentData = DataEngine.getLesson(lessonNum); this.idx = 0; this.preload(); },
     preload: function() { this.currentData.forEach(item => { if(item.img) new Image().src = item.img; }); },
-    render: function() {
+render: function() {
         const item = this.currentData[this.idx]; if(!item) return; AudioEngine.stopCurrentSound();
         document.getElementById('game-screen').style.display = 'none'; document.getElementById('learning-screen').style.display = 'flex'; document.getElementById('win-modal').style.display = 'none'; document.getElementById('stars').innerText = "☆☆☆☆☆"; document.getElementById('stars').classList.remove('active'); document.getElementById('feedback').innerText = "...";
+        
+        // --- VẼ THANH CHẤM TRÒN ---
+        let progressData = JSON.parse(localStorage.getItem('eng_lesson_map') || '{}');
+        let completedSet = progressData[this.currentLessonId] || [];
+        const dotsContainer = document.getElementById('lesson-dots-container');
+        if (dotsContainer) {
+            dotsContainer.innerHTML = '';
+            this.currentData.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'lesson-dot';
+                if (completedSet.includes(i)) dot.classList.add('completed');
+                if (i === this.idx) dot.classList.add('active');
+                // Bấm vào dấu chấm để nhảy thẳng đến phần chưa học
+                dot.onclick = () => { this.idx = i; this.render(); }; 
+                dotsContainer.appendChild(dot);
+            });
+        }
+        // -------------------------
+
         const imgEl = document.getElementById('learn-img'); const btnContainer = document.getElementById('action-container'); const infoDisplay = document.getElementById('info-display');
         if(item.type === 'game') {
             imgEl.src = item.img || 'https://img.icons8.com/color/500/controller.png';
