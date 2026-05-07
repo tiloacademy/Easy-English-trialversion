@@ -348,25 +348,15 @@ render: function() {
         else if (bestAccuracy >= 50) { finalStars = 3; msg = "Good try! (Cố lên nhé!)"; AudioEngine.playEffect('correct'); } 
         else { finalStars = 1; msg = "Try again! (Thử lại nhé!)"; AudioEngine.playEffect('wrong'); }
 
-        // Tính % tiến độ và Gem
+        // Tính % tiến độ và Gem (Trong hàm checkResult)
         if (finalStars >= 3) {
             StorageEngine.saveLessonProgress(this.currentLessonId, this.idx);
-            
-            // Tặng 2 Gem cho mỗi lần đọc đúng
             StorageEngine.setGems(StorageEngine.getGems() + 2);
             App.updateGemDisplay();
-
-            // Kiểm tra xem đã hoàn thành 100% bài học chưa
-            let totalItems = this.currentData.length;
-            let currentProgress = StorageEngine.getLessonProgress(this.currentLessonId, totalItems);
-            if (currentProgress >= 100) {
-                // Đảm bảo chỉ cộng quest 1 lần mỗi bài bằng cách check flag tạm
-                if(!this.currentData.completedFlag) {
-                    this.currentData.completedFlag = true;
-                    QuestEngine.updateWeeklyQuest();
-                    StorageEngine.setGems(StorageEngine.getGems() + 20); // Thưởng hoàn thành bài
-                    App.updateGemDisplay();
-                }
+            
+            // GỌI HÀM KIỂM TRA HOÀN THÀNH BÀI
+            this.checkLessonComplete();
+        }
             }
         }
 
