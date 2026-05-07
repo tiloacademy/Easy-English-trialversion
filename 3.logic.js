@@ -106,7 +106,12 @@ const GameEngine = {
         const recordData = StorageEngine.saveHighScore(gameId, this.score);
         document.getElementById('high-score-display').innerText = "🏆 High Score (Kỷ lục): " + recordData.highScore;
         document.getElementById('new-record-msg').style.display = recordData.isNewRecord ? 'block' : 'none';
-
+// --- LƯU PHẦN TRĂM BÀI HỌC KHI THẮNG GAME ---
+        if (App.currentPart === 1) {
+            StorageEngine.saveLessonProgress(LearningEngine.currentLessonId, LearningEngine.idx);
+            LearningEngine.checkLessonComplete();
+        }
+        // ---------------------------------------------
         document.getElementById('win-modal').style.display = 'flex'; 
     }
 };
@@ -256,7 +261,11 @@ const SnakeEngine = {
         const recordData = StorageEngine.saveHighScore('snake', this.score);
         document.getElementById('high-score-display').innerText = "🏆 High Score (Kỷ lục): " + recordData.highScore;
         document.getElementById('new-record-msg').style.display = recordData.isNewRecord ? 'block' : 'none';
-        
+        // --- LƯU PHẦN TRĂM BÀI HỌC KHI THẮNG RẮN ---
+        if (isWin && App.currentPart === 1) {
+            StorageEngine.saveLessonProgress(LearningEngine.currentLessonId, LearningEngine.idx);
+            LearningEngine.checkLessonComplete();
+        }
         document.getElementById('win-modal').style.display = 'flex'; 
     },
     showGameOver: function(msg) { this.endGame(msg + " (Thử lại nhé!)", false); },
