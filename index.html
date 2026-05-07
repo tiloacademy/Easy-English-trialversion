@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,17 +8,16 @@
     <link rel="stylesheet" href="2.style.css">
 </head>
 <body>
-    <!-- Màn hình Nhập tên (Onboarding) -->
+    <div id="cursor-hammer" class="hammer"></div>
+
     <div id="onboarding-screen" style="display: none; position: fixed; z-index: 20000; background: #E0F7FA; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
         <h1 style="color: #d35400; font-size: 32px;">Welcome! 👋<br><span style="font-size: 24px;">(Chào mừng bạn!)</span></h1>
         <p style="font-size: 20px; color: #333; font-weight: bold;">What is your name?<br><span style="font-size: 16px; font-weight: normal;">(Tên của bạn là gì?)</span></p>
         <input type="text" id="user-name-input" placeholder="Your name..." style="padding: 15px; font-size: 20px; border-radius: 10px; border: 2px solid #00A4EF; width: 80%; max-width: 300px; margin-bottom: 20px; text-align: center;">
         <button class="btn-menu" style="width: auto; padding: 10px 40px; background: #00A4EF; color: white;" onclick="App.saveUserName()">Start (Bắt đầu)</button>
     </div>
-    <div id="cursor-hammer" class="hammer"></div>
 
     <div id="landing-screen">
-       <!-- Thanh User & Gems -->
         <div class="user-bar">
             <div class="user-info">👤 <span id="display-user-name">Hello!</span></div>
             <div class="gem-badge">💎 <span id="total-gems">0</span></div>
@@ -26,12 +25,12 @@
         
         <div class="app-logo" style="margin-bottom: 10px; margin-top: 20px;">ENGLISH MASTERY</div>
 
-        <!-- Khu vực Nhiệm vụ tuần -->
         <div class="quest-section">
-            <div style="font-weight: 900; color: #d35400; font-size: 16px; margin-bottom: 5px;">Weekly Quest (Nhiệm vụ tuần)</div>
+            <div style="font-weight: 900; color: #d35400; font-size: 16px; margin-bottom: 5px;">Weekly Goal (Mục tiêu tuần)</div>
             <div class="progress-container"><div id="quest-bar" class="progress-bar"></div></div>
-            <small id="quest-status" style="color: #555; font-weight: bold;">0/5 lessons (bài học)</small>
+            <small id="quest-status" style="color: #555; font-weight: bold;">0/5 lessons</small>
         </div>
+
         <div class="landing-grid">
             <div class="landing-card c-pronun" onclick="App.openPart(1)">
                 <div class="card-icon">🗣️</div>
@@ -63,11 +62,9 @@
             <div class="header-title" id="movie-title">Movie Title</div>
             <div style="width: 40px;"></div>
         </div>
-        
         <div class="video-main-container">
             <div id="youtube-player"></div>
         </div>
-
         <div class="speed-control-bar">
             <span>Speed: </span>
             <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(0.5)">0.5x</button>
@@ -76,9 +73,7 @@
             <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(1.25)">1.25x</button>
             <button class="speed-btn" onclick="ShadowingEngine.changeSpeed(1.5)">1.5x</button>
         </div>
-
-        <div id="segment-list" class="segment-container">
-            </div>
+        <div id="segment-list" class="segment-container"></div>
     </div>
     
     <div id="menu-screen" style="display: none;"></div>
@@ -89,18 +84,46 @@
         <button class="btn-back-ipa" onclick="App.closeIPA()"> ◀ Back</button>
     </div>
 
-    <div id="main-container" style="display: none;">
+    <div id="vocab-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; flex-direction: column; z-index: 10;">
+        <div class="top-bar">
+            <button class="btn-home" onclick="App.openPart(3)"> 🔙 </button>
+            <div class="header-title" id="vocab-title">Topic</div>
+            <div style="width: 40px;"></div>
+        </div>
+        <div id="vocab-mode-menu" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+            <button class="btn-menu" style="border-color: #27ae60; color: #27ae60;" onclick="VocabEngine.startLearn()">📖 Learn Words</button>
+            <button class="btn-menu" style="border-color: #e67e22; color: #e67e22;" onclick="VocabEngine.startGame()">🎮 Play Game</button>
+        </div>
+        <div id="vocab-learn-container" style="display: none; flex: 1; flex-direction: column; align-items: center; padding: 20px;">
+            <img id="v-learn-img" src="" style="max-height: 200px; border-radius: 15px; margin-bottom: 20px;">
+            <div id="v-info-display" style="min-height: 100px;"></div>
+            <div class="stars" id="v-stars">☆☆☆☆☆</div>
+            <div class="feedback-text" id="v-feedback">...</div>
+            <div class="action-row" style="width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                <button class="btn-action btn-mic" id="v-mic-btn" onclick="VocabEngine.startListening()"> 🎤 Read </button>
+                <button class="btn-action btn-listen" onclick="VocabEngine.playCurrentWord()"> 🔊 Listen </button>
+            </div>
+            <div class="nav-row" style="width: 100%; display: flex; justify-content: space-between; margin-top: auto;">
+                <button class="btn-nav" onclick="VocabEngine.nav(-1)"> ◀ </button>
+                <button class="btn-nav" onclick="VocabEngine.nav(1)"> ▶ </button>
+            </div>
+        </div>
+        <div id="vocab-game-container" style="display: none; flex: 1; flex-direction: column; align-items: center; background: #fff3e0; padding: 10px;">
+            <h2 id="game-status" style="color: #d35400;">Score: 0</h2>
+            <div id="vocab-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <div id="main-container" style="display: none; position: relative; width: 100%; height: 100%;">
         <div id="learning-screen">
-            <div id="learning-screen" class="screen-container" style="display: none; align-items: center; justify-content: flex-start; padding-top: 20px;">
-            
-            <div id="lesson-dots-container" class="lesson-dots-container"></div>
-            
-            <img id="learn-img" src="" style="width: 200px; height: 200px; object-fit: contain; margin-bottom: 20px; border-radius: 15px;">
             <div class="top-bar">
                 <button class="btn-home" onclick="App.goHome()"> 🏠 </button>
                 <div class="header-title">English Learning</div>
                 <div style="width: 40px;"></div>
             </div>
+            
+            <div id="lesson-dots-container" class="lesson-dots-container"></div>
+            
             <div class="learn-img-wrapper"><img id="learn-img" src="" alt="Lesson Image"></div>
             <div class="info-area" id="info-display"></div>
             <div class="stars" id="stars">☆☆☆☆☆</div>
@@ -161,8 +184,8 @@
             <div id="win-modal">
                 <h1 style="color:green; font-size:36px; margin-bottom: 10px;">COMPLETED! 🎉 </h1>
                 <h2 style="color:#d35400; font-size:40px; margin: 5px 0;">Score: <span id="final-score">0</span></h2>
-                <h3 id="high-score-display" style="color:#2980b9; font-size:24px; margin: 0 0 5px 0;">🏆 High Score (Kỷ lục): 0</h3>
-                <p id="new-record-msg" style="color:#e74c3c; font-size:20px; font-weight:900; margin: 0 0 15px 0; display:none;">🔥 NEW RECORD (KỶ LỤC MỚI)! 🔥</p>
+                <h3 id="high-score-display" style="color:#2980b9; font-size:24px; margin: 0 0 5px 0;">🏆 Kỷ lục: 0</h3>
+                <p id="new-record-msg" style="color:#e74c3c; font-size:20px; font-weight:900; margin: 0 0 15px 0; display:none;">🔥 KỶ LỤC MỚI! 🔥</p>
                 <p id="win-msg" style="font-size:20px; color:#555; margin-bottom: 30px;">Time: 00:00</p>
                 <button class="btn-action btn-nav" style="width:auto; padding: 0 40px;" onclick="GameEngine.restart()">Replay</button>
                 <br><br>
@@ -175,4 +198,3 @@
     <script src="3.logic.js"></script>
 </body>
 </html>
-
