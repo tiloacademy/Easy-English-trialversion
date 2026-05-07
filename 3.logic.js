@@ -266,6 +266,19 @@ const SnakeEngine = {
 /* --- LEARNING ENGINE (UPDATED) --- */
 const LearningEngine = {
     currentData: [], idx: 0, currentLessonId: 0, listenTimeout: null, 
+   // THÊM HÀM NÀY ĐỂ XỬ LÝ HOÀN THÀNH BÀI:
+    checkLessonComplete: function() {
+        let totalItems = this.currentData.length;
+        let currentProgress = StorageEngine.getLessonProgress(this.currentLessonId, totalItems);
+        if (currentProgress >= 100) {
+            if(!this.currentData.completedFlag) {
+                this.currentData.completedFlag = true;
+                QuestEngine.updateWeeklyQuest();
+                StorageEngine.setGems(StorageEngine.getGems() + 20); 
+                App.updateGemDisplay();
+            }
+        }
+    },
     initLesson: function(lessonNum) { this.currentLessonId = lessonNum; this.currentData = DataEngine.getLesson(lessonNum); this.idx = 0; this.preload(); },
     preload: function() { this.currentData.forEach(item => { if(item.img) new Image().src = item.img; }); },
     render: function() {
