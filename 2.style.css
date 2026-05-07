@@ -231,3 +231,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .lesson-progress-text { font-size: 12px; color: #666; display: block; margin-top: 5px; font-weight: normal; }
 .menu-btn-progress { height: 6px; background: #eee; width: 80%; margin: 5px auto 0; border-radius: 3px; overflow: hidden; }
 .menu-btn-fill { background: #4CAF50; height: 100%; width: 0%; border-radius: 3px; }
+
+/* --- THANH CHẤM TRÒN TIẾN TRÌNH --- */
+.lesson-dots-container { display: flex; justify-content: center; gap: 8px; width: 90%; max-width: 400px; margin-bottom: 20px; flex-wrap: wrap; }
+.lesson-dot { width: 14px; height: 14px; border-radius: 50%; background: #ccc; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
+.lesson-dot.completed { background: #4CAF50; /* Màu xanh: Đã hoàn thành */ }
+.lesson-dot.active { transform: scale(1.4); border-color: #2196F3; background: white; /* Đang học */ }
+.lesson-dot.completed.active { border-color: #2196F3; background: #4CAF50; }
