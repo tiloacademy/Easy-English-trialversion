@@ -366,8 +366,7 @@ render: function() {
             // GỌI HÀM KIỂM TRA HOÀN THÀNH BÀI
             this.checkLessonComplete();
         }
-            }
-        }
+
 
         let s = ""; for(let i=0; i<5; i++) s += (i < finalStars) ? "  ⭐  " : "☆"; 
         document.getElementById('stars').innerText = s; 
