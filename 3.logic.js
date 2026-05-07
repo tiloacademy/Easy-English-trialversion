@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE: 3.logic.js (BẢN HOÀN CHỈNH VÀ CHỐNG SẬP 100%)
+   FILE: 3.logic.js (BẢN FIX LỖI MÀN HÌNH TRẮNG & HOÀN CHỈNH)
    ========================================================================== */
 
 /* --- STORAGE & QUEST ENGINE --- */
@@ -80,13 +80,13 @@ const GameEngine = {
     },
     restart: function() { if(this.currentConfig) this.start(this.currentConfig, this.currentDataPool); },
     stop: function() { this.active = false; clearInterval(this.moleAudioLoop); clearTimeout(this.moleLoop); clearInterval(this.timerInt); clearTimeout(this.hammerTimeout); document.querySelectorAll('.mole').forEach(m => m.classList.remove('up', 'bonked')); const hammer = document.getElementById('cursor-hammer'); if(hammer) hammer.classList.remove('active'); SnakeEngine.stop(); },
-    startMoleGame: function() { this.stop(); this.active = true; this.score = 0; this.sec = 0; this.updateScore(0); this.moles = document.querySelectorAll('.mole'); App.safeHide('tower', true); App.safeHide('whack-wrapper', false); App.safeHide('win-modal', true); App.safeHide('snake-game-container', true); this.refillMoleWords(); if(this.moleRemainingWords.length === 0) return alert("No words!"); this.startTimer(); this.nextMoleRound(); },
+    startMoleGame: function() { this.stop(); this.active = true; this.score = 0; this.sec = 0; this.updateScore(0); this.moles = document.querySelectorAll('.mole'); App.setDisplay('tower', 'none'); App.setDisplay('whack-wrapper', 'flex'); App.setDisplay('win-modal', 'none'); App.setDisplay('snake-game-container', 'none'); this.refillMoleWords(); if(this.moleRemainingWords.length === 0) return alert("No words!"); this.startTimer(); this.nextMoleRound(); },
     refillMoleWords: function() { const tP = this.currentConfig.phoneme; this.moleRemainingWords = this.currentDataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(tP))).sort(() => 0.5 - Math.random()); },
     nextMoleRound: function() { if (!this.active) return; if (this.score >= this.WINNING_SCORE) { this.win(); return; } if (this.moleRemainingWords.length === 0) { this.refillMoleWords(); } this.moleTarget = this.moleRemainingWords.pop(); let html = ''; this.moleTarget.parts.forEach(p => { const ipaHtml = p.i ? p.i : "&nbsp;"; html += `<div class="target-char"><div class="target-ipa">${ipaHtml}</div><div class="target-txt">${p.t}</div></div>`; }); const tc = document.getElementById('target-word-container'); if(tc) tc.innerHTML = html; AudioEngine.playTTS(this.moleTarget.speak); clearInterval(this.moleAudioLoop); this.moleAudioLoop = setInterval(() => { if(this.active) AudioEngine.playTTS(this.moleTarget.speak); }, 2000); this.peep(); },
     peep: function() { if (!this.active) return; let speed = Math.max(600, 1500 - (this.score * 0.8)); const time = speed + Math.random() * 400; const hole = this.moles[Math.floor(Math.random() * this.moles.length)]; let isTarget = Math.random() < 0.4; let mData = isTarget ? this.moleTarget : this.currentDataPool[Math.floor(Math.random() * this.currentDataPool.length)]; const imgEl = hole.querySelector('img'); if(imgEl) imgEl.src = mData.img; hole.dataset.speak = mData.speak; hole.classList.add('up'); this.moleLoop = setTimeout(() => { hole.classList.remove('up'); if (this.active) this.peep(); }, time); },
     bonk: function(moleEl, event) { if(!moleEl.classList.contains('up') || !this.active) return; let touchX = event.clientX || event.pageX; let touchY = event.clientY || event.pageY; this.spawnHammer(touchX, touchY); const clickedWord = moleEl.dataset.speak; if (clickedWord === this.moleTarget.speak) { AudioEngine.playEffect('correct'); moleEl.classList.add('bonked'); this.updateScore(100); this.showFloatingText(touchX, touchY, "+100", "yellow"); setTimeout(() => { moleEl.classList.remove('up', 'bonked'); clearTimeout(this.moleLoop); this.nextMoleRound(); }, 300); } else { AudioEngine.playEffect('wrong'); moleEl.classList.remove('up'); this.updateScore(-50); this.showFloatingText(touchX, touchY, "-50", "red"); } },
     spawnHammer: function(x, y) { const hammer = document.getElementById('cursor-hammer'); if(!hammer) return; hammer.style.left = (x - 60) + 'px'; hammer.style.top = (y - 70) + 'px'; hammer.classList.remove('active'); void hammer.offsetWidth; hammer.classList.add('active'); clearTimeout(this.hammerTimeout); this.hammerTimeout = setTimeout(() => { hammer.classList.remove('active'); }, 150); },
-    startFlipGame: function() { this.stop(); this.active = true; this.sec = 0; this.matches = 0; App.safeHide('tower', false); App.safeHide('whack-wrapper', true); App.safeHide('win-modal', true); App.safeHide('snake-game-container', true); const tower = document.getElementById('tower'); if(!tower) return; tower.innerHTML = ''; let cards = []; let validItems = []; this.currentConfig.pairs.forEach(key => { let original = this.currentDataPool.find(d => { if(d.type === 'game' || d.type === 'sent') return false; let fullWord = d.parts.map(p => p.t).join(""); return fullWord === key; }); if(original) validItems.push(original); }); validItems.sort(() => 0.5 - Math.random()); validItems = validItems.slice(0, 5); validItems.forEach(original => { cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); let htmlText = `<div class="game-card-text">`; original.parts.forEach(p => { htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; }); htmlText += `</div>`; cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); }); cards.sort(() => 0.5 - Math.random()); let cCount = 0; let num = 1; const rows = [3, 2, 3, 2]; rows.forEach(cnt => { const rowDiv = document.createElement('div'); rowDiv.className = 'tower-row'; for(let k=0; k<cnt; k++) { if(cCount >= cards.length) break; const c = cards[cCount]; const el = document.createElement('div'); el.className = 'card-flip'; el.dataset.speak = c.speak; el.dataset.id = c.id; el.innerHTML = `<div class="card-inner"><div class="face front">${num}</div><div class="face back">${c.content}</div></div>`; el.onclick = function() { GameEngine.cardClick(this); }; rowDiv.appendChild(el); cCount++; num++; } tower.appendChild(rowDiv); }); this.startTimer(); },
+    startFlipGame: function() { this.stop(); this.active = true; this.sec = 0; this.matches = 0; App.setDisplay('tower', 'flex'); App.setDisplay('whack-wrapper', 'none'); App.setDisplay('win-modal', 'none'); App.setDisplay('snake-game-container', 'none'); const tower = document.getElementById('tower'); if(!tower) return; tower.innerHTML = ''; let cards = []; let validItems = []; this.currentConfig.pairs.forEach(key => { let original = this.currentDataPool.find(d => { if(d.type === 'game' || d.type === 'sent') return false; let fullWord = d.parts.map(p => p.t).join(""); return fullWord === key; }); if(original) validItems.push(original); }); validItems.sort(() => 0.5 - Math.random()); validItems = validItems.slice(0, 5); validItems.forEach(original => { cards.push({ id: original.speak, type: 'img', content: `<img src="${original.img}">`, speak: original.speak }); let htmlText = `<div class="game-card-text">`; original.parts.forEach(p => { htmlText += `<div class="gc-block"><div class="gc-ipa">${p.i || "&nbsp;"}</div><div class="gc-word">${p.t}</div></div>`; }); htmlText += `</div>`; cards.push({ id: original.speak, type: 'text', content: htmlText, speak: original.speak }); }); cards.sort(() => 0.5 - Math.random()); let cCount = 0; let num = 1; const rows = [3, 2, 3, 2]; rows.forEach(cnt => { const rowDiv = document.createElement('div'); rowDiv.className = 'tower-row'; for(let k=0; k<cnt; k++) { if(cCount >= cards.length) break; const c = cards[cCount]; const el = document.createElement('div'); el.className = 'card-flip'; el.dataset.speak = c.speak; el.dataset.id = c.id; el.innerHTML = `<div class="card-inner"><div class="face front">${num}</div><div class="face back">${c.content}</div></div>`; el.onclick = function() { GameEngine.cardClick(this); }; rowDiv.appendChild(el); cCount++; num++; } tower.appendChild(rowDiv); }); this.startTimer(); },
     cardClick: function(el) { if(el.classList.contains('flipped') || el.classList.contains('matched')) return; el.classList.add('flipped'); AudioEngine.playTTS(el.dataset.speak); if(!this.c1) { this.c1 = el; } else { this.c2 = el; if(this.c1.dataset.id === this.c2.dataset.id) { setTimeout(() => { this.c1.classList.add('matched'); this.c2.classList.add('matched'); this.c1 = null; this.c2 = null; this.matches++; AudioEngine.playEffect('correct'); if(this.matches === 5) this.win(); }, 600); } else { setTimeout(() => { this.c1.classList.remove('flipped'); this.c2.classList.remove('flipped'); this.c1 = null; this.c2 = null; AudioEngine.playEffect('wrong'); }, 1000); } } },
     startTimer: function() { clearInterval(this.timerInt); const t = document.getElementById('timer'); if(t) t.innerText = "00:00"; this.timerInt = setInterval(() => { this.sec++; let m=Math.floor(this.sec/60).toString().padStart(2,'0'); let s=(this.sec%60).toString().padStart(2,'0'); if(t) t.innerText = `${m}:${s}`; }, 1000); },
     updateScore: function(val) { this.score += val; if(this.score < 0) this.score = 0; const s = document.getElementById('score-display'); if(s) s.innerText = this.score; },
@@ -106,7 +106,7 @@ const GameEngine = {
             StorageEngine.saveLessonProgress(LearningEngine.currentLessonId, LearningEngine.idx);
             LearningEngine.checkLessonComplete();
         }
-        App.safeHide('win-modal', false); 
+        App.setDisplay('win-modal', 'flex'); 
     }
 };
 
@@ -119,7 +119,7 @@ const SnakeEngine = {
         this.poolCorrect = dataPool.filter(w => w.parts && w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         this.poolWrong = dataPool.filter(w => !w.parts || !w.parts.some(p => p.i && p.i.includes(this.targetPhoneme)));
         if (this.poolCorrect.length === 0) return alert("Missing data for /" + this.targetPhoneme + "/");
-        App.safeHide('tower', true); App.safeHide('whack-wrapper', true); App.safeHide('win-modal', true); App.safeHide('pause-modal', true); App.safeHide('snake-game-container', false);
+        App.setDisplay('tower', 'none'); App.setDisplay('whack-wrapper', 'none'); App.setDisplay('win-modal', 'none'); App.setDisplay('pause-modal', 'none'); App.setDisplay('snake-game-container', 'flex');
         const ss = document.getElementById('snake-score'); if(ss) ss.innerText = this.score;
         this.updateLivesUI();
         const center = Math.floor(this.boardSize / 2);
@@ -151,7 +151,7 @@ const SnakeEngine = {
             StorageEngine.saveLessonProgress(LearningEngine.currentLessonId, LearningEngine.idx);
             LearningEngine.checkLessonComplete();
         }
-        App.safeHide('win-modal', false); 
+        App.setDisplay('win-modal', 'flex'); 
     },
     showGameOver: function(msg) { this.endGame(msg + " (Thử lại nhé!)", false); },
     win: function() { this.endGame("Awesome! (Tuyệt vời!)", true); }
@@ -176,7 +176,7 @@ const LearningEngine = {
     preload: function() { this.currentData.forEach(item => { if(item.img) new Image().src = item.img; }); },
     render: function() {
         const item = this.currentData[this.idx]; if(!item) return; AudioEngine.stopCurrentSound();
-        App.safeHide('game-screen', true); App.safeHide('learning-screen', false); App.safeHide('win-modal', true); 
+        App.setDisplay('game-screen', 'none'); App.setDisplay('learning-screen', 'flex'); App.setDisplay('win-modal', 'none'); 
         const s = document.getElementById('stars'); if(s){ s.innerText = "☆☆☆☆☆"; s.classList.remove('active'); }
         const fb = document.getElementById('feedback'); if(fb) fb.innerText = "...";
         
@@ -249,9 +249,9 @@ const VocabEngine = {
     init: function(topicData) {
         this.currentTopic = topicData;
         const vt = document.getElementById('vocab-title'); if(vt) vt.innerText = topicData.topic;
-        App.safeHide('vocab-mode-menu', false); App.safeHide('vocab-learn-container', true); App.safeHide('vocab-game-container', true);
+        App.setDisplay('vocab-mode-menu', 'flex'); App.setDisplay('vocab-learn-container', 'none'); App.setDisplay('vocab-game-container', 'none');
     },
-    startLearn: function() { App.safeHide('vocab-mode-menu', true); App.safeHide('vocab-learn-container', false); this.idx = 0; this.renderLearnCard(); },
+    startLearn: function() { App.setDisplay('vocab-mode-menu', 'none'); App.setDisplay('vocab-learn-container', 'flex'); this.idx = 0; this.renderLearnCard(); },
     renderLearnCard: function() {
         const item = this.currentTopic.vocab[this.idx];
         const vi = document.getElementById('v-learn-img'); if(vi) vi.src = item.img;
@@ -280,7 +280,7 @@ const VocabEngine = {
     },
     resetMic: function() { const btn = document.getElementById('v-mic-btn'); if(btn){ btn.disabled = false; btn.innerText = "🎤 Read"; btn.style.backgroundColor = "#27ae60"; } },
     startGame: function() {
-        App.safeHide('vocab-mode-menu', true); App.safeHide('vocab-game-container', false);
+        App.setDisplay('vocab-mode-menu', 'none'); App.setDisplay('vocab-game-container', 'flex');
         this.gameQueue = [...this.currentTopic.vocab]; this.gameQueue.sort(() => 0.5 - Math.random()); 
         this.retryQueue = []; this.score = 0; this.streak = 0; this.updateScore(); this.nextQuestion();
     },
@@ -317,7 +317,7 @@ const VocabEngine = {
     updateScore: function() { let fire = this.streak > 1 ? "🔥 x" + this.streak : ""; const gs = document.getElementById('game-status'); if(gs) gs.innerHTML = `Score: ${this.score} <span style="color:orange; margin-left:10px;">${fire}</span>`; }
 };
 
-/* --- APP CONTROLLER (CHỐNG SẬP) --- */
+/* --- APP CONTROLLER (CHỐNG LỖI CSS & BẢO VỆ GIAO DIỆN) --- */
 const App = {
     currentPart: 0, 
     init: function() {
@@ -330,7 +330,6 @@ const App = {
             if (onboardScreen) {
                 onboardScreen.style.display = 'flex';
             } else {
-                // Tự động bật hộp thoại nếu bạn quên chèn HTML
                 setTimeout(() => {
                     let pName = prompt("Welcome! 👋 Chào mừng bạn! \nVui lòng nhập tên của bạn:");
                     if (pName && pName.trim() !== "") {
@@ -348,18 +347,18 @@ const App = {
             this.renderQuests();
         }
         
-        this.safeHide('landing-screen', false); 
-        this.safeHide('menu-screen', true);
-        this.safeHide('main-container', true);
-        this.safeHide('ipa-screen', true);
-        this.safeHide('shadowing-screen', true);
-        this.safeHide('vocab-screen', true);
+        this.setDisplay('landing-screen', 'flex'); 
+        this.setDisplay('menu-screen', 'none');
+        this.setDisplay('main-container', 'none');
+        this.setDisplay('ipa-screen', 'none');
+        this.setDisplay('shadowing-screen', 'none');
+        this.setDisplay('vocab-screen', 'none');
     },
     
-    // Hàm phụ trợ bật/tắt an toàn
-    safeHide: function(id, hide) {
+    // HÀM QUAN TRỌNG: Không ép về Flex nữa, cho phép tuỳ chỉnh thuộc tính
+    setDisplay: function(id, val) {
         const el = document.getElementById(id);
-        if (el) el.style.display = hide ? 'none' : 'flex';
+        if (el) el.style.display = val;
     },
 
     saveUserName: function() {
@@ -384,9 +383,9 @@ const App = {
     openPart: function(partId) { 
         this.currentPart = partId; 
         AudioEngine.unlock(); 
-        this.safeHide('landing-screen', true);
-        this.safeHide('shadowing-screen', true);
-        this.safeHide('menu-screen', true);
+        this.setDisplay('landing-screen', 'none');
+        this.setDisplay('shadowing-screen', 'none');
+        this.setDisplay('menu-screen', 'none');
         
         if (partId === 1) { this.initPronunMenu(); } 
         else if (partId === 2) { this.initIntonationMenu(); } 
@@ -429,8 +428,8 @@ const App = {
         if(typeof IntonationData !== 'undefined') { IntonationData.forEach(item => { const btn = document.createElement('button'); btn.className = 'btn-menu'; btn.innerText = "🎬 " + item.title; btn.style.borderColor = "#2980b9"; btn.style.color = "#2980b9"; btn.onclick = function() { App.startShadowing(item); }; menuContainer.appendChild(btn); }); }
     },
     startShadowing: function(movieData) { 
-        this.safeHide('menu-screen', true);
-        this.safeHide('shadowing-screen', false);
+        this.setDisplay('menu-screen', 'none');
+        this.setDisplay('shadowing-screen', 'flex');
         ShadowingEngine.init(movieData); 
     },
     initVocabMenu: function() { 
@@ -446,8 +445,8 @@ const App = {
                 btn.className = 'btn-menu'; btn.innerText = "💬 " + topic.topic; 
                 btn.style.borderColor = topic.color; btn.style.color = topic.color; 
                 btn.onclick = function() { 
-                    App.safeHide('menu-screen', true);
-                    App.safeHide('vocab-screen', false);
+                    App.setDisplay('menu-screen', 'none');
+                    App.setDisplay('vocab-screen', 'flex');
                     if(typeof VocabEngine !== 'undefined') VocabEngine.init(topic); 
                 }; 
                 menuContainer.appendChild(btn); 
@@ -455,26 +454,29 @@ const App = {
         } 
     },
     openIPA: function() {
-        this.safeHide('menu-screen', true);
-        this.safeHide('ipa-screen', false);
+        this.setDisplay('menu-screen', 'none');
+        this.setDisplay('ipa-screen', 'flex');
         const content = document.getElementById('ipa-content'); 
         if(!content) return;
         content.innerHTML = ''; 
         for (const [sectionName, soundFiles] of Object.entries(IPA_DATA)) { const secTitle = document.createElement('div'); secTitle.className = 'ipa-sec-title'; secTitle.innerText = sectionName; if (sectionName.includes("Vowels")) secTitle.classList.add("bg-blue"); else secTitle.classList.add("bg-green"); content.appendChild(secTitle); const grid = document.createElement('div'); grid.className = 'ipa-grid'; soundFiles.forEach(fileName => { const item = document.createElement('div'); item.className = 'ipa-item'; item.innerHTML = `<img src="${fileName}.jpg" onerror="this.style.display='none'">`; item.onclick = function() { const audio = new Audio(fileName + ".wav"); audio.play(); this.style.transform = "scale(0.9)"; setTimeout(() => this.style.transform = "scale(1)", 150); }; grid.appendChild(item); }); content.appendChild(grid); content.appendChild(document.createElement('br')); }
     },
     closeIPA: function() { 
-        this.safeHide('ipa-screen', true);
-        this.safeHide('menu-screen', false);
+        this.setDisplay('ipa-screen', 'none');
+        this.setDisplay('menu-screen', 'flex');
     },
     startLesson: function(num) { 
         AudioEngine.unlock(); 
-        this.safeHide('menu-screen', true);
-        this.safeHide('main-container', false);
+        this.setDisplay('menu-screen', 'none');
+        
+        // --- CHÌA KHÓA NẰM Ở ĐÂY: Trả lại 'block' cho main-container ---
+        this.setDisplay('main-container', 'block'); 
+        
         if(typeof LearningEngine !== 'undefined') { LearningEngine.initLesson(num); LearningEngine.render(); }
     },
     enterGame: function() { 
-        this.safeHide('learning-screen', true);
-        this.safeHide('game-screen', false);
+        this.setDisplay('learning-screen', 'none');
+        this.setDisplay('game-screen', 'flex');
         if(typeof LearningEngine !== 'undefined') {
             const item = LearningEngine.currentData[LearningEngine.idx]; 
             let vocabList = []; 
@@ -489,12 +491,12 @@ const App = {
     exitGame: function() { GameEngine.stop(); if(typeof LearningEngine !== 'undefined') LearningEngine.render(); },
     goHome: function() { 
         AudioEngine.stopAllAndBlock(); GameEngine.stop(); ShadowingEngine.stopLoop(); 
-        this.safeHide('main-container', true);
-        this.safeHide('menu-screen', true);
-        this.safeHide('ipa-screen', true);
-        this.safeHide('shadowing-screen', true);
-        this.safeHide('vocab-screen', true);
-        this.safeHide('landing-screen', false);
+        this.setDisplay('main-container', 'none');
+        this.setDisplay('menu-screen', 'none');
+        this.setDisplay('ipa-screen', 'none');
+        this.setDisplay('shadowing-screen', 'none');
+        this.setDisplay('vocab-screen', 'none');
+        this.setDisplay('landing-screen', 'flex');
     }
 };
 
