@@ -263,7 +263,27 @@ const VocabEngine = {
         const vid = document.getElementById('v-info-display'); if(vid) vid.innerHTML = html;
         setTimeout(() => this.playCurrentWord(), 300);
     },
-    playCurrentWord: function() { const item = this.currentTopic.vocab[this.idx]; const audioSrc = item.speak + ".mp3"; AudioEngine.playSequence(audioSrc, null); },
+    playCurrentWord: function() {
+        const item = this.currentTopic.vocab[this.idx];
+        
+        // 1. Tạo audio cho Từ vựng
+        const wordAudio = new Audio(item.audio);
+        
+        wordAudio.onended = () => {
+            // 2. Sau khi phát xong Từ vựng, chờ 0.5s rồi phát Câu ví dụ
+            if (item.exampleAudio) {
+                setTimeout(() => {
+                    const exampleAudio = new Audio(item.exampleAudio);
+                    exampleAudio.play().catch(e => console.log("Thiếu file câu ví dụ"));
+                }, 500);
+            }
+        };
+
+        wordAudio.play().catch(e => {
+            console.log("Thiếu file audio từ vựng: " + item.audio);
+            // Nếu không có file mp3, có thể dùng TTS chữa cháy hoặc bỏ qua
+        });
+    },
     nav: function(d) { if (this.idx + d >= 0 && this.idx + d < this.currentTopic.vocab.length) { this.idx += d; this.renderLearnCard(); } },
     startListening: function() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Device not supported");
