@@ -604,22 +604,22 @@ const VocabData = [
             { img: "soft.jpg", speak: "soft", audio: "soft.mp3", exampleAudio: "It is soft.mp3" },
             { img: "hard.jpg", speak: "hard", audio: "hard.mp3", exampleAudio: "It is hard.mp3" }
         ],
-        // BÀI ĐỌC DÀNH RIÊNG CHO PART 3
+// BÀI ĐỌC DÀNH RIÊNG CHO PART 3
         reading: {
             title: "My Big Brother",
-            img: "reading_unit1.jpg", // Hình minh họa cho bài đọc (nếu có)
-            text: "This is my brother. His name is Nam. He is fifteen years old. Nam is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
-            audio: "reading_unit1.mp3", // File audio đọc mẫu cả đoạn văn
+            img: "reading_unit1.jpg", 
+            text: "This is my brother. His name is Ben. He is fifteen years old. Ben is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
+            audio: "reading_unit1.mp3", 
             quiz: [
                 // Part A: Yes/No
-                { type: "yesno", q: "1. Is Nam short?", a: "no" },
+                { type: "yesno", q: "1. Is Ben short?", a: "no" },
                 { type: "yesno", q: "2. Is he fifteen years old?", a: "yes" },
-                { type: "yesno", q: "3. Is Nam strong and brave?", a: "yes" },
-                // Part B: Short Answer (Mảng chứa các đáp án được chấp nhận)
+                { type: "yesno", q: "3. Is Ben strong and brave?", a: "yes" },
+                // Part B: Short Answer
                 { 
                     type: "write", 
                     q: "4. What is his name?", 
-                    a: ["his name is nam", "nam", "he is nam"] 
+                    a: ["his name is ben", "ben", "he is ben"] 
                 },
                 { 
                     type: "write", 
