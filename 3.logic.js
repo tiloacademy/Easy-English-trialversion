@@ -246,12 +246,39 @@ const LearningEngine = {
 /* --- VOCAB ENGINE --- */
 const VocabEngine = {
     currentTopic: null, idx: 0, gameQueue: [], retryQueue: [], currentQuestion: null, score: 0, streak: 0, isProcessing: false, 
+    
     init: function(topicData) {
         this.currentTopic = topicData;
         const vt = document.getElementById('vocab-title'); if(vt) vt.innerText = topicData.topic;
-        App.setDisplay('vocab-mode-menu', 'flex'); App.setDisplay('vocab-learn-container', 'none'); App.setDisplay('vocab-game-container', 'none');
+        
+        // Reset giao diện về Màn hình chọn 3 Part
+        App.setDisplay('vocab-part-menu', 'flex'); 
+        App.setDisplay('vocab-learn-container', 'none'); 
+        App.setDisplay('vocab-pacman-container', 'none'); 
+        App.setDisplay('vocab-reading-container', 'none');
     },
-    startLearn: function() { App.setDisplay('vocab-mode-menu', 'none'); App.setDisplay('vocab-learn-container', 'flex'); this.idx = 0; this.renderLearnCard(); },
+
+    // Kích hoạt Part 1: Học từ
+    startPart1: function() { 
+        App.setDisplay('vocab-part-menu', 'none'); 
+        App.setDisplay('vocab-learn-container', 'flex'); 
+        this.idx = 0; 
+        this.renderLearnCard(); 
+    },
+
+    // Kích hoạt Part 2: Game Pacman
+    startPart2: function() {
+        App.setDisplay('vocab-part-menu', 'none'); 
+        App.setDisplay('vocab-pacman-container', 'flex'); 
+        alert("Sẵn sàng cho Game Pac-man nhé? Mình sẽ thiết kế ở bước tiếp theo!");
+    },
+
+    // Kích hoạt Part 3: Reading & Quiz
+    startPart3: function() {
+        App.setDisplay('vocab-part-menu', 'none'); 
+        App.setDisplay('vocab-reading-container', 'flex'); 
+        ReadingEngine.init(this.currentTopic.reading);
+    },
     renderLearnCard: function() {
         const item = this.currentTopic.vocab[this.idx];
         const vi = document.getElementById('v-learn-img'); if(vi) vi.src = item.img;
@@ -335,6 +362,166 @@ const VocabEngine = {
     },
     showFloatingText: function(x, y, text, color) { const el = document.createElement('div'); el.className = 'floating-text'; el.innerText = text; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.color = color; el.style.fontSize = "30px"; el.style.zIndex = "9999"; document.body.appendChild(el); setTimeout(() => el.remove(), 800); },
     updateScore: function() { let fire = this.streak > 1 ? "🔥 x" + this.streak : ""; const gs = document.getElementById('game-status'); if(gs) gs.innerHTML = `Score: ${this.score} <span style="color:orange; margin-left:10px;">${fire}</span>`; }
+};
+
+/* --- READING ENGINE (CHẤM LỖI TỰ LUẬN & TRẮC NGHIỆM) --- */
+const ReadingEngine = {
+    currentData: null,
+    quizList: [],
+    currentQIdx: 0,
+    score: 0,
+    audio: null,
+
+    init: function(readingData) {
+        this.currentData = readingData;
+        this.quizList = readingData.quiz;
+        this.currentQIdx = 0;
+        this.score = 0;
+
+        document.getElementById('read-title').innerText = readingData.title;
+        document.getElementById('read-img').src = readingData.img;
+        document.getElementById('read-text').innerText = readingData.text;
+
+        this.audio = new Audio(readingData.audio);
+
+        this.renderQuestion();
+    },
+
+    readAloud: function() {
+        if (this.audio) {
+            this.audio.play().catch(e => alert("Không tìm thấy file audio: " + this.currentData.audio));
+        }
+    },
+
+    renderQuestion: function() {
+        if (this.currentQIdx >= this.quizList.length) {
+            // Hoàn thành bài Đọc
+            AudioEngine.playEffect('win');
+            alert(`🎉 CHÚC MỪNG! Bạn đã hoàn thành bài đọc.\nĐiểm của bạn: ${this.score}/${this.quizList.length}`);
+            StorageEngine.setGems(StorageEngine.getGems() + (this.score * 5)); // Cộng 5 gem cho mỗi câu đúng
+            App.updateGemDisplay();
+            App.openPart(3); // Quay lại menu chính
+            return;
+        }
+
+        const qData = this.quizList[this.currentQIdx];
+        document.getElementById('quiz-status').innerText = `Question ${this.currentQIdx + 1}/${this.quizList.length}`;
+        document.getElementById('quiz-question').innerText = qData.q;
+        
+        const feedbackEl = document.getElementById('quiz-feedback');
+        feedbackEl.innerText = "";
+        feedbackEl.style.color = "#333";
+
+        const interactiveArea = document.getElementById('quiz-interactive-area');
+        interactiveArea.innerHTML = '';
+
+        if (qData.type === "yesno") {
+            interactiveArea.innerHTML = `
+                <button class="btn-menu" style="width: 120px; border-color: #27ae60; color: #27ae60;" onclick="ReadingEngine.checkYesNo('yes')">YES</button>
+                <button class="btn-menu" style="width: 120px; border-color: #e74c3c; color: #e74c3c;" onclick="ReadingEngine.checkYesNo('no')">NO</button>
+            `;
+        } else if (qData.type === "write") {
+            interactiveArea.innerHTML = `
+                <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <input type="text" id="write-answer-input" placeholder="Type your answer here..." style="font-size: 20px; padding: 10px; width: 90%; max-width: 400px; border-radius: 10px; border: 2px solid #3498db; margin-bottom: 10px; text-align: center;">
+                    <button class="btn-action btn-listen" style="width: 200px; border-radius: 20px;" onclick="ReadingEngine.checkWrite()">Submit</button>
+                </div>
+            `;
+        }
+    },
+
+    checkYesNo: function(userChoice) {
+        const qData = this.quizList[this.currentQIdx];
+        const feedbackEl = document.getElementById('quiz-feedback');
+        
+        if (userChoice === qData.a.toLowerCase()) {
+            AudioEngine.playEffect('correct');
+            feedbackEl.innerText = "Tuyệt vời! Chính xác 100%. 🎉";
+            feedbackEl.style.color = "#27ae60";
+            this.score++;
+            setTimeout(() => { this.currentQIdx++; this.renderQuestion(); }, 1500);
+        } else {
+            AudioEngine.playEffect('wrong');
+            feedbackEl.innerText = "Chưa đúng rồi. Bạn thử đọc lại đoạn văn nhé!";
+            feedbackEl.style.color = "#e74c3c";
+        }
+    },
+
+    checkWrite: function() {
+        const inputEl = document.getElementById('write-answer-input');
+        const userInput = inputEl.value;
+        const qData = this.quizList[this.currentQIdx];
+        const feedbackEl = document.getElementById('quiz-feedback');
+
+        const result = this.analyzeWrittenAnswer(userInput, qData.a);
+
+        if (result.status === "correct") {
+            AudioEngine.playEffect('correct');
+            feedbackEl.innerText = result.msg;
+            feedbackEl.style.color = "#27ae60";
+            this.score++;
+            inputEl.disabled = true;
+            setTimeout(() => { this.currentQIdx++; this.renderQuestion(); }, 2000);
+        } else {
+            AudioEngine.playEffect('wrong');
+            feedbackEl.innerText = result.msg;
+            feedbackEl.style.color = "#e74c3c";
+            inputEl.style.animation = "shake 0.5s";
+            setTimeout(() => inputEl.style.animation = "", 500);
+        }
+    },
+
+    analyzeWrittenAnswer: function(userInput, acceptedAnswersArray) {
+        // BƯỚC 1: Làm sạch (Xóa dấu câu, in thường, bỏ khoảng trắng thừa)
+        const clean = (str) => str.toLowerCase().replace(/[.,?!]/g, "").trim().replace(/\s+/g, " ");
+        const cleanInput = clean(userInput);
+        
+        if (cleanInput === "") return { status: "wrong", msg: "Bạn chưa nhập câu trả lời kìa!" };
+        const cleanAccepted = acceptedAnswersArray.map(a => clean(a));
+
+        // BƯỚC 2: Chấm đúng tuyệt đối
+        if (cleanAccepted.includes(cleanInput)) {
+            return { status: "correct", msg: "Tuyệt vời! Bạn viết đúng 100%. 🎉" };
+        }
+
+        // BƯỚC 3: Tìm đáp án mục tiêu gần giống nhất
+        let bestMatch = cleanAccepted[0];
+        let maxOverlap = -1;
+        let inputWords = cleanInput.split(" ");
+        
+        for (let ans of cleanAccepted) {
+            let ansWords = ans.split(" ");
+            let overlap = 0;
+            for (let w of inputWords) { if (ansWords.includes(w)) overlap++; }
+            if (overlap > maxOverlap) { maxOverlap = overlap; bestMatch = ans; }
+        }
+
+        let targetWords = bestMatch.split(" ");
+
+        // BƯỚC 4: Bắt lỗi chi tiết
+        // 4.1 Lỗi thiếu từ
+        if (inputWords.length < targetWords.length) {
+            let missingWord = targetWords.find(w => !inputWords.includes(w));
+            if (missingWord) return { status: "wrong", msg: `Oops! Bạn đang viết thiếu từ '${missingWord}' rồi.` };
+            return { status: "wrong", msg: `Bạn đang viết thiếu từ, hãy kiểm tra lại nhé.` };
+        }
+
+        // 4.2 Lỗi dư từ
+        if (inputWords.length > targetWords.length) {
+            let extraWord = inputWords.find(w => !targetWords.includes(w));
+            if (extraWord) return { status: "wrong", msg: `Bạn đang viết thừa từ '${extraWord}' ở đâu đó.` };
+            return { status: "wrong", msg: `Câu của bạn đang bị dư từ rồi.` };
+        }
+
+        // 4.3 Lỗi sai chính tả
+        for (let i = 0; i < targetWords.length; i++) {
+            if (inputWords[i] !== targetWords[i]) {
+                return { status: "wrong", msg: `Chữ '${inputWords[i]}' sai rồi. Bạn sửa lại thành '${targetWords[i]}' xem!` };
+            }
+        }
+
+        return { status: "wrong", msg: "Chưa chính xác. Thử lại nhé!" };
+    }
 };
 
 /* --- APP CONTROLLER (CHỐNG LỖI CSS & BẢO VỆ GIAO DIỆN) --- */
