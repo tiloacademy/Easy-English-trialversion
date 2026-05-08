@@ -579,25 +579,54 @@ const IntonationData = [
     }
 ];
 
-/* --- PART 3: VOCABULARY & READING --- */
+/* --- PART 3: FLUENCY JOURNEY (8-MONTH CURRICULUM) --- */
 const VocabData = [
     {
-        id: 1,
-        topic: "Animals",
-        color: "#FF9800",
+        id: "unit_1",
+        topic: "Month 1: Who am I?",
+        desc: "Description & Adjectives",
+        color: "#e67e22",
+        // TỪ VỰNG DÀNH CHO PART 1 & PART 2
         vocab: [
-            { img: "cat.jpg", speak: "cat", mean: "Cat" },
-            { img: "dog.jpg", speak: "dog", mean: "Dog" },
-            { img: "duck.jpg", speak: "duck", mean: "Duck" },
-            { img: "pig.jpg", speak: "pig", mean: "Pig" }
+            { img: "big.jpg", speak: "big", audio: "big.mp3", exampleAudio: "It is big.mp3" },
+            { img: "small.jpg", speak: "small", audio: "small.mp3", exampleAudio: "It is small.mp3" },
+            { img: "long.jpg", speak: "long", audio: "long.mp3", exampleAudio: "He is long.mp3" },
+            { img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "He is short.mp3" },
+            { img: "fat.jpg", speak: "fat", audio: "fat.mp3", exampleAudio: "She is fat.mp3" },
+            { img: "thin.jpg", speak: "thin", audio: "thin.mp3", exampleAudio: "She is thin.mp3" },
+            { img: "young.jpg", speak: "young", audio: "young.mp3", exampleAudio: "She is young.mp3" },
+            { img: "old.jpg", speak: "old", audio: "old.mp3", exampleAudio: "She is old.mp3" },
+            { img: "strong.jpg", speak: "strong", audio: "strong.mp3", exampleAudio: "He is strong.mp3" },
+            { img: "weak.jpg", speak: "weak", audio: "weak.mp3", exampleAudio: "He is weak.mp3" },
+            { img: "cute.jpg", speak: "cute", audio: "cute.mp3", exampleAudio: "I am cute.mp3" },
+            { img: "ugly.jpg", speak: "ugly", audio: "ugly.mp3", exampleAudio: "It is ugly.mp3" },
+            { img: "fierce.jpg", speak: "fierce", audio: "fierce.mp3", exampleAudio: "You are fierce.mp3" },
+            { img: "soft.jpg", speak: "soft", audio: "soft.mp3", exampleAudio: "It is soft.mp3" },
+            { img: "hard.jpg", speak: "hard", audio: "hard.mp3", exampleAudio: "It is hard.mp3" }
         ],
+        // BÀI ĐỌC DÀNH RIÊNG CHO PART 3
         reading: {
-            title: "My Pet",
-            text: "I have a cat. It is fat. It likes to sleep.",
-            audio: "reading_animals.mp3"
-        },
-        quiz: [
-            { question: "What does the cat like?", options: ["Run", "Sleep", "Eat"], answer: 1 }
-        ]
+            title: "My Big Brother",
+            img: "reading_unit1.jpg", // Hình minh họa cho bài đọc (nếu có)
+            text: "This is my brother. His name is Nam. He is fifteen years old. Nam is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
+            audio: "reading_unit1.mp3", // File audio đọc mẫu cả đoạn văn
+            quiz: [
+                // Part A: Yes/No
+                { type: "yesno", q: "1. Is Nam short?", a: "no" },
+                { type: "yesno", q: "2. Is he fifteen years old?", a: "yes" },
+                { type: "yesno", q: "3. Is Nam strong and brave?", a: "yes" },
+                // Part B: Short Answer (Mảng chứa các đáp án được chấp nhận)
+                { 
+                    type: "write", 
+                    q: "4. What is his name?", 
+                    a: ["his name is nam", "nam", "he is nam"] 
+                },
+                { 
+                    type: "write", 
+                    q: "5. Why is he handsome?", 
+                    a: ["because he has a nice smile", "he has a nice smile", "because of his nice smile"] 
+                }
+            ]
+        }
     }
 ];
