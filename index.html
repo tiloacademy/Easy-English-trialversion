@@ -84,16 +84,20 @@
         <button class="btn-back-ipa" onclick="App.closeIPA()"> ◀ Back</button>
     </div>
 
-    <div id="vocab-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; flex-direction: column; z-index: 10;">
+<div id="vocab-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; flex-direction: column; z-index: 10;">
         <div class="top-bar">
             <button class="btn-home" onclick="App.openPart(3)"> 🔙 </button>
             <div class="header-title" id="vocab-title">Topic</div>
             <div style="width: 40px;"></div>
         </div>
-        <div id="vocab-mode-menu" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
-            <button class="btn-menu" style="border-color: #27ae60; color: #27ae60;" onclick="VocabEngine.startLearn()">📖 Learn Words</button>
-            <button class="btn-menu" style="border-color: #e67e22; color: #e67e22;" onclick="VocabEngine.startGame()">🎮 Play Game</button>
+
+        <div id="vocab-part-menu" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; background: #E3F2FD;">
+            <div style="font-size: 20px; font-weight: 900; color: #1565C0; margin-bottom: 10px;">Choose a challenge:</div>
+            <button class="btn-menu" style="border-color: #27ae60; color: #27ae60;" onclick="VocabEngine.startPart1()">📖 Part 1: Word Master</button>
+            <button class="btn-menu" style="border-color: #f39c12; color: #f39c12;" onclick="VocabEngine.startPart2()">🏃‍♂️ Part 2: Pac-man Spell</button>
+            <button class="btn-menu" style="border-color: #8e44ad; color: #8e44ad;" onclick="VocabEngine.startPart3()">📝 Part 3: Read & Write</button>
         </div>
+
         <div id="vocab-learn-container" style="display: none; flex: 1; flex-direction: column; align-items: center; padding: 20px;">
             <img id="v-learn-img" src="" style="max-height: 200px; border-radius: 15px; margin-bottom: 20px;">
             <div id="v-info-display" style="min-height: 100px;"></div>
@@ -108,9 +112,50 @@
                 <button class="btn-nav" onclick="VocabEngine.nav(1)"> ▶ </button>
             </div>
         </div>
-        <div id="vocab-game-container" style="display: none; flex: 1; flex-direction: column; align-items: center; background: #fff3e0; padding: 10px;">
-            <h2 id="game-status" style="color: #d35400;">Score: 0</h2>
-            <div id="vocab-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; margin-top: 20px;"></div>
+
+        <div id="vocab-pacman-container" style="display: none; flex: 1; flex-direction: column; align-items: center; background: #2c3e50;">
+            <div style="width: 100%; display: flex; justify-content: space-between; padding: 10px 20px; color: white; font-weight: bold; font-size: 20px;">
+                <span>Score: <span id="pacman-score" style="color: #f1c40f;">0</span></span>
+                <span>Fruits left: <span id="pacman-fruits">0</span></span>
+            </div>
+            
+            <div id="pacman-board" style="width: 95vw; max-width: 400px; aspect-ratio: 1/1; background: #34495e; position: relative; border: 4px solid #f39c12; border-radius: 10px; overflow: hidden; display: grid;"></div>
+            
+            <div id="pacman-dpad" style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; opacity: 0.8;">
+                <div></div><button class="btn-nav" onclick="PacmanEngine.changeDir('up')">⬆️</button><div></div>
+                <button class="btn-nav" onclick="PacmanEngine.changeDir('left')">⬅️</button>
+                <button class="btn-nav" onclick="PacmanEngine.changeDir('down')">⬇️</button>
+                <button class="btn-nav" onclick="PacmanEngine.changeDir('right')">➡️</button>
+            </div>
+
+            <div id="spell-modal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+                <img id="spell-img" src="" style="width: 150px; height: 150px; border-radius: 15px; border: 4px solid white; margin-bottom: 20px;">
+                <button class="btn-action btn-listen" onclick="PacmanEngine.playSpellAudio()" style="margin-bottom: 20px;"> 🔊 Listen Again </button>
+                <input type="text" id="spell-input" placeholder="Type the word here..." style="font-size: 24px; padding: 10px; width: 80%; text-align: center; border-radius: 10px; border: none; margin-bottom: 20px;">
+                <button class="btn-action btn-mic" onclick="PacmanEngine.checkSpelling()"> Check Answer </button>
+                <div id="spell-feedback" style="font-size: 24px; font-weight: bold; margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <div id="vocab-reading-container" style="display: none; flex: 1; flex-direction: column; background: #fdfefe;">
+            
+            <div style="flex: 4; padding: 15px; overflow-y: auto; border-bottom: 3px dashed #bbdefb; background: white;">
+                <h2 id="read-title" style="color: #2980b9; margin-top: 0; text-align: center;">Title</h2>
+                <div style="display: flex; gap: 15px; align-items: flex-start;">
+                    <img id="read-img" src="" style="width: 100px; height: 100px; border-radius: 10px; object-fit: cover; flex-shrink: 0;">
+                    <p id="read-text" style="font-size: 18px; line-height: 1.6; color: #333; margin: 0;"></p>
+                </div>
+                <button class="btn-action btn-listen" style="width: 100%; margin-top: 15px; border-radius: 10px;" onclick="ReadingEngine.readAloud()"> 🔊 Read Aloud </button>
+            </div>
+
+            <div style="flex: 5; padding: 15px; background: #f4f6f7; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div id="quiz-status" style="font-weight: bold; color: #7f8c8d; margin-bottom: 10px;">Question 1/5</div>
+                <div id="quiz-question" style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #2c3e50;">Question goes here?</div>
+                
+                <div id="quiz-interactive-area" style="width: 100%; display: flex; justify-content: center; gap: 15px;"></div>
+                
+                <div id="quiz-feedback" style="font-size: 20px; font-weight: bold; margin-top: 20px; height: 30px;"></div>
+            </div>
         </div>
     </div>
 
