@@ -238,3 +238,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .lesson-dot.completed { background: #4CAF50; /* Màu xanh: Đã hoàn thành */ }
 .lesson-dot.active { transform: scale(1.4); border-color: #2196F3; background: white; /* Đang học */ }
 .lesson-dot.completed.active { border-color: #2196F3; background: #4CAF50; }
+
+/* Hiệu ứng rung khi gõ sai đáp án */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); border-color: #e74c3c; background-color: #ffebee;}
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); border-color: #e74c3c; }
+  100% { transform: translateX(0); }
+}
