@@ -583,7 +583,7 @@ const IntonationData = [
 const VocabData = [
     {
         id: "unit_1",
-        topic: "Month 1: Who am I?",
+        topic: "Unit 1: Description",
         desc: "Description & Adjectives",
         color: "#e67e22",
         // TỪ VỰNG DÀNH CHO PART 1 & PART 2
@@ -608,18 +608,18 @@ const VocabData = [
         reading: {
             title: "My Big Brother",
             img: "reading_unit1.jpg", 
-            text: "This is my brother. His name is Ben. He is fifteen years old. Ben is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
+            text: "This is my brother. His name is Nam. He is fifteen years old. Nam is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
             audio: "reading_unit1.mp3", 
             quiz: [
                 // Part A: Yes/No
-                { type: "yesno", q: "1. Is Ben short?", a: "no" },
+                { type: "yesno", q: "1. Is Nam short?", a: "no" },
                 { type: "yesno", q: "2. Is he fifteen years old?", a: "yes" },
-                { type: "yesno", q: "3. Is Ben strong and brave?", a: "yes" },
+                { type: "yesno", q: "3. Is Nam weak and brave?", a: "no" },
                 // Part B: Short Answer
                 { 
                     type: "write", 
                     q: "4. What is his name?", 
-                    a: ["his name is ben", "ben", "he is ben"] 
+                    a: ["his name is nam", "nam", "he is nam"] 
                 },
                 { 
                     type: "write", 
