@@ -632,7 +632,18 @@ const App = {
         if(typeof VocabData !== 'undefined') { 
             VocabData.forEach(topic => { 
                 const btn = document.createElement('button'); 
-                btn.className = 'btn-menu'; btn.innerText = "💬 " + topic.topic; 
+                btn.className = 'btn-menu'; 
+                
+                // TÍNH TOÁN % TIẾN ĐỘ
+                const totalItems = topic.vocab.length;
+                const percent = StorageEngine.getLessonProgress(topic.id, totalItems);
+
+                btn.innerHTML = `
+                    💬 ${topic.topic}
+                    <span class="lesson-progress-text">${percent}% completed (hoàn thành)</span>
+                    <div class="menu-btn-progress"><div class="menu-btn-fill" style="width:${percent}%"></div></div>
+                `;
+                
                 btn.style.borderColor = topic.color; btn.style.color = topic.color; 
                 btn.onclick = function() { 
                     App.setDisplay('menu-screen', 'none');
