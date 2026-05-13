@@ -279,15 +279,59 @@ const VocabEngine = {
         App.setDisplay('vocab-reading-container', 'flex'); 
         ReadingEngine.init(this.currentTopic.reading);
     },
-    renderLearnCard: function() {
+renderLearnCard: function() {
         const item = this.currentTopic.vocab[this.idx];
         const vi = document.getElementById('v-learn-img'); if(vi) vi.src = item.img;
         const vs = document.getElementById('v-stars'); if(vs) { vs.innerText = "☆☆☆☆☆"; vs.className = "stars"; }
         const vf = document.getElementById('v-feedback'); if(vf) vf.innerText = "...";
-        let html = '<div class="word-group">';
-        if (item.parts) { item.parts.forEach(p => { const ipa = p.i || "&nbsp;"; html += `<div class="char-block"><div class="cb-ipa" style="font-size:18px;">${ipa}</div><div class="cb-text" style="font-size:32px;">${p.t}</div></div>`; }); }
+        
+        // --- HÀM PHỤ TRỢ: VẼ TỪNG DÒNG IPA ---
+        const renderParts = (partsArray, isSentence) => {
+            if (!partsArray) return '';
+            let html = ''; 
+            let currentWordBuffer = [];
+            partsArray.forEach(p => { 
+                if (p.t === " ") { 
+                    if (currentWordBuffer.length > 0) { 
+                        html += `<div class="word-group">`; 
+                        currentWordBuffer.forEach(subP => { 
+                            const ipaHtml = subP.i || "&nbsp;"; 
+                            html += `<div class="char-block"><div class="${isSentence ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${isSentence ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; 
+                        }); 
+                        html += `</div>`; 
+                        currentWordBuffer = []; 
+                    } 
+                } else { 
+                    currentWordBuffer.push(p); 
+                } 
+            });
+            if (currentWordBuffer.length > 0) { 
+                html += `<div class="word-group">`; 
+                currentWordBuffer.forEach(subP => { 
+                    const ipaHtml = subP.i || "&nbsp;"; 
+                    html += `<div class="char-block"><div class="${isSentence ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${isSentence ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; 
+                }); 
+                html += `</div>`; 
+            }
+            return html;
+        };
+
+        // --- GHÉP 2 DÒNG LÊN GIAO DIỆN ---
+        let html = '';
+        
+        // Dòng 1: Từ vựng (Chữ to)
+        html += '<div style="display:flex; justify-content:center; width:100%; margin-bottom: 25px;">';
+        html += renderParts(item.wordParts, false);
         html += '</div>';
-        const vid = document.getElementById('v-info-display'); if(vid) vid.innerHTML = html;
+
+        // Dòng 2: Câu ví dụ (Chữ nhỏ hơn)
+        html += '<div style="display:flex; justify-content:center; width:100%; flex-wrap: wrap;">';
+        html += renderParts(item.sentParts, true);
+        html += '</div>';
+
+        const vid = document.getElementById('v-info-display'); 
+        if(vid) vid.innerHTML = html;
+        
         setTimeout(() => this.playCurrentWord(), 300);
     },
     playCurrentWord: function() {
