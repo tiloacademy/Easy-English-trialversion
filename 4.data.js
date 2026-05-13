@@ -586,8 +586,9 @@ const VocabData = [
         topic: "Unit 1: Description",
         desc: "Description & Adjectives",
         color: "#e67e22",
-        // TỪ VỰNG & CÂU VÍ DỤ (Đã chẻ nhỏ IPA làm 2 phần: wordParts và sentParts)
+        // TỪ VỰNG DÀNH CHO PART 1 & PART 2 (29 TỪ CÓ TRÁI NGHĨA)
         vocab: [
+            // Cặp 1: Kích thước
             {
                 img: "big.jpg", speak: "big", audio: "big.mp3", exampleAudio: "It is big.mp3",
                 wordParts: [{t:"b", i:"b"}, {t:"i", i:"ɪ"}, {t:"g", i:"g"}],
@@ -598,16 +599,62 @@ const VocabData = [
                 wordParts: [{t:"s", i:"s"}, {t:"m", i:"m"}, {t:"a", i:"ɔː"}, {t:"ll", i:"l"}],
                 sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"small.", i:"smɔːl"}]
             },
+            // Cặp 2: Chiều dài
             {
-                img: "long.jpg", speak: "long", audio: "long.mp3", exampleAudio: "He is long.mp3",
+                img: "long.jpg", speak: "long", audio: "long.mp3", exampleAudio: "It is long.mp3",
                 wordParts: [{t:"l", i:"l"}, {t:"o", i:"ɔː"}, {t:"ng", i:"ŋ"}],
-                sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"long.", i:"lɔːŋ"}]
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"long.", i:"lɔːŋ"}]
             },
             {
-                img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "He is short.mp3",
+                img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "It is short.mp3",
                 wordParts: [{t:"sh", i:"ʃ"}, {t:"or", i:"ɔːr"}, {t:"t", i:"t"}],
-                sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"short.", i:"ʃɔːrt"}]
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"short.", i:"ʃɔːrt"}]
             },
+            // Cặp 3: Trọng lượng
+            {
+                img: "heavy.jpg", speak: "heavy", audio: "heavy.mp3", exampleAudio: "It is heavy.mp3",
+                wordParts: [{t:"h", i:"h"}, {t:"ea", i:"e"}, {t:"v", i:"v"}, {t:"y", i:"i"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"heavy.", i:"ˈhev.i"}]
+            },
+            {
+                img: "light.jpg", speak: "light", audio: "light.mp3", exampleAudio: "It is light.mp3",
+                wordParts: [{t:"l", i:"l"}, {t:"igh", i:"aɪ"}, {t:"t", i:"t"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"light.", i:"laɪt"}]
+            },
+            // Cặp 4: Tốc độ
+            {
+                img: "fast.jpg", speak: "fast", audio: "fast.mp3", exampleAudio: "It is fast.mp3",
+                wordParts: [{t:"f", i:"f"}, {t:"a", i:"æ"}, {t:"s", i:"s"}, {t:"t", i:"t"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"fast.", i:"fæst"}]
+            },
+            {
+                img: "slow.jpg", speak: "slow", audio: "slow.mp3", exampleAudio: "It is slow.mp3",
+                wordParts: [{t:"s", i:"s"}, {t:"l", i:"l"}, {t:"ow", i:"oʊ"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"slow.", i:"sloʊ"}]
+            },
+            // Cặp 5: Độ cứng
+            {
+                img: "hard.jpg", speak: "hard", audio: "hard.mp3", exampleAudio: "It is hard.mp3",
+                wordParts: [{t:"h", i:"h"}, {t:"ar", i:"ɑːr"}, {t:"d", i:"d"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"hard.", i:"hɑːrd"}]
+            },
+            {
+                img: "soft.jpg", speak: "soft", audio: "soft.mp3", exampleAudio: "It is soft.mp3",
+                wordParts: [{t:"s", i:"s"}, {t:"o", i:"ɑ"}, {t:"f", i:"f"}, {t:"t", i:"t"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"soft.", i:"sɑːft"}]
+            },
+            // Cặp 6: Vệ sinh
+            {
+                img: "clean.jpg", speak: "clean", audio: "clean.mp3", exampleAudio: "They are clean.mp3",
+                wordParts: [{t:"c", i:"k"}, {t:"l", i:"l"}, {t:"ea", i:"iː"}, {t:"n", i:"n"}],
+                sentParts: [{t:"They", i:"ðeɪ"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"clean.", i:"kliːn"}]
+            },
+            {
+                img: "dirty.jpg", speak: "dirty", audio: "dirty.mp3", exampleAudio: "They are dirty.mp3",
+                wordParts: [{t:"d", i:"d"}, {t:"ir", i:"ɜːr"}, {t:"t", i:"t"}, {t:"y", i:"i"}],
+                sentParts: [{t:"They", i:"ðeɪ"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"dirty.", i:"ˈdɜːr.ti"}]
+            },
+            // Cặp 7: Ngoại hình (Ốm/Mập)
             {
                 img: "fat.jpg", speak: "fat", audio: "fat.mp3", exampleAudio: "She is fat.mp3",
                 wordParts: [{t:"f", i:"f"}, {t:"a", i:"æ"}, {t:"t", i:"t"}],
@@ -618,6 +665,7 @@ const VocabData = [
                 wordParts: [{t:"th", i:"θ"}, {t:"i", i:"ɪ"}, {t:"n", i:"n"}],
                 sentParts: [{t:"She", i:"ʃiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"thin.", i:"θɪn"}]
             },
+            // Cặp 8: Tuổi tác
             {
                 img: "young.jpg", speak: "young", audio: "young.mp3", exampleAudio: "She is young.mp3",
                 wordParts: [{t:"y", i:"j"}, {t:"ou", i:"ʌ"}, {t:"ng", i:"ŋ"}],
@@ -628,6 +676,7 @@ const VocabData = [
                 wordParts: [{t:"o", i:"oʊ"}, {t:"l", i:"l"}, {t:"d", i:"d"}],
                 sentParts: [{t:"She", i:"ʃiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"old.", i:"oʊld"}]
             },
+            // Cặp 9: Sức mạnh
             {
                 img: "strong.jpg", speak: "strong", audio: "strong.mp3", exampleAudio: "He is strong.mp3",
                 wordParts: [{t:"s", i:"s"}, {t:"t", i:"t"}, {t:"r", i:"r"}, {t:"o", i:"ɔː"}, {t:"ng", i:"ŋ"}],
@@ -638,30 +687,64 @@ const VocabData = [
                 wordParts: [{t:"w", i:"w"}, {t:"ea", i:"iː"}, {t:"k", i:"k"}],
                 sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"weak.", i:"wiːk"}]
             },
+            // Cặp 10: Âm thanh
             {
-                img: "cute.jpg", speak: "cute", audio: "cute.mp3", exampleAudio: "I am cute.mp3",
-                wordParts: [{t:"c", i:"k"}, {t:"u", i:"juː"}, {t:"t", i:"t"}, {t:"e", i:""}],
-                sentParts: [{t:"I", i:"aɪ"}, {t:" "}, {t:"am", i:"æm"}, {t:" "}, {t:"cute.", i:"kjuːt"}]
+                img: "noisy.jpg", speak: "noisy", audio: "noisy.mp3", exampleAudio: "He is noisy.mp3",
+                wordParts: [{t:"n", i:"n"}, {t:"oi", i:"ɔɪ"}, {t:"s", i:"z"}, {t:"y", i:"i"}],
+                sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"noisy.", i:"ˈnɔɪ.zi"}]
             },
             {
-                img: "ugly.jpg", speak: "ugly", audio: "ugly.mp3", exampleAudio: "It is ugly.mp3",
-                wordParts: [{t:"u", i:"ʌ"}, {t:"g", i:"g"}, {t:"l", i:"l"}, {t:"y", i:"i"}],
-                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"ugly.", i:"ˈʌg.li"}]
+                img: "quiet.jpg", speak: "quiet", audio: "quiet.mp3", exampleAudio: "She is quiet.mp3",
+                wordParts: [{t:"q", i:"k"}, {t:"u", i:"w"}, {t:"i", i:"aɪ"}, {t:"e", i:"ə"}, {t:"t", i:"t"}],
+                sentParts: [{t:"She", i:"ʃiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"quiet.", i:"ˈkwaɪ.ət"}]
             },
+            // Cặp 11: Tính cách
             {
                 img: "fierce.jpg", speak: "fierce", audio: "fierce.mp3", exampleAudio: "You are fierce.mp3",
                 wordParts: [{t:"f", i:"f"}, {t:"ier", i:"ɪr"}, {t:"c", i:"s"}, {t:"e", i:""}],
                 sentParts: [{t:"You", i:"juː"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"fierce.", i:"fɪrs"}]
             },
             {
-                img: "soft.jpg", speak: "soft", audio: "soft.mp3", exampleAudio: "It is soft.mp3",
-                wordParts: [{t:"s", i:"s"}, {t:"o", i:"ɑ"}, {t:"f", i:"f"}, {t:"t", i:"t"}],
-                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"soft.", i:"sɑːft"}]
+                img: "kind.jpg", speak: "kind", audio: "kind.mp3", exampleAudio: "You are kind.mp3",
+                wordParts: [{t:"k", i:"k"}, {t:"i", i:"aɪ"}, {t:"n", i:"n"}, {t:"d", i:"d"}],
+                sentParts: [{t:"You", i:"juː"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"kind.", i:"kaɪnd"}]
+            },
+            // Cặp 12: Đáng yêu / Xấu xí (It)
+            {
+                img: "cute.jpg", speak: "cute", audio: "cute.mp3", exampleAudio: "It is cute.mp3",
+                wordParts: [{t:"c", i:"k"}, {t:"u", i:"juː"}, {t:"t", i:"t"}, {t:"e", i:""}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"cute.", i:"kjuːt"}]
             },
             {
-                img: "hard.jpg", speak: "hard", audio: "hard.mp3", exampleAudio: "It is hard.mp3",
-                wordParts: [{t:"h", i:"h"}, {t:"ar", i:"ɑːr"}, {t:"d", i:"d"}],
-                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"hard.", i:"hɑːrd"}]
+                img: "ugly.jpg", speak: "ugly", audio: "ugly.mp3", exampleAudio: "It is ugly.mp3",
+                wordParts: [{t:"u", i:"ʌ"}, {t:"g", i:"g"}, {t:"l", i:"l"}, {t:"y", i:"i"}],
+                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"ugly.", i:"ˈʌg.li"}]
+            },
+            // Từ bổ sung không có cặp trực tiếp, hoặc dùng câu khác
+            {
+                img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "He is short.mp3",
+                wordParts: [{t:"sh", i:"ʃ"}, {t:"or", i:"ɔːr"}, {t:"t", i:"t"}],
+                sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"short.", i:"ʃɔːrt"}]
+            },
+            {
+                img: "cute.jpg", speak: "cute", audio: "cute.mp3", exampleAudio: "I am cute.mp3",
+                wordParts: [{t:"c", i:"k"}, {t:"u", i:"juː"}, {t:"t", i:"t"}, {t:"e", i:""}],
+                sentParts: [{t:"I", i:"aɪ"}, {t:" "}, {t:"am", i:"æm"}, {t:" "}, {t:"cute.", i:"kjuːt"}]
+            },
+            {
+                img: "handsome.jpg", speak: "handsome", audio: "handsome.mp3", exampleAudio: "You are handsome.mp3",
+                wordParts: [{t:"h", i:"h"}, {t:"a", i:"æ"}, {t:"n", i:"n"}, {t:"d", i:""}, {t:"s", i:"s"}, {t:"o", i:"ə"}, {t:"m", i:"m"}, {t:"e", i:""}],
+                sentParts: [{t:"You", i:"juː"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"handsome.", i:"ˈhæn.səm"}]
+            },
+            {
+                img: "brave.jpg", speak: "brave", audio: "brave.mp3", exampleAudio: "I am brave.mp3",
+                wordParts: [{t:"b", i:"b"}, {t:"r", i:"r"}, {t:"a", i:"eɪ"}, {t:"v", i:"v"}, {t:"e", i:""}],
+                sentParts: [{t:"I", i:"aɪ"}, {t:" "}, {t:"am", i:"æm"}, {t:" "}, {t:"brave.", i:"breɪv"}]
+            },
+            {
+                img: "funny.jpg", speak: "funny", audio: "funny.mp3", exampleAudio: "I am funny.mp3",
+                wordParts: [{t:"f", i:"f"}, {t:"u", i:"ʌ"}, {t:"nn", i:"n"}, {t:"y", i:"i"}],
+                sentParts: [{t:"I", i:"aɪ"}, {t:" "}, {t:"am", i:"æm"}, {t:" "}, {t:"funny.", i:"ˈfʌn.i"}]
             }
         ],
         // BÀI ĐỌC DÀNH RIÊNG CHO PART 3
@@ -671,11 +754,21 @@ const VocabData = [
             text: "This is my brother. His name is Nam. He is fifteen years old. Nam is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
             audio: "reading_unit1.mp3", 
             quiz: [
+                // Part A: Yes/No
                 { type: "yesno", q: "1. Is Nam short?", a: "no" },
                 { type: "yesno", q: "2. Is he fifteen years old?", a: "yes" },
                 { type: "yesno", q: "3. Is Nam weak and brave?", a: "no" },
-                { type: "write", q: "4. What is his name?", a: ["his name is nam", "nam", "he is nam"] },
-                { type: "write", q: "5. Why is he handsome?", a: ["because he has a nice smile", "he has a nice smile", "because of his nice smile"] }
+                // Part B: Short Answer
+                { 
+                    type: "write", 
+                    q: "4. What is his name?", 
+                    a: ["his name is nam", "nam", "he is nam"] 
+                },
+                { 
+                    type: "write", 
+                    q: "5. Why is he handsome?", 
+                    a: ["because he has a nice smile", "he has a nice smile", "because of his nice smile"] 
+                }
             ]
         }
     }
