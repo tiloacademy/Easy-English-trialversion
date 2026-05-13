@@ -250,162 +250,101 @@ const VocabEngine = {
     init: function(topicData) {
         this.currentTopic = topicData;
         const vt = document.getElementById('vocab-title'); if(vt) vt.innerText = topicData.topic;
-        
-        // Reset giao diện về Màn hình chọn 3 Part
-        App.setDisplay('vocab-part-menu', 'flex'); 
-        App.setDisplay('vocab-learn-container', 'none'); 
-        App.setDisplay('vocab-pacman-container', 'none'); 
-        App.setDisplay('vocab-reading-container', 'none');
+        App.setDisplay('vocab-part-menu', 'flex'); App.setDisplay('vocab-learn-container', 'none'); App.setDisplay('vocab-pacman-container', 'none'); App.setDisplay('vocab-reading-container', 'none');
     },
 
-    // Kích hoạt Part 1: Học từ
-    startPart1: function() { 
-        App.setDisplay('vocab-part-menu', 'none'); 
-        App.setDisplay('vocab-learn-container', 'flex'); 
-        this.idx = 0; 
-        this.renderLearnCard(); 
-    },
+    startPart1: function() { App.setDisplay('vocab-part-menu', 'none'); App.setDisplay('vocab-learn-container', 'flex'); this.idx = 0; this.renderLearnCard(); },
+    startPart2: function() { App.setDisplay('vocab-part-menu', 'none'); App.setDisplay('vocab-pacman-container', 'flex'); alert("Sẵn sàng cho Game Pac-man nhé? Mình sẽ thiết kế ở bước tiếp theo!"); },
+    startPart3: function() { App.setDisplay('vocab-part-menu', 'none'); App.setDisplay('vocab-reading-container', 'flex'); ReadingEngine.init(this.currentTopic.reading); },
 
-    // Kích hoạt Part 2: Game Pacman
-    startPart2: function() {
-        App.setDisplay('vocab-part-menu', 'none'); 
-        App.setDisplay('vocab-pacman-container', 'flex'); 
-        alert("Sẵn sàng cho Game Pac-man nhé? Mình sẽ thiết kế ở bước tiếp theo!");
-    },
-
-    // Kích hoạt Part 3: Reading & Quiz
-    startPart3: function() {
-        App.setDisplay('vocab-part-menu', 'none'); 
-        App.setDisplay('vocab-reading-container', 'flex'); 
-        ReadingEngine.init(this.currentTopic.reading);
-    },
-renderLearnCard: function() {
+    renderLearnCard: function() {
         const item = this.currentTopic.vocab[this.idx];
         const vi = document.getElementById('v-learn-img'); if(vi) vi.src = item.img;
         const vs = document.getElementById('v-stars'); if(vs) { vs.innerText = "☆☆☆☆☆"; vs.className = "stars"; }
         const vf = document.getElementById('v-feedback'); if(vf) vf.innerText = "...";
         
-        // --- HÀM PHỤ TRỢ: VẼ TỪNG DÒNG IPA ---
+        // --- VẼ THANH CHẤM TRÒN ---
+        let progressData = JSON.parse(localStorage.getItem('eng_lesson_map') || '{}');
+        let completedSet = progressData[this.currentTopic.id] || []; // Lấy ID của Unit
+        const dotsContainer = document.getElementById('vocab-dots-container');
+        if (dotsContainer) {
+            dotsContainer.innerHTML = '';
+            this.currentTopic.vocab.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'lesson-dot';
+                if (completedSet.includes(i)) dot.classList.add('completed');
+                if (i === this.idx) dot.classList.add('active');
+                dot.onclick = () => { this.idx = i; this.renderLearnCard(); }; 
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // Vẽ 2 dòng (Từ & Câu)
         const renderParts = (partsArray, isSentence) => {
             if (!partsArray) return '';
-            let html = ''; 
-            let currentWordBuffer = [];
-            partsArray.forEach(p => { 
-                if (p.t === " ") { 
-                    if (currentWordBuffer.length > 0) { 
-                        html += `<div class="word-group">`; 
-                        currentWordBuffer.forEach(subP => { 
-                            const ipaHtml = subP.i || "&nbsp;"; 
-                            html += `<div class="char-block"><div class="${isSentence ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${isSentence ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; 
-                        }); 
-                        html += `</div>`; 
-                        currentWordBuffer = []; 
-                    } 
-                } else { 
-                    currentWordBuffer.push(p); 
-                } 
-            });
-            if (currentWordBuffer.length > 0) { 
-                html += `<div class="word-group">`; 
-                currentWordBuffer.forEach(subP => { 
-                    const ipaHtml = subP.i || "&nbsp;"; 
-                    html += `<div class="char-block"><div class="${isSentence ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${isSentence ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; 
-                }); 
-                html += `</div>`; 
-            }
+            let html = ''; let currentWordBuffer = [];
+            partsArray.forEach(p => { if (p.t === " ") { if (currentWordBuffer.length > 0) { html += `<div class="word-group">`; currentWordBuffer.forEach(subP => { const ipaHtml = subP.i || "&nbsp;"; html += `<div class="char-block"><div class="${isSentence ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${isSentence ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; }); html += `</div>`; currentWordBuffer = []; } } else { currentWordBuffer.push(p); } });
+            if (currentWordBuffer.length > 0) { html += `<div class="word-group">`; currentWordBuffer.forEach(subP => { const ipaHtml = subP.i || "&nbsp;"; html += `<div class="char-block"><div class="${isSentence ? 'sent-ipa' : 'cb-ipa'}">${ipaHtml}</div><div class="${isSentence ? 'sent-text' : 'cb-text'}">${subP.t}</div></div>`; }); html += `</div>`; }
             return html;
         };
 
-        // --- GHÉP 2 DÒNG LÊN GIAO DIỆN ---
         let html = '';
-        
-        // Dòng 1: Từ vựng (Chữ to)
-        html += '<div style="display:flex; justify-content:center; width:100%; margin-bottom: 25px;">';
-        html += renderParts(item.wordParts, false);
-        html += '</div>';
+        html += '<div style="display:flex; justify-content:center; width:100%; margin-bottom: 25px;">' + renderParts(item.wordParts, false) + '</div>';
+        html += '<div style="display:flex; justify-content:center; width:100%; flex-wrap: wrap;">' + renderParts(item.sentParts, true) + '</div>';
 
-        // Dòng 2: Câu ví dụ (Chữ nhỏ hơn)
-        html += '<div style="display:flex; justify-content:center; width:100%; flex-wrap: wrap;">';
-        html += renderParts(item.sentParts, true);
-        html += '</div>';
-
-        const vid = document.getElementById('v-info-display'); 
-        if(vid) vid.innerHTML = html;
-        
+        const vid = document.getElementById('v-info-display'); if(vid) vid.innerHTML = html;
         setTimeout(() => this.playCurrentWord(), 300);
     },
-    playCurrentWord: function() {
-        const item = this.currentTopic.vocab[this.idx];
-        
-        // 1. Tạo audio cho Từ vựng
-        const wordAudio = new Audio(item.audio);
-        
-        wordAudio.onended = () => {
-            // 2. Sau khi phát xong Từ vựng, chờ 0.5s rồi phát Câu ví dụ
-            if (item.exampleAudio) {
-                setTimeout(() => {
-                    const exampleAudio = new Audio(item.exampleAudio);
-                    exampleAudio.play().catch(e => console.log("Thiếu file câu ví dụ"));
-                }, 500);
-            }
-        };
 
-        wordAudio.play().catch(e => {
-            console.log("Thiếu file audio từ vựng: " + item.audio);
-            // Nếu không có file mp3, có thể dùng TTS chữa cháy hoặc bỏ qua
-        });
+    playCurrentWord: function() { 
+        const item = this.currentTopic.vocab[this.idx]; 
+        const wordAudio = new Audio(item.audio);
+        wordAudio.onended = () => { if (item.exampleAudio) { setTimeout(() => { const exampleAudio = new Audio(item.exampleAudio); exampleAudio.play().catch(e => console.log("Missing example audio")); }, 500); } };
+        wordAudio.play().catch(e => console.log("Missing word audio"));
     },
+    
     nav: function(d) { if (this.idx + d >= 0 && this.idx + d < this.currentTopic.vocab.length) { this.idx += d; this.renderLearnCard(); } },
+    
     startListening: function() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) return alert("Device not supported");
         const btn = document.getElementById('v-mic-btn'); if(btn){ btn.disabled = true; btn.innerText = "👂 Listening..."; btn.style.backgroundColor = "#e74c3c"; }
         const currentItem = this.currentTopic.vocab[this.idx]; const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start();
+        
         recognition.onresult = (e) => {
             const heard = e.results[0][0].transcript.toLowerCase(); const target = currentItem.speak.toLowerCase();
             const vs = document.getElementById('v-stars'); const vf = document.getElementById('v-feedback');
-            if (heard.includes(target)) { if(vs) {vs.innerText = "⭐⭐⭐⭐⭐"; vs.className = "stars active";} if(vf) vf.innerText = "Correct: " + heard; AudioEngine.playEffect('correct'); } 
-            else { if(vs) vs.innerText = "⭐☆☆☆☆"; if(vf) vf.innerText = "Heard: " + heard; AudioEngine.playEffect('wrong'); }
+            
+            if (heard.includes(target)) { 
+                if(vs) {vs.innerText = "⭐⭐⭐⭐⭐"; vs.className = "stars active";} 
+                if(vf) vf.innerText = "Correct: " + heard; 
+                AudioEngine.playEffect('correct'); 
+                
+                // LƯU TIẾN ĐỘ VÀ CỘNG GEM
+                StorageEngine.saveLessonProgress(this.currentTopic.id, this.idx);
+                StorageEngine.setGems(StorageEngine.getGems() + 2);
+                if(typeof App !== 'undefined') App.updateGemDisplay();
+                
+                // Kiểm tra xem đã hoàn thành 100% chưa
+                let totalItems = this.currentTopic.vocab.length;
+                let currentProgress = StorageEngine.getLessonProgress(this.currentTopic.id, totalItems);
+                if (currentProgress >= 100 && !this.currentTopic.completedFlag) {
+                    this.currentTopic.completedFlag = true;
+                    QuestEngine.updateWeeklyQuest();
+                    StorageEngine.setGems(StorageEngine.getGems() + 20); // Thưởng hoàn thành
+                    if(typeof App !== 'undefined') App.updateGemDisplay();
+                }
+
+            } else { 
+                if(vs) vs.innerText = "⭐☆☆☆☆"; 
+                if(vf) vf.innerText = "Heard: " + heard; 
+                AudioEngine.playEffect('wrong'); 
+            }
             this.resetMic();
         };
         recognition.onerror = () => this.resetMic(); recognition.onend = () => this.resetMic();
     },
-    resetMic: function() { const btn = document.getElementById('v-mic-btn'); if(btn){ btn.disabled = false; btn.innerText = "🎤 Read"; btn.style.backgroundColor = "#27ae60"; } },
-    startGame: function() {
-        App.setDisplay('vocab-mode-menu', 'none'); App.setDisplay('vocab-game-container', 'flex');
-        this.gameQueue = [...this.currentTopic.vocab]; this.gameQueue.sort(() => 0.5 - Math.random()); 
-        this.retryQueue = []; this.score = 0; this.streak = 0; this.updateScore(); this.nextQuestion();
-    },
-    nextQuestion: function() {
-        this.isProcessing = false;
-        if (this.gameQueue.length === 0) {
-            if (this.retryQueue.length > 0) { alert("Reviewing wrong answers! 💪"); this.gameQueue = [...this.retryQueue]; this.retryQueue = []; this.gameQueue.sort(() => 0.5 - Math.random()); } 
-            else { AudioEngine.playEffect('win'); alert(`GAME OVER! \n🏆 Final Score: ${this.score}`); App.openPart(3); return; }
-        }
-        this.currentQuestion = this.gameQueue.shift(); this.renderGameGrid(); setTimeout(() => this.playQuestion(), 500);
-    },
-    renderGameGrid: function() {
-        const grid = document.getElementById('vocab-grid'); if(!grid) return; grid.innerHTML = '';
-        let options = [this.currentQuestion]; let distractors = this.currentTopic.vocab.filter(v => v.speak !== this.currentQuestion.speak);
-        distractors.sort(() => 0.5 - Math.random()); options = options.concat(distractors.slice(0, 5)); options.sort(() => 0.5 - Math.random());
-        options.forEach(item => { const div = document.createElement('div'); div.className = 'v-card-game'; div.innerHTML = `<img src="${item.img}">`; div.onclick = (e) => this.checkAnswer(item, div, e); grid.appendChild(div); });
-    },
-    playQuestion: function() { const stemAudio = new Audio("sound_stem_find.mp3"); stemAudio.onended = () => { const wordAudio = new Audio(this.currentQuestion.speak + ".mp3"); wordAudio.play(); }; stemAudio.onerror = () => { const wordAudio = new Audio(this.currentQuestion.speak + ".mp3"); wordAudio.play(); }; stemAudio.play().catch(e => { const wordAudio = new Audio(this.currentQuestion.speak + ".mp3"); wordAudio.play(); }); },
-    checkAnswer: function(selectedItem, divElement, event) {
-        if (this.isProcessing) return;
-        if (selectedItem.speak === this.currentQuestion.speak) {
-            this.isProcessing = true; divElement.classList.add('correct'); AudioEngine.playEffect('correct');
-            this.streak++; const bonus = this.streak * 10; this.score += bonus;
-            let comboText = this.streak > 1 ? " Combo!" : ""; this.showFloatingText(event.clientX, event.clientY, `+${bonus}${comboText}`, "#4CAF50");
-            this.updateScore(); setTimeout(() => this.nextQuestion(), 1500);
-        } else {
-            divElement.classList.add('wrong'); AudioEngine.playEffect('wrong');
-            this.score -= 10; if (this.score < 0) this.score = 0; this.streak = 0;
-            this.showFloatingText(event.clientX, event.clientY, `-10`, "#F44336"); this.updateScore();
-            if (!this.retryQueue.find(i => i.speak === this.currentQuestion.speak)) { this.retryQueue.push(this.currentQuestion); }
-        }
-    },
-    showFloatingText: function(x, y, text, color) { const el = document.createElement('div'); el.className = 'floating-text'; el.innerText = text; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.color = color; el.style.fontSize = "30px"; el.style.zIndex = "9999"; document.body.appendChild(el); setTimeout(() => el.remove(), 800); },
-    updateScore: function() { let fire = this.streak > 1 ? "🔥 x" + this.streak : ""; const gs = document.getElementById('game-status'); if(gs) gs.innerHTML = `Score: ${this.score} <span style="color:orange; margin-left:10px;">${fire}</span>`; }
+    
+    resetMic: function() { const btn = document.getElementById('v-mic-btn'); if(btn){ btn.disabled = false; btn.innerText = "🎤 Read"; btn.style.backgroundColor = "#27ae60"; } }
 };
 
 /* --- READING ENGINE (CHẤM LỖI TỰ LUẬN & TRẮC NGHIỆM) --- */
