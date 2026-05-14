@@ -586,7 +586,7 @@ const VocabData = [
         topic: "Unit 1: Description",
         desc: "Description & Adjectives",
         color: "#e67e22",
-        // TỪ VỰNG DÀNH CHO PART 1 & PART 2 (29 TỪ CÓ TRÁI NGHĨA)
+        // 27 TỪ VỰNG KÈM CÂU VÍ DỤ (Đã nối tiếp cặp trái nghĩa)
         vocab: [
             // Cặp 1: Kích thước
             {
@@ -606,9 +606,9 @@ const VocabData = [
                 sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"long.", i:"lɔːŋ"}]
             },
             {
-                img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "It is short.mp3",
+                img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "He is short.mp3",
                 wordParts: [{t:"sh", i:"ʃ"}, {t:"or", i:"ɔːr"}, {t:"t", i:"t"}],
-                sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"short.", i:"ʃɔːrt"}]
+                sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"short.", i:"ʃɔːrt"}]
             },
             // Cặp 3: Trọng lượng
             {
@@ -654,7 +654,7 @@ const VocabData = [
                 wordParts: [{t:"d", i:"d"}, {t:"ir", i:"ɜːr"}, {t:"t", i:"t"}, {t:"y", i:"i"}],
                 sentParts: [{t:"They", i:"ðeɪ"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"dirty.", i:"ˈdɜːr.ti"}]
             },
-            // Cặp 7: Ngoại hình (Ốm/Mập)
+            // Cặp 7: Ngoại hình
             {
                 img: "fat.jpg", speak: "fat", audio: "fat.mp3", exampleAudio: "She is fat.mp3",
                 wordParts: [{t:"f", i:"f"}, {t:"a", i:"æ"}, {t:"t", i:"t"}],
@@ -709,7 +709,7 @@ const VocabData = [
                 wordParts: [{t:"k", i:"k"}, {t:"i", i:"aɪ"}, {t:"n", i:"n"}, {t:"d", i:"d"}],
                 sentParts: [{t:"You", i:"juː"}, {t:" "}, {t:"are", i:"ɑːr"}, {t:" "}, {t:"kind.", i:"kaɪnd"}]
             },
-            // Cặp 12: Đáng yêu / Xấu xí (It)
+            // Cặp 12: Dễ thương / Xấu xí
             {
                 img: "cute.jpg", speak: "cute", audio: "cute.mp3", exampleAudio: "It is cute.mp3",
                 wordParts: [{t:"c", i:"k"}, {t:"u", i:"juː"}, {t:"t", i:"t"}, {t:"e", i:""}],
@@ -720,17 +720,7 @@ const VocabData = [
                 wordParts: [{t:"u", i:"ʌ"}, {t:"g", i:"g"}, {t:"l", i:"l"}, {t:"y", i:"i"}],
                 sentParts: [{t:"It", i:"ɪt"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"ugly.", i:"ˈʌg.li"}]
             },
-            // Từ bổ sung không có cặp trực tiếp, hoặc dùng câu khác
-            {
-                img: "short.jpg", speak: "short", audio: "short.mp3", exampleAudio: "He is short.mp3",
-                wordParts: [{t:"sh", i:"ʃ"}, {t:"or", i:"ɔːr"}, {t:"t", i:"t"}],
-                sentParts: [{t:"He", i:"hiː"}, {t:" "}, {t:"is", i:"ɪz"}, {t:" "}, {t:"short.", i:"ʃɔːrt"}]
-            },
-            {
-                img: "cute.jpg", speak: "cute", audio: "cute.mp3", exampleAudio: "I am cute.mp3",
-                wordParts: [{t:"c", i:"k"}, {t:"u", i:"juː"}, {t:"t", i:"t"}, {t:"e", i:""}],
-                sentParts: [{t:"I", i:"aɪ"}, {t:" "}, {t:"am", i:"æm"}, {t:" "}, {t:"cute.", i:"kjuːt"}]
-            },
+            // Nhóm 13: Các từ còn lại
             {
                 img: "handsome.jpg", speak: "handsome", audio: "handsome.mp3", exampleAudio: "You are handsome.mp3",
                 wordParts: [{t:"h", i:"h"}, {t:"a", i:"æ"}, {t:"n", i:"n"}, {t:"d", i:""}, {t:"s", i:"s"}, {t:"o", i:"ə"}, {t:"m", i:"m"}, {t:"e", i:""}],
@@ -754,21 +744,11 @@ const VocabData = [
             text: "This is my brother. His name is Nam. He is fifteen years old. Nam is very tall and thin. He is also strong and brave. He is handsome because he has a nice smile. He is a very kind person.",
             audio: "reading_unit1.mp3", 
             quiz: [
-                // Part A: Yes/No
                 { type: "yesno", q: "1. Is Nam short?", a: "no" },
                 { type: "yesno", q: "2. Is he fifteen years old?", a: "yes" },
                 { type: "yesno", q: "3. Is Nam weak and brave?", a: "no" },
-                // Part B: Short Answer
-                { 
-                    type: "write", 
-                    q: "4. What is his name?", 
-                    a: ["his name is nam", "nam", "he is nam"] 
-                },
-                { 
-                    type: "write", 
-                    q: "5. Why is he handsome?", 
-                    a: ["because he has a nice smile", "he has a nice smile", "because of his nice smile"] 
-                }
+                { type: "write", q: "4. What is his name?", a: ["his name is nam", "nam", "he is nam"] },
+                { type: "write", q: "5. Why is he handsome?", a: ["because he has a nice smile", "he has a nice smile", "because of his nice smile"] }
             ]
         }
     }
