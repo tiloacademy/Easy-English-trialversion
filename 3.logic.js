@@ -519,7 +519,7 @@ const PacmanEngine = {
     pendingWords: [], activeFruits: [], ghosts: [], 
     currentTopic: null, score: 0, streak: 0, currentTarget: null,
     
-    // Bản đồ dọc cho điện thoại (15 hàng x 11 cột)
+    // Bản đồ dọc đã được dỡ bỏ các bức tường gây kẹt (15 hàng x 11 cột)
     mapLayout: [
         [1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,1,0,0,0,0,1],
@@ -528,7 +528,7 @@ const PacmanEngine = {
         [1,0,1,1,0,1,1,1,1,0,1],
         [1,0,0,0,0,0,0,0,0,0,1],
         [1,1,1,0,1,1,1,0,1,1,1],
-        [1,0,0,0,1,0,1,0,0,0,1], // Giữa là chuồng ma
+        [1,0,0,0,0,0,0,0,0,0,1], // Đã mở thông toàn bộ khu vực giữa
         [1,1,1,0,1,1,1,0,1,1,1],
         [1,0,0,0,0,0,0,0,0,0,1],
         [1,0,1,1,1,1,1,1,1,0,1],
@@ -544,16 +544,15 @@ const PacmanEngine = {
         this.pacman = {x: 1, y: 1}; 
         this.dir = {x: 0, y: 0}; this.nextDir = {x: 0, y: 0};
         
-        // Khởi tạo Ma ở chuồng (giữa bản đồ)
+        // Khởi tạo Ma ở góc dưới để tránh cắn Pacman ngay từ đầu
         this.ghosts = [
-            { x: 4, y: 7, color: 'red', dir: {x:0, y:-1} },
-            { x: 6, y: 7, color: 'blue', dir: {x:0, y:-1} }
+            { x: 1, y: 13, color: 'red', dir: {x:0, y:-1} },
+            { x: 9, y: 13, color: 'blue', dir: {x:0, y:-1} }
         ];
 
         document.getElementById('pacman-score').innerText = this.score;
         App.setDisplay('spell-modal', 'none');
         
-        // Trộn từ vựng và chỉ hiện tối đa 3 quả
         this.pendingWords = [...this.currentTopic.vocab].sort(() => 0.5 - Math.random());
         this.activeFruits = [];
         this.replenishFruits();
@@ -577,8 +576,7 @@ const PacmanEngine = {
         for(let r=1; r<14; r++) {
             for(let c=1; c<10; c++) {
                 if(this.mapLayout[r][c] === 0) {
-                    // Không đặt trái cây gần Pacman hoặc trong chuồng ma
-                    if(Math.abs(r - this.pacman.y) + Math.abs(c - this.pacman.x) > 3 && !(r===7)) {
+                    if(Math.abs(r - this.pacman.y) + Math.abs(c - this.pacman.x) > 3) {
                         emptySpots.push({x: c, y: r});
                     }
                 }
@@ -631,23 +629,21 @@ const PacmanEngine = {
 
         zone.ontouchmove = (e) => {
             if(!this.active) return;
-            e.preventDefault(); // Chống cuộn trang
+            e.preventDefault(); 
             let touch = e.touches[0];
             let dx = touch.clientX - startX;
             let dy = touch.clientY - startY;
             
-            // Giới hạn đồ họa stick trong vòng tròn
             let distance = Math.min(Math.hypot(dx, dy), 40);
             let angle = Math.atan2(dy, dx);
             let stickX = Math.cos(angle) * distance;
             let stickY = Math.sin(angle) * distance;
             stick.style.transform = `translate(calc(-50% + ${stickX}px), calc(-50% + ${stickY}px))`;
 
-            // Xác định hướng đi
             if (Math.abs(dx) > Math.abs(dy)) {
-                this.nextDir = {x: dx > 0 ? 1 : -1, y: 0}; // Trái Phải
+                this.nextDir = {x: dx > 0 ? 1 : -1, y: 0};
             } else {
-                this.nextDir = {x: 0, y: dy > 0 ? 1 : -1}; // Lên Xuống
+                this.nextDir = {x: 0, y: dy > 0 ? 1 : -1};
             }
         };
 
@@ -657,7 +653,6 @@ const PacmanEngine = {
     draw: function() {
         document.querySelectorAll('.pac-entity, .pac-fruit, .pac-ghost').forEach(el => el.remove());
 
-        // Vẽ Trái cây
         this.activeFruits.forEach(f => {
             let cell = document.getElementById(`pac-cell-${f.y}-${f.x}`);
             if(cell) {
@@ -668,7 +663,6 @@ const PacmanEngine = {
             }
         });
 
-        // Vẽ Ma
         this.ghosts.forEach(g => {
             let gCell = document.getElementById(`pac-cell-${g.y}-${g.x}`);
             if(gCell) {
@@ -678,7 +672,6 @@ const PacmanEngine = {
             }
         });
 
-        // Vẽ Pac-man
         let pCell = document.getElementById(`pac-cell-${this.pacman.y}-${this.pacman.x}`);
         if(pCell) {
             let pEl = document.createElement('div');
@@ -692,10 +685,17 @@ const PacmanEngine = {
         }
     },
 
+    changeDir: function(direction) {
+        if(!this.active) return;
+        if (direction === 'up') this.nextDir = {x: 0, y: -1};
+        if (direction === 'down') this.nextDir = {x: 0, y: 1};
+        if (direction === 'left') this.nextDir = {x: -1, y: 0};
+        if (direction === 'right') this.nextDir = {x: 1, y: 0};
+    },
+
     gameLoop: function() {
         if(!this.active) return;
 
-        // 1. Di chuyển Pacman
         let nextX = this.pacman.x + this.nextDir.x;
         let nextY = this.pacman.y + this.nextDir.y;
         if (this.mapLayout[nextY] && this.mapLayout[nextY][nextX] === 0) {
@@ -709,26 +709,22 @@ const PacmanEngine = {
             this.pacman.y = moveY;
         }
 
-        this.checkCollisions(); // Check ăn trái cây
+        this.checkCollisions();
 
-        // 2. Di chuyển Ma (AI thông minh)
         if(this.active) {
             this.ghosts.forEach(g => {
                 let options = [ {x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0} ];
                 let valid = options.filter(d => {
                     let nx = g.x + d.x, ny = g.y + d.y;
-                    // Không đi lùi lại hướng vừa đi để tránh giật lag
                     if (d.x === -g.dir.x && d.y === -g.dir.y && g.dir.x !== 0 && g.dir.y !== 0) return false;
                     return this.mapLayout[ny] && this.mapLayout[ny][nx] === 0;
                 });
                 
-                // Nếu bị kẹt (ngõ cụt), cho phép quay đầu
                 if(valid.length === 0) {
                     valid = options.filter(d => this.mapLayout[g.y + d.y] && this.mapLayout[g.y + d.y][g.x + d.x] === 0);
                 }
 
                 if(valid.length > 0) {
-                    // Ma có 60% tỷ lệ tìm đường ngắn nhất tới Pacman, 40% đi ngẫu nhiên (để trẻ em dễ thở hơn)
                     if (Math.random() > 0.4) {
                         valid.sort((a, b) => {
                             let distA = Math.abs((g.x+a.x) - this.pacman.x) + Math.abs((g.y+a.y) - this.pacman.y);
@@ -742,14 +738,13 @@ const PacmanEngine = {
                     g.x += g.dir.x; g.y += g.dir.y;
                 }
             });
-            this.checkCollisions(); // Check bị ma cắn
+            this.checkCollisions(); 
         }
 
         if(this.active) this.draw();
     },
 
     checkCollisions: function() {
-        // Ma cắn Pacman
         let caughtByGhost = this.ghosts.find(g => g.x === this.pacman.x && g.y === this.pacman.y);
         if (caughtByGhost) {
             AudioEngine.playEffect('wrong');
@@ -757,17 +752,16 @@ const PacmanEngine = {
             this.streak = 0;
             document.getElementById('pacman-score').innerText = this.score;
             
-            // Hiện số âm nổi lên
             let bRect = document.getElementById('pacman-board').getBoundingClientRect();
             let cW = bRect.width / 11; let cH = bRect.height / 15;
             this.showFloatingText(bRect.left + this.pacman.x * cW, bRect.top + this.pacman.y * cH, "-50", "#e74c3c");
             
-            // Đưa ma về chuồng
-            caughtByGhost.x = 5; caughtByGhost.y = 7;
+            // XỬ LÝ LỖI KẸT MA: Đưa ma bị chạm dội ngược về góc bản đồ (vị trí luôn thông thoáng)
+            caughtByGhost.x = (this.pacman.x > 5) ? 1 : 9; 
+            caughtByGhost.y = (this.pacman.y > 7) ? 1 : 13;
             return;
         }
 
-        // Pacman ăn trái cây
         let fruitIndex = this.activeFruits.findIndex(f => f.x === this.pacman.x && f.y === this.pacman.y);
         if(fruitIndex !== -1) {
             this.active = false; 
@@ -778,13 +772,11 @@ const PacmanEngine = {
 
     showSpellModal: function() {
         App.setDisplay('spell-modal', 'flex');
-        document.getElementById('joystick-base').style.display = 'none'; // Giấu joystick đi
+        document.getElementById('joystick-base').style.display = 'none'; 
         document.getElementById('spell-img').src = this.currentTarget.data.wordData.img;
         document.getElementById('spell-input').value = "";
         document.getElementById('spell-feedback').innerText = "";
         setTimeout(() => this.playSpellAudio(), 300);
-        
-        // Tự động focus vào ô nhập liệu
         setTimeout(() => document.getElementById('spell-input').focus(), 500);
     },
 
@@ -819,13 +811,12 @@ const PacmanEngine = {
             feedbackEl.innerText = `Chưa đúng! Đáp án là:\n${targetWord.toUpperCase()}`;
             feedbackEl.style.color = "#e74c3c";
             
-            // Xóa trái cây khỏi map nhưng ném lại vào pool để hỏi lại sau
             let failedFruit = this.activeFruits.splice(this.currentTarget.index, 1)[0];
             this.pendingWords.push(failedFruit.wordData); 
             this.replenishFruits();
             this.updateFruitCount();
 
-            setTimeout(() => this.resumeGame(), 3000); // Nhìn đáp án lâu hơn
+            setTimeout(() => this.resumeGame(), 3000);
         }
     },
 
@@ -857,7 +848,6 @@ const PacmanEngine = {
         let msg = `🎉 GAME OVER! 🎉\n\nYour Score: ${this.score}\n🏆 High Score: ${recordData.highScore}`;
         if(recordData.isNewRecord) msg += "\n🔥 NEW RECORD! 🔥";
         
-        // Thưởng thêm gem khi thắng
         StorageEngine.setGems(StorageEngine.getGems() + 20);
         App.updateGemDisplay();
 
@@ -867,7 +857,6 @@ const PacmanEngine = {
         App.setDisplay('vocab-part-menu', 'flex'); 
     }
 };
-
 /* --- APP CONTROLLER (CHỐNG LỖI CSS & BẢO VỆ GIAO DIỆN) --- */
 const App = {
     currentPart: 0, 
