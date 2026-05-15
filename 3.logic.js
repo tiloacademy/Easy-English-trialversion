@@ -1054,9 +1054,23 @@ const App = {
 window.onload = function() { App.init(); };
 
 window.addEventListener('keydown', (e) => { 
-    if (typeof SnakeEngine !== 'undefined' && !SnakeEngine.active) return; 
-    if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); 
-    else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); 
-    else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); 
-    else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); 
+    // Điều hướng cho Game Rắn săn mồi
+    if (typeof SnakeEngine !== 'undefined' && SnakeEngine.active) {
+        if (e.key === 'ArrowUp') SnakeEngine.changeDirection('up'); 
+        else if (e.key === 'ArrowDown') SnakeEngine.changeDirection('down'); 
+        else if (e.key === 'ArrowLeft') SnakeEngine.changeDirection('left'); 
+        else if (e.key === 'ArrowRight') SnakeEngine.changeDirection('right'); 
+    }
+    
+    // Điều hướng cho Game Pac-man
+    if (typeof PacmanEngine !== 'undefined' && PacmanEngine.active) {
+        // Chống cuộn trang khi bấm phím mũi tên trên PC
+        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.key) > -1) {
+            e.preventDefault();
+        }
+        if (e.key === 'ArrowUp') PacmanEngine.changeDir('up'); 
+        else if (e.key === 'ArrowDown') PacmanEngine.changeDir('down'); 
+        else if (e.key === 'ArrowLeft') PacmanEngine.changeDir('left'); 
+        else if (e.key === 'ArrowRight') PacmanEngine.changeDir('right'); 
+    }
 });
