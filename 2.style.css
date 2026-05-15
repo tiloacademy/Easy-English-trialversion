@@ -247,3 +247,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
   75% { transform: translateX(-5px); border-color: #e74c3c; }
   100% { transform: translateX(0); }
 }
+
+/* --- PAC-MAN GAME STYLES --- */
+#pacman-board { display: grid; background: black; padding: 5px; gap: 2px; }
+.pac-cell { width: 100%; height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.pac-wall { background: #1919A6; border: 1px solid #2424FF; box-shadow: inset 0 0 5px #000; border-radius: 2px; }
+.pac-path { background: #000; }
+.pac-entity { background-color: yellow; border-radius: 50%; width: 80%; height: 80%; transition: all 0.2s linear; }
+.pac-fruit { font-size: 18px; line-height: 1; filter: drop-shadow(0 0 5px rgba(255,255,255,0.8)); }
+
+/* Hiệu ứng mồm há/ngậm của Pac-man */
+.pac-entity.up { clip-path: polygon(100% 74%, 44% 48%, 100% 21%, 100% 0, 74% 0, 0 0, 0 100%, 74% 100%, 100% 100%); }
+.pac-entity.down { clip-path: polygon(100% 74%, 44% 48%, 100% 21%, 100% 100%, 74% 100%, 0 100%, 0 0, 74% 0, 100% 0); transform: rotate(180deg); }
+.pac-entity.left { clip-path: polygon(100% 74%, 44% 48%, 100% 21%, 100% 0, 74% 0, 0 0, 0 100%, 74% 100%, 100% 100%); transform: rotate(-90deg); }
+.pac-entity.right { clip-path: polygon(100% 74%, 44% 48%, 100% 21%, 100% 0, 74% 0, 0 0, 0 100%, 74% 100%, 100% 100%); transform: rotate(90deg); }
