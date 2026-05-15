@@ -522,7 +522,8 @@ const PacmanEngine = {
    stop: function() {
         this.active = false;
         clearInterval(this.loopId);
-    
+      },
+
     // Bản đồ dọc đã được dỡ bỏ các bức tường gây kẹt (15 hàng x 11 cột)
     mapLayout: [
         [1,1,1,1,1,1,1,1,1,1,1],
