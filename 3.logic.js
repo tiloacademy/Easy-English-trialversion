@@ -512,6 +512,240 @@ const ReadingEngine = {
     }
 };
 
+/* --- PACMAN SPELLING ENGINE --- */
+const PacmanEngine = {
+    active: false, loopId: null, board: [], pacman: {x: 1, y: 1}, 
+    dir: {x: 0, y: 0}, nextDir: {x: 0, y: 0},
+    fruits: [], currentTopic: null, score: 0, streak: 0, currentTarget: null,
+    
+    // Bản đồ: 1 là tường, 0 là đường đi (11x11 grid)
+    mapLayout: [
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,1,0,0,0,0,1],
+        [1,0,1,1,0,1,0,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,0,1,1,0,1],
+        [1,0,0,0,0,1,0,0,0,0,1],
+        [1,0,1,1,0,1,0,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,0,1,1,0,1],
+        [1,0,0,0,0,1,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1]
+    ],
+
+    start: function(topicData) {
+        this.currentTopic = topicData;
+        this.active = true; this.score = 0; this.streak = 0;
+        this.pacman = {x: 1, y: 1}; 
+        this.dir = {x: 0, y: 0}; this.nextDir = {x: 0, y: 0};
+        
+        document.getElementById('pacman-score').innerText = this.score;
+        App.setDisplay('spell-modal', 'none');
+        
+        this.spawnFruits();
+        this.createBoard();
+        this.draw();
+        
+        clearInterval(this.loopId);
+        this.loopId = setInterval(() => this.gameLoop(), 350); // Tốc độ di chuyển
+    },
+
+    spawnFruits: function() {
+        this.fruits = [];
+        let vocabList = [...this.currentTopic.vocab];
+        vocabList.sort(() => 0.5 - Math.random()); // Trộn từ vựng ngẫu nhiên
+
+        const fruitIcons = ['🍎', '🍓', '🍇', '🍒', '🍑', '🍍', '🥝', '🍉'];
+        
+        // Tìm các ô đường đi (số 0) để đặt trái cây
+        let emptySpots = [];
+        for(let r=0; r<this.mapLayout.length; r++) {
+            for(let c=0; c<this.mapLayout[r].length; c++) {
+                if(this.mapLayout[r][c] === 0 && !(r===1 && c===1)) {
+                    emptySpots.push({x: c, y: r});
+                }
+            }
+        }
+        emptySpots.sort(() => 0.5 - Math.random());
+
+        // Đặt trái cây lên bản đồ dựa trên số lượng từ vựng
+        for(let i=0; i < vocabList.length; i++) {
+            if(i >= emptySpots.length) break; // Hết chỗ
+            let spot = emptySpots[i];
+            let icon = fruitIcons[i % fruitIcons.length];
+            this.fruits.push({ x: spot.x, y: spot.y, wordData: vocabList[i], icon: icon });
+        }
+        document.getElementById('pacman-fruits').innerText = this.fruits.length;
+    },
+
+    createBoard: function() {
+        const boardEl = document.getElementById('pacman-board');
+        if(!boardEl) return;
+        const rows = this.mapLayout.length;
+        const cols = this.mapLayout[0].length;
+        boardEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        boardEl.innerHTML = '';
+        
+        for(let r=0; r<rows; r++) {
+            for(let c=0; c<cols; c++) {
+                let cell = document.createElement('div');
+                cell.className = 'pac-cell ' + (this.mapLayout[r][c] === 1 ? 'pac-wall' : 'pac-path');
+                cell.id = `pac-cell-${r}-${c}`;
+                boardEl.appendChild(cell);
+            }
+        }
+    },
+
+    draw: function() {
+        // Xóa Pacman và Trái cây cũ
+        document.querySelectorAll('.pac-entity').forEach(el => el.remove());
+        document.querySelectorAll('.pac-fruit').forEach(el => el.remove());
+
+        // Vẽ Trái cây
+        this.fruits.forEach(f => {
+            let cell = document.getElementById(`pac-cell-${f.y}-${f.x}`);
+            if(cell) {
+                let fruitEl = document.createElement('div');
+                fruitEl.className = 'pac-fruit';
+                fruitEl.innerText = f.icon;
+                cell.appendChild(fruitEl);
+            }
+        });
+
+        // Vẽ Pac-man
+        let pCell = document.getElementById(`pac-cell-${this.pacman.y}-${this.pacman.x}`);
+        if(pCell) {
+            let pEl = document.createElement('div');
+            pEl.className = 'pac-entity';
+            // Đổi góc há mồm theo hướng đi
+            if(this.dir.x === 1) pEl.classList.add('right');
+            else if(this.dir.x === -1) pEl.classList.add('left');
+            else if(this.dir.y === 1) pEl.classList.add('down');
+            else if(this.dir.y === -1) pEl.classList.add('up');
+            else pEl.classList.add('right');
+            
+            pCell.appendChild(pEl);
+        }
+    },
+
+    changeDir: function(direction) {
+        if(!this.active) return;
+        if (direction === 'up') this.nextDir = {x: 0, y: -1};
+        if (direction === 'down') this.nextDir = {x: 0, y: 1};
+        if (direction === 'left') this.nextDir = {x: -1, y: 0};
+        if (direction === 'right') this.nextDir = {x: 1, y: 0};
+    },
+
+    gameLoop: function() {
+        if(!this.active) return;
+
+        // Thử rẽ theo hướng mới (nextDir), nếu vướng tường thì giữ hướng cũ (dir)
+        let nextX = this.pacman.x + this.nextDir.x;
+        let nextY = this.pacman.y + this.nextDir.y;
+        
+        if (this.mapLayout[nextY] && this.mapLayout[nextY][nextX] === 0) {
+            this.dir = {...this.nextDir}; 
+        }
+
+        // Cập nhật tọa độ
+        let moveX = this.pacman.x + this.dir.x;
+        let moveY = this.pacman.y + this.dir.y;
+
+        // Nếu hướng hiện tại không đụng tường thì đi tới
+        if (this.mapLayout[moveY] && this.mapLayout[moveY][moveX] === 0) {
+            this.pacman.x = moveX;
+            this.pacman.y = moveY;
+        }
+
+        this.draw();
+        this.checkCollision();
+    },
+
+    checkCollision: function() {
+        let fruitIndex = this.fruits.findIndex(f => f.x === this.pacman.x && f.y === this.pacman.y);
+        if(fruitIndex !== -1) {
+            this.active = false; // Tạm dừng game
+            this.currentTarget = { index: fruitIndex, data: this.fruits[fruitIndex] };
+            this.showSpellModal();
+        }
+    },
+
+    showSpellModal: function() {
+        App.setDisplay('spell-modal', 'flex');
+        document.getElementById('spell-img').src = this.currentTarget.data.wordData.img;
+        document.getElementById('spell-input').value = "";
+        document.getElementById('spell-feedback').innerText = "";
+        
+        setTimeout(() => this.playSpellAudio(), 300);
+    },
+
+    playSpellAudio: function() {
+        if(this.currentTarget) {
+            AudioEngine.playSequence(this.currentTarget.data.wordData.audio, null);
+        }
+    },
+
+    checkSpelling: function() {
+        let inputVal = document.getElementById('spell-input').value.trim().toLowerCase();
+        let targetWord = this.currentTarget.data.wordData.speak.toLowerCase();
+        let feedbackEl = document.getElementById('spell-feedback');
+
+        if(inputVal === targetWord) {
+            // TRẢ LỜI ĐÚNG
+            AudioEngine.playEffect('correct');
+            feedbackEl.innerText = "Excellent! +100";
+            feedbackEl.style.color = "#2ecc71";
+            
+            this.streak++;
+            this.score += 100 + (this.streak * 10); // Thêm điểm Combo
+            document.getElementById('pacman-score').innerText = this.score;
+            
+            this.fruits.splice(this.currentTarget.index, 1); // Ăn trái cây
+            document.getElementById('pacman-fruits').innerText = this.fruits.length;
+            
+            setTimeout(() => this.resumeGame(), 1000);
+        } else {
+            // TRẢ LỜI SAI
+            AudioEngine.playEffect('wrong');
+            this.streak = 0; // Mất combo
+            feedbackEl.innerText = "Sai rồi! Từ đúng là: " + targetWord;
+            feedbackEl.style.color = "#e74c3c";
+            
+            this.fruits.splice(this.currentTarget.index, 1); // Xóa trái cây (không được điểm)
+            document.getElementById('pacman-fruits').innerText = this.fruits.length;
+
+            setTimeout(() => this.resumeGame(), 2500); // Đợi lâu hơn để bé nhìn đáp án
+        }
+    },
+
+    resumeGame: function() {
+        App.setDisplay('spell-modal', 'none');
+        if(this.fruits.length === 0) {
+            this.endGame();
+        } else {
+            this.active = true;
+        }
+    },
+
+    endGame: function() {
+        clearInterval(this.loopId);
+        AudioEngine.playEffect('win');
+        
+        // Lưu kỷ lục riêng cho Pacman của Unit này
+        const gameId = 'pacman_' + this.currentTopic.id;
+        const recordData = StorageEngine.saveHighScore(gameId, this.score);
+        
+        let msg = `🎉 GAME OVER! 🎉\n\nYour Score: ${this.score}\n🏆 High Score: ${recordData.highScore}`;
+        if(recordData.isNewRecord) msg += "\n🔥 NEW RECORD! 🔥";
+        
+        alert(msg);
+        
+        App.setDisplay('vocab-pacman-container', 'none');
+        App.setDisplay('vocab-part-menu', 'flex'); // Quay về màn hình chọn Part
+    }
+};
+
 /* --- APP CONTROLLER (CHỐNG LỖI CSS & BẢO VỆ GIAO DIỆN) --- */
 const App = {
     currentPart: 0, 
