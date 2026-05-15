@@ -254,7 +254,12 @@ const VocabEngine = {
     },
 
     startPart1: function() { App.setDisplay('vocab-part-menu', 'none'); App.setDisplay('vocab-learn-container', 'flex'); this.idx = 0; this.renderLearnCard(); },
-    startPart2: function() { App.setDisplay('vocab-part-menu', 'none'); App.setDisplay('vocab-pacman-container', 'flex'); alert("Sẵn sàng cho Game Pac-man nhé? Mình sẽ thiết kế ở bước tiếp theo!"); },
+    startPart2: function() { 
+        App.setDisplay('vocab-part-menu', 'none'); 
+        App.setDisplay('vocab-pacman-container', 'flex'); 
+        // GỌI ENGINE PACMAN Ở ĐÂY
+        if(typeof PacmanEngine !== 'undefined') PacmanEngine.start(this.currentTopic);
+    },
     startPart3: function() { App.setDisplay('vocab-part-menu', 'none'); App.setDisplay('vocab-reading-container', 'flex'); ReadingEngine.init(this.currentTopic.reading); },
 
     renderLearnCard: function() {
