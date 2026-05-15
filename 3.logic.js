@@ -248,6 +248,7 @@ const VocabEngine = {
     currentTopic: null, idx: 0, gameQueue: [], retryQueue: [], currentQuestion: null, score: 0, streak: 0, isProcessing: false, 
     
     init: function(topicData) {
+       if (typeof PacmanEngine !== 'undefined') PacmanEngine.stop();
         this.currentTopic = topicData;
         const vt = document.getElementById('vocab-title'); if(vt) vt.innerText = topicData.topic;
         App.setDisplay('vocab-part-menu', 'flex'); App.setDisplay('vocab-learn-container', 'none'); App.setDisplay('vocab-pacman-container', 'none'); App.setDisplay('vocab-reading-container', 'none');
@@ -518,6 +519,9 @@ const PacmanEngine = {
     dir: {x: 0, y: 0}, nextDir: {x: 0, y: 0},
     pendingWords: [], activeFruits: [], ghosts: [], 
     currentTopic: null, score: 0, streak: 0, currentTarget: null,
+   stop: function() {
+        this.active = false;
+        clearInterval(this.loopId);
     
     // Bản đồ dọc đã được dỡ bỏ các bức tường gây kẹt (15 hàng x 11 cột)
     mapLayout: [
@@ -922,7 +926,8 @@ const App = {
     },
     openPart: function(partId) { 
         this.currentPart = partId; 
-        AudioEngine.unlock(); 
+        AudioEngine.unlock();
+       if (typeof PacmanEngine !== 'undefined') PacmanEngine.stop();
         this.setDisplay('landing-screen', 'none');
         this.setDisplay('shadowing-screen', 'none');
         this.setDisplay('menu-screen', 'none');
@@ -1041,7 +1046,10 @@ const App = {
     },
     exitGame: function() { GameEngine.stop(); if(typeof LearningEngine !== 'undefined') LearningEngine.render(); },
     goHome: function() { 
-        AudioEngine.stopAllAndBlock(); GameEngine.stop(); ShadowingEngine.stopLoop(); 
+        AudioEngine.stopAllAndBlock(); 
+        if (typeof GameEngine !== 'undefined') GameEngine.stop(); 
+        if (typeof ShadowingEngine !== 'undefined') ShadowingEngine.stopLoop(); 
+        if (typeof PacmanEngine !== 'undefined') PacmanEngine.stop(); 
         this.setDisplay('main-container', 'none');
         this.setDisplay('menu-screen', 'none');
         this.setDisplay('ipa-screen', 'none');
