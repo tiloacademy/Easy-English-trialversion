@@ -1,12 +1,67 @@
 /* ==========================================================================
    FILE: 3.logic.js (BẢN FIX LỖI MÀN HÌNH TRẮNG & HOÀN CHỈNH)
    ========================================================================== */
+/* --- FIREBASE CLOUD ENGINE --- */
+const firebaseConfig = {
+  apiKey: "AIzaSyCk9Veg-KdfoRrOsf_DxujJr-cXG7QY4t4",
+  authDomain: "english-with-love-6cc34.firebaseapp.com",
+  projectId: "english-with-love-6cc34",
+  storageBucket: "english-with-love-6cc34.firebasestorage.app",
+  messagingSenderId: "350194145970",
+  appId: "1:350194145970:web:46a048c463b24796dbc7ab",
+  measurementId: "G-Z1VZF8QJC8"
+};
+
+// Khởi tạo kết nối
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = typeof firebase !== 'undefined' ? firebase.firestore() : null;
+
+// Cỗ máy đồng bộ dữ liệu
+const CloudEngine = {
+    syncUp: function() {
+        if (!db) return;
+        const username = StorageEngine.getUserName();
+        if (!username) return;
+        const dataToSave = {
+            gems: StorageEngine.getGems(),
+            highscores: localStorage.getItem('eng_highscores') || '{}',
+            lessonMap: localStorage.getItem('eng_lesson_map') || '{}',
+            weeklyQuest: localStorage.getItem('eng_weekly_quest') || '{"count":0}'
+        };
+        db.collection("users").doc(username).set(dataToSave)
+          .then(() => console.log("☁️ Đã lưu mây thành công!"))
+          .catch((error) => console.error("Lỗi lưu mây: ", error));
+    },
+
+    syncDown: function(username, callback) {
+        if (!db) { if (callback) callback(); return; }
+        db.collection("users").doc(username).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                localStorage.setItem('eng_gems', data.gems);
+                localStorage.setItem('eng_highscores', data.highscores);
+                localStorage.setItem('eng_lesson_map', data.lessonMap);
+                localStorage.setItem('eng_weekly_quest', data.weeklyQuest);
+                console.log("☁️ Đã tải dữ liệu từ mây về!");
+            }
+            if (callback) callback();
+        }).catch((error) => {
+            console.error("Lỗi tải mây: ", error);
+            if (callback) callback();
+        });
+    }
+};
 
 /* --- STORAGE & QUEST ENGINE --- */
 const StorageEngine = {
     setUserName: (name) => localStorage.setItem('eng_username', name),
     getUserName: () => localStorage.getItem('eng_username'),
-    setGems: (val) => localStorage.setItem('eng_gems', val),
+    setGems: (val) => { 
+        localStorage.setItem('eng_gems', val); 
+        if (typeof CloudEngine !== 'undefined') CloudEngine.syncUp(); 
+    },
     getGems: () => parseInt(localStorage.getItem('eng_gems') || '0'),
     
     saveHighScore: function(gameId, currentScore) {
@@ -15,6 +70,7 @@ const StorageEngine = {
         if (!highScores[gameId] || currentScore > highScores[gameId]) {
             highScores[gameId] = currentScore;
             localStorage.setItem('eng_highscores', JSON.stringify(highScores));
+            if (typeof CloudEngine !== 'undefined') CloudEngine.syncUp();
             isNewRecord = true;
         }
         return { highScore: highScores[gameId], isNewRecord: isNewRecord };
@@ -25,6 +81,7 @@ const StorageEngine = {
         if (!progress[lessonId].includes(itemIdx)) {
             progress[lessonId].push(itemIdx);
             localStorage.setItem('eng_lesson_map', JSON.stringify(progress));
+            if (typeof CloudEngine !== 'undefined') CloudEngine.syncUp();
         }
     },
     getLessonProgress: (lessonId, totalItems) => {
@@ -878,18 +935,28 @@ const App = {
                 setTimeout(() => {
                     let pName = prompt("Welcome! 👋 Chào mừng bạn! \nVui lòng nhập tên của bạn:");
                     if (pName && pName.trim() !== "") {
-                        StorageEngine.setUserName(pName.trim());
-                        if (nameDisplay) nameDisplay.innerText = pName.trim();
-                        this.updateGemDisplay();
-                        this.renderQuests();
+                        const finalName = pName.trim();
+                        StorageEngine.setUserName(finalName);
+                        
+                        if (typeof CloudEngine !== 'undefined') {
+                            CloudEngine.syncDown(finalName, () => {
+                                if (nameDisplay) nameDisplay.innerText = finalName;
+                                this.updateGemDisplay();
+                                this.renderQuests();
+                            });
+                        }
                     }
                 }, 500);
             }
         } else {
             if (onboardScreen) onboardScreen.style.display = 'none';
-            if (nameDisplay) nameDisplay.innerText = name;
-            this.updateGemDisplay();
-            this.renderQuests();
+            if (typeof CloudEngine !== 'undefined') {
+                CloudEngine.syncDown(name, () => {
+                    if (nameDisplay) nameDisplay.innerText = name;
+                    this.updateGemDisplay();
+                    this.renderQuests();
+                });
+            }
         }
         
         this.setDisplay('landing-screen', 'flex'); 
