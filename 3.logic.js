@@ -30,14 +30,14 @@ const CloudEngine = {
             lessonMap: localStorage.getItem('eng_lesson_map') || '{}',
             weeklyQuest: localStorage.getItem('eng_weekly_quest') || '{"count":0}'
         };
-        db.collection("users").doc(username).set(dataToSave)
+        db.collection("users_test").doc(username).set(dataToSave)
           .then(() => console.log("☁️ Đã lưu mây thành công!"))
           .catch((error) => console.error("Lỗi lưu mây: ", error));
     },
 
     syncDown: function(username, callback) {
         if (!db) { if (callback) callback(); return; }
-        db.collection("users").doc(username).get().then((doc) => {
+        db.collection("users_test").doc(username).get().then((doc) => {
             if (doc.exists) {
                 const data = doc.data();
                 localStorage.setItem('eng_gems', data.gems);
